@@ -1,0 +1,35 @@
+1. Finnish the implementation of Holstein Event
+	- The Abstract Base Class  structure is already there to accept the
+	  Holstein Events
+	- The Physics is the main difficulty to implement 
+
+2. Increase the use of histograms. 
+	- With the increased avaliablity of histograms it might be useful to strip out 
+	  lots of the file i/o to make the code clearer or at least set up 
+	  functions and flags to turn it off. 
+
+3. Scriptability 
+	- I have given up on being able to use scripts to control batch jobs.
+	  The built in facility for doing this seg faults every time. I could 
+	  rewrite the scripting utility to use a much simpler interface that 
+	  would take a file redirected from the OS as inut but this just seems 
+	  like a big time sink with not that much benifit. 
+
+4. Geometry 
+	- Implement the shake-off electron detector properly and put in the 
+	  recoil ion detector. 
+
+5. Particles 
+	- Right now the only Ar species that is being produced is Ar^1-. 
+	  What we should realy do is implement a scheme for producing 
+	  a charge state distribution that matchs measurments.
+
+	  UPDATE:
+	  As of Dec 1 2011 I have a c++ class that will choose a charge state
+	  according to the percent yields that I supply to it. I am currently
+	  trying to find what the yields actually are. I am going to try 
+	  an migrate my module into the K37 source code. 
+	  
+6. Timing 
+	- When the Ar is implemented it would be nice to implement a timing signal
+	  for the different charge states as they hit the recoil detector. 
