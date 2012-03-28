@@ -47,7 +47,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(K37DetectorConstruction* de
 	ion = particleTable->GetIon(18,37,0);
 
 	G4cout<<"::::::::::::::::::::::::::::::::::::::::::::::::::::::::"<<G4endl;
-	G4cout<<"The fermi function from evGenerator is: "<<G4endl;
+	//G4cout<<"The fermi function from evGenerator is: "<<G4endl;
 	evGenerator->MakeEvent();
 	////G4IonTable* ionTable = particleTable-> GetIonTable();
 	////ionTable->DumpTable();	
@@ -123,7 +123,7 @@ void K37PrimaryGeneratorAction::setBetaVertex()
 void K37PrimaryGeneratorAction::setDaughterVertex()
 {
 	vertex = new G4PrimaryVertex(EventVertex,0);
-	G4PrimaryParticle* particle = new G4PrimaryParticle(Ar37MinusParticle ,evGenerator->dMomentumX(),evGenerator->dMomentumY(),evGenerator->dMomentumZ());
+	G4PrimaryParticle* particle = new G4PrimaryParticle(ion, evGenerator->dMomentumX(),evGenerator->dMomentumY(),evGenerator->dMomentumZ());
 	vertex->SetPrimary(particle);
 }
 
