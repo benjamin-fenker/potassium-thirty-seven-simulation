@@ -1,20 +1,20 @@
 
-#ifndef K37ScintillatorPlusZSD_h
-#define K37ScintillatorPlusZSD_h 1
+#ifndef K37ScintillatorSD_h
+#define K37ScintillatorSD_h 1
 
 #include "G4VSensitiveDetector.hh"
-#include "K37ScintillatorPlusZHit.hh"
+#include "K37ScintillatorHit.hh"
 
 class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
-class K37ScintillatorPlusZSD : public G4VSensitiveDetector
+class K37ScintillatorSD : public G4VSensitiveDetector
 {
 
   public:
-      K37ScintillatorPlusZSD(G4String name);
-      ~K37ScintillatorPlusZSD();
+      K37ScintillatorSD(G4String name);
+      ~K37ScintillatorSD();
 
       void Initialize(G4HCofThisEvent*HCE);
       G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
@@ -24,7 +24,7 @@ class K37ScintillatorPlusZSD : public G4VSensitiveDetector
       void PrintAll();
 
   private:
-      K37ScintillatorPlusZHitsCollection *fullenergy1Collection;
+      K37ScintillatorHitsCollection *fullenergy1Collection;
 
   public:
 };

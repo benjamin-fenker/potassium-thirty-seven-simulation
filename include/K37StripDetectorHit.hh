@@ -1,6 +1,6 @@
 
-#ifndef K37StripDetectorMinusZHit_h
-#define K37StripDetectorMinusZHit_h 1
+#ifndef K37StripDetectorHit_h
+#define K37StripDetectorHit_h 1
 
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
@@ -10,15 +10,15 @@
 
 class G4AttDef;
 
-class K37StripDetectorMinusZHit : public G4VHit
+class K37StripDetectorHit : public G4VHit
 {
   public:
 
-      K37StripDetectorMinusZHit();
-      ~K37StripDetectorMinusZHit();
-      K37StripDetectorMinusZHit(const K37StripDetectorMinusZHit &right);
-      const K37StripDetectorMinusZHit& operator=(const K37StripDetectorMinusZHit &right);
-      G4int operator==(const K37StripDetectorMinusZHit &right) const;
+      K37StripDetectorHit();
+      ~K37StripDetectorHit();
+      K37StripDetectorHit(const K37StripDetectorHit &right);
+      const K37StripDetectorHit& operator=(const K37StripDetectorHit &right);
+      G4int operator==(const K37StripDetectorHit &right) const;
 
       inline void *operator new(size_t);
       inline void operator delete(void *aHit);
@@ -29,13 +29,14 @@ class K37StripDetectorMinusZHit : public G4VHit
       void Print();
 
   private:
-      G4double edep;
-      G4ThreeVector pos1;
-      G4ThreeVector pos2;
-      G4double time;
-      G4double good;
-      G4bool primary;
-      static std::map<G4String,G4AttDef> fAttDefs;
+	G4double edep;
+	G4ThreeVector pos1;
+	G4ThreeVector pos2;
+	G4double time;
+	G4double good;
+	G4bool primary;
+	G4bool SoftwareVeto;
+	static std::map<G4String,G4AttDef> fAttDefs;
 
 public:
 
@@ -68,24 +69,29 @@ public:
 	{ time = tim; }
 	inline G4double GetTime()
 	{ return time; }
+	
+	inline void SetSoftwareVeto(G4bool sof)
+	{ SoftwareVeto = sof; }
+	inline G4double GetSoftwareVeto()
+	{ return SoftwareVeto; }
 	  
       
 };
 
-typedef G4THitsCollection<K37StripDetectorMinusZHit> K37StripDetectorMinusZHitsCollection;
+typedef G4THitsCollection<K37StripDetectorHit> K37StripDetectorHitsCollection;
 
-extern G4Allocator<K37StripDetectorMinusZHit> K37StripDetectorMinusZHitAllocator;
+extern G4Allocator<K37StripDetectorHit> K37StripDetectorHitAllocator;
 
-inline void* K37StripDetectorMinusZHit::operator new(size_t)
+inline void* K37StripDetectorHit::operator new(size_t)
 {
   void *aHit;
-  aHit = (void *) K37StripDetectorMinusZHitAllocator.MallocSingle();
+  aHit = (void *) K37StripDetectorHitAllocator.MallocSingle();
   return aHit;
 }
 
-inline void K37StripDetectorMinusZHit::operator delete(void *aHit)
+inline void K37StripDetectorHit::operator delete(void *aHit)
 {
-  K37StripDetectorMinusZHitAllocator.FreeSingle((K37StripDetectorMinusZHit*) aHit);
+  K37StripDetectorHitAllocator.FreeSingle((K37StripDetectorHit*) aHit);
 }
 
 #endif

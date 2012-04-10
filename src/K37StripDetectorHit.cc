@@ -1,6 +1,6 @@
 
 
-#include "K37StripDetectorPlusZHit.hh"
+#include "K37StripDetectorHit.hh"
 #include "G4ios.hh"
 #include "G4VVisManager.hh"
 #include "G4Circle.hh"
@@ -12,15 +12,15 @@
 #include "G4AttDef.hh"
 #include "G4AttCheck.hh"
 
-G4Allocator<K37StripDetectorPlusZHit> K37StripDetectorPlusZHitAllocator;
+G4Allocator<K37StripDetectorHit> K37StripDetectorHitAllocator;
 
-K37StripDetectorPlusZHit::K37StripDetectorPlusZHit()
+K37StripDetectorHit::K37StripDetectorHit()
 {;}
 
-K37StripDetectorPlusZHit::~K37StripDetectorPlusZHit()
+K37StripDetectorHit::~K37StripDetectorHit()
 {;}
 
-K37StripDetectorPlusZHit::K37StripDetectorPlusZHit(const K37StripDetectorPlusZHit &right)
+K37StripDetectorHit::K37StripDetectorHit(const K37StripDetectorHit &right)
   : G4VHit()
 {
 	edep = right.edep;
@@ -32,7 +32,7 @@ K37StripDetectorPlusZHit::K37StripDetectorPlusZHit(const K37StripDetectorPlusZHi
 	SoftwareVeto = right.SoftwareVeto;
 }
 
-const K37StripDetectorPlusZHit& K37StripDetectorPlusZHit::operator=(const K37StripDetectorPlusZHit &right)
+const K37StripDetectorHit& K37StripDetectorHit::operator=(const K37StripDetectorHit &right)
 {
 	edep = right.edep;
 	pos1 = right.pos1;
@@ -43,15 +43,15 @@ const K37StripDetectorPlusZHit& K37StripDetectorPlusZHit::operator=(const K37Str
 	return *this;
 }
 
-G4int K37StripDetectorPlusZHit::operator==(const K37StripDetectorPlusZHit &right) const
+G4int K37StripDetectorHit::operator==(const K37StripDetectorHit &right) const
 {
   return (this==&right) ? 1 : 0;
 }
 
-std::map<G4String,G4AttDef> K37StripDetectorPlusZHit::fAttDefs;
+std::map<G4String,G4AttDef> K37StripDetectorHit::fAttDefs;
 
 /*
-void K37StripDetectorPlusZHit::Draw()
+void K37StripDetectorHit::Draw()
 {
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if(pVVisManager)
@@ -67,7 +67,7 @@ void K37StripDetectorPlusZHit::Draw()
 }
 */
 
-const std::map<G4String,G4AttDef>* K37StripDetectorPlusZHit::GetAttDefs() const
+const std::map<G4String,G4AttDef>* K37StripDetectorHit::GetAttDefs() const
 {
   // G4AttDefs have to have long life.  Use static member...
   if (fAttDefs.empty()) {
@@ -77,17 +77,17 @@ const std::map<G4String,G4AttDef>* K37StripDetectorPlusZHit::GetAttDefs() const
   return &fAttDefs;
 }
 
-std::vector<G4AttValue>* K37StripDetectorPlusZHit::CreateAttValues() const
+std::vector<G4AttValue>* K37StripDetectorHit::CreateAttValues() const
 {
   // Create expendable G4AttsValues for picking...
   std::vector<G4AttValue>* attValues = new std::vector<G4AttValue>;
-  attValues->push_back (G4AttValue("HitType","K37StripDetectorPlusZHit",""));
+  attValues->push_back (G4AttValue("HitType","K37StripDetectorHit",""));
   attValues->push_back (G4AttValue("EDep",G4BestUnit(edep,"Energy"),""));
   //G4cout << "Checking...\n" << G4AttCheck(attValues, GetAttDefs());
   return attValues;
 }
 
-void K37StripDetectorPlusZHit::Print()
+void K37StripDetectorHit::Print()
 {;}
 
 

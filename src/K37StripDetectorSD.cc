@@ -1,7 +1,7 @@
 
 
-#include "K37StripDetectorPlusZSD.hh"
-#include "K37StripDetectorPlusZHit.hh"
+#include "K37StripDetectorSD.hh"
+#include "K37StripDetectorHit.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Track.hh"
@@ -11,39 +11,52 @@
 #include "G4TouchableHistory.hh"
 #include "G4ios.hh"
 
-K37StripDetectorPlusZSD::K37StripDetectorPlusZSD(G4String name)
+K37StripDetectorSD::K37StripDetectorSD(G4String name)
 :G4VSensitiveDetector(name)
 {
   G4String HCname;
-  collectionName.insert(HCname="dedx1Collection");
-	X=0.;
-	Y=0.;
-	Z=0.;
+  if( name == "/mydet/dsssdPlusZ") {
+    collectionName.insert(HCname="dsssdPlusZHC");
+  } else if(name == "/mydet/dsssdMinusZ") {
+    collectionName.insert(HCname="dsssdMinusZHC");
+  } else {
+    G4cout << "K37StripDetectorSD::K37StripDetectorSD(" << name << "):  ";
+    G4cout << "Comparison Failed." << G4endl;
+  }
+  //collectionName.insert(HCname="dedx1Collection");
+  X=0.;
+  Y=0.;
+  Z=0.;
 	
 }
 
-K37StripDetectorPlusZSD::~K37StripDetectorPlusZSD()
+K37StripDetectorSD::~K37StripDetectorSD()
 {;}
 
-void K37StripDetectorPlusZSD::Initialize(G4HCofThisEvent* HCE)
+void K37StripDetectorSD::Initialize(G4HCofThisEvent* HCE)
 {
   static int HCID = -1;
-  dedx1Collection = new K37StripDetectorPlusZHitsCollection (SensitiveDetectorName,collectionName[0]); 
-  if(HCID<0)
-  { HCID = GetCollectionID(0); }
+  dedx1Collection = new K37StripDetectorHitsCollection (SensitiveDetectorName,collectionName[0]); 
+  //if(HCID<0)
+  //{ HCID = GetCollectionID(0); }
+  if( SensitiveDetectorName == "dsssdPlusZ") {
+    HCID = 2;
+  } else if( SensitiveDetectorName == "dsssdMinusZ") {
+    HCID = 3;
+  }
   HCE->AddHitsCollection(HCID,dedx1Collection);
 
 }
 
 
 
-G4bool K37StripDetectorPlusZSD::ProcessHits(G4Step*aStep,G4TouchableHistory* )
+G4bool K37StripDetectorSD::ProcessHits(G4Step*aStep,G4TouchableHistory* )
 {
 	X=0.;
 	Y=0.;
 	Z=0.;
 	
-	K37StripDetectorPlusZHit* newHit = new K37StripDetectorPlusZHit();
+	K37StripDetectorHit* newHit = new K37StripDetectorHit();
   	
 	G4Track * theTrack = aStep->GetTrack();
 	
@@ -106,15 +119,15 @@ G4bool K37StripDetectorPlusZSD::ProcessHits(G4Step*aStep,G4TouchableHistory* )
 	return true;
 }
 
-void K37StripDetectorPlusZSD::EndOfEvent(G4HCofThisEvent*HCE)
+void K37StripDetectorSD::EndOfEvent(G4HCofThisEvent*HCE)
 {;}
 
-void K37StripDetectorPlusZSD::clear()
+void K37StripDetectorSD::clear()
 {;} 
 
-void K37StripDetectorPlusZSD::DrawAll()
+void K37StripDetectorSD::DrawAll()
 {;} 
 
-void K37StripDetectorPlusZSD::PrintAll()
+void K37StripDetectorSD::PrintAll()
 {;} 
 
