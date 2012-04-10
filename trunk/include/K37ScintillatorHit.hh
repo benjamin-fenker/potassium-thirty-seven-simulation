@@ -1,6 +1,6 @@
 
-#ifndef K37ScintillatorPlusZHit_h
-#define K37ScintillatorPlusZHit_h 1
+#ifndef K37ScintillatorHit_h
+#define K37ScintillatorHit_h 1
 
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
@@ -9,16 +9,16 @@
 
 class G4AttDef;
 
-class K37ScintillatorPlusZHit : public G4VHit
+class K37ScintillatorHit : public G4VHit
 {
 
 public:
 
-	K37ScintillatorPlusZHit();
-	~K37ScintillatorPlusZHit();
-	K37ScintillatorPlusZHit(const K37ScintillatorPlusZHit &right);
-	const K37ScintillatorPlusZHit& operator=(const K37ScintillatorPlusZHit &right);
-	G4int operator==(const K37ScintillatorPlusZHit &right) const;
+	K37ScintillatorHit();
+	~K37ScintillatorHit();
+	K37ScintillatorHit(const K37ScintillatorHit &right);
+	const K37ScintillatorHit& operator=(const K37ScintillatorHit &right);
+	G4int operator==(const K37ScintillatorHit &right) const;
 
 	inline void *operator new(size_t);
 	inline void operator delete(void *aHit);
@@ -71,20 +71,20 @@ public:
 
 };
 
-typedef G4THitsCollection<K37ScintillatorPlusZHit> K37ScintillatorPlusZHitsCollection;
+typedef G4THitsCollection<K37ScintillatorHit> K37ScintillatorHitsCollection;
 
-extern G4Allocator<K37ScintillatorPlusZHit> K37ScintillatorPlusZHitAllocator;
+extern G4Allocator<K37ScintillatorHit> K37ScintillatorHitAllocator;
 
-inline void* K37ScintillatorPlusZHit::operator new(size_t)
+inline void* K37ScintillatorHit::operator new(size_t)
 {
   void *aHit;
-  aHit = (void *) K37ScintillatorPlusZHitAllocator.MallocSingle();
+  aHit = (void *) K37ScintillatorHitAllocator.MallocSingle();
   return aHit;
 }
 
-inline void K37ScintillatorPlusZHit::operator delete(void *aHit)
+inline void K37ScintillatorHit::operator delete(void *aHit)
 {
-  K37ScintillatorPlusZHitAllocator.FreeSingle((K37ScintillatorPlusZHit*) aHit);
+  K37ScintillatorHitAllocator.FreeSingle((K37ScintillatorHit*) aHit);
 }
 
 #endif
