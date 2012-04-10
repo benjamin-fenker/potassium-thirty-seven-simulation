@@ -4,10 +4,10 @@
 
 #include "G4UserStackingAction.hh"
 #include "globals.hh"
-#include "K37ScintillatorMinusZHit.hh"
-#include "K37ScintillatorPlusZHit.hh"
-#include "K37StripDetectorMinusZHit.hh"
-#include "K37StripDetectorPlusZHit.hh"
+//#include "K37ScintillatorMinusZHit.hh"
+#include "K37ScintillatorHit.hh"
+//#include "K37StripDetectorMinusZHit.hh"
+#include "K37StripDetectorHit.hh"
 
 class G4Track;
 
@@ -25,10 +25,10 @@ class K37StackingAction : public G4UserStackingAction
     void PrepareNewEvent();
 
  private:
-    K37ScintillatorPlusZHitsCollection* scintillatorPlusZHits;
-    K37ScintillatorMinusZHitsCollection* scintillatorMinusZHits;
-    K37StripDetectorPlusZHitsCollection* stripDetectorPlusZHits;
-    K37StripDetectorMinusZHitsCollection* stripDetectorMinusZHits;
+    K37ScintillatorHitsCollection* scintillatorPlusZHits;
+    K37ScintillatorHitsCollection* scintillatorMinusZHits;
+    K37StripDetectorHitsCollection* stripDetectorPlusZHits;
+    K37StripDetectorHitsCollection* stripDetectorMinusZHits;
     G4VHitsCollection* GetCollection(G4String colName);
 
     G4bool GetPointersToHitCollections();
