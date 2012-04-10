@@ -1,11 +1,11 @@
 
 #include "K37DetectorConstruction.hh"
 #include "K37DetectorMessenger.hh"
-#include "K37ScintillatorPlusZSD.hh"
-#include "K37ScintillatorMinusZSD.hh"
+#include "K37ScintillatorSD.hh"
+//#include "K37ScintillatorMinusZSD.hh"
 #include "K37MirrorSD.hh"
-#include "K37StripDetectorPlusZSD.hh"
-#include "K37StripDetectorMinusZSD.hh"
+#include "K37StripDetectorSD.hh"
+//#include "K37StripDetectorMinusZSD.hh"
 #include "K37ElectricFieldSetup.hh"
 
 //materials
@@ -895,24 +895,24 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment()
 */	
 	//------------------------------------------------------------------
 	
-	G4String fullenergy1SDname = "/mydet/fullenergy1";
-	K37ScintillatorPlusZSD * fullenergy1SD = new K37ScintillatorPlusZSD(fullenergy1SDname);
+	G4String fullenergy1SDname = "/mydet/scintillatorPlusZ";
+	K37ScintillatorSD * fullenergy1SD = new K37ScintillatorSD(fullenergy1SDname);
 	SDman->AddNewDetector(fullenergy1SD);
 	scint_plusZ_log->SetSensitiveDetector(fullenergy1SD);
 	
-	G4String fullenergy2SDname = "/mydet/fullenergy2";
-	K37ScintillatorMinusZSD * fullenergy2SD = new K37ScintillatorMinusZSD(fullenergy2SDname);
+	G4String fullenergy2SDname = "/mydet/scintillatorMinusZ";
+	K37ScintillatorSD * fullenergy2SD = new K37ScintillatorSD(fullenergy2SDname);
 	SDman->AddNewDetector(fullenergy2SD);
 	scint_minusZ_log->SetSensitiveDetector(fullenergy2SD);
 		
 	
-	G4String dedx1SDname = "/mydet/dedx1";
-	K37StripDetectorPlusZSD * dedx1SD = new K37StripDetectorPlusZSD(dedx1SDname);
+	G4String dedx1SDname = "/mydet/dsssdPlusZ";
+	K37StripDetectorSD * dedx1SD = new K37StripDetectorSD(dedx1SDname);
 	SDman->AddNewDetector(dedx1SD);
 	dedx_plusZ_log->SetSensitiveDetector(dedx1SD);
 	
-	G4String dedx2SDname = "/mydet/dedx2";
-	K37StripDetectorMinusZSD * dedx2SD = new K37StripDetectorMinusZSD(dedx2SDname);
+	G4String dedx2SDname = "/mydet/dsssdMinusZ";
+	K37StripDetectorSD * dedx2SD = new K37StripDetectorSD(dedx2SDname);
 	SDman->AddNewDetector(dedx2SD);
 	dedx_MinusZ_log->SetSensitiveDetector(dedx2SD);
 	

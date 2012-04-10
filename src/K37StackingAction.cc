@@ -53,13 +53,20 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(const G4Track* aT
 
 G4VHitsCollection* K37StackingAction::GetCollection(G4String colName)
 {
+  //G4cout << "In K37StackingAction::GetCollection(" << colName << ")" << G4endl;
+
   G4SDManager* SDMan = G4SDManager::GetSDMpointer();
   G4RunManager* runMan = G4RunManager::GetRunManager();
+
   int colID = SDMan->GetCollectionID(colName);
+  //G4cout << "SDMan->GetCollectionID(" << colName << ") returned " << colID << G4endl;
+
   if(colID>=0)
   {
     const G4Event* currentEvent = runMan->GetCurrentEvent();
     G4HCofThisEvent* HCE = currentEvent->GetHCofThisEvent();
+    //G4cout << "HCE has " << HCE->GetNumberOfCollections() << " collections" << G4endl;
+    //G4cout << "Passed colID>=0 and about to return:  " << HCE->GetHC(colID) << G4endl;
     return HCE->GetHC(colID);
   }
   return 0;
@@ -68,48 +75,58 @@ G4VHitsCollection* K37StackingAction::GetCollection(G4String colName)
 //-----------------------------------------------
 G4bool K37StackingAction::GetPointersToHitCollections()
 {
-
-	if(!scintillatorPlusZHits )
-	{
-	       	scintillatorPlusZHits = (K37ScintillatorPlusZHitsCollection*)GetCollection("fullenergy1Collection");
-       	}
-	if(!scintillatorPlusZHits )
-	{
-	       	G4cerr << "SCINTILLATOR PLUS Z HITS COLLECTION NOT FOUND" << G4endl;
-		return false;
-	}
-	if(!scintillatorMinusZHits)
-	{
-	       	scintillatorMinusZHits= (K37ScintillatorMinusZHitsCollection*)GetCollection("fullenergy2Collection");
-       	}
-	if(!scintillatorMinusZHits)
-	{
-	       	G4cerr << "SCINTILLATOR MINUS Z HITS COLLECTION NOT FOUND" << G4endl;
-		return false;
-	}
-	if(!stripDetectorMinusZHits)
-	{
-	       	stripDetectorMinusZHits= (K37StripDetectorMinusZHitsCollection*)GetCollection("dedx2Collection");
-       	}
-	if(!stripDetectorMinusZHits)
-	{
-	       	G4cerr << "STRIP DETECTOR MINUS Z HITS COLLECTION NOT FOUND" << G4endl;
-		return false;
-	}
-	if(!stripDetectorPlusZHits)
-	{
-	       	stripDetectorPlusZHits= (K37StripDetectorPlusZHitsCollection*)GetCollection("dedx1Collection");
-       	}
-	if(!stripDetectorPlusZHits)
-	{
-	       	G4cerr << "STRIP DETECTOR PLUS Z HITS COLLECTION NOT FOUND" << G4endl;
-		return false;
-	}
-	return true;
+  //G4cout << "In K37StackingAction::GetPointersToHitsCollections()" << G4endl;
+  if(!scintillatorPlusZHits )
+    {
+      scintillatorPlusZHits = (K37ScintillatorHitsCollection*)GetCollection("scintillatorPlusZHC");
+      //G4cout << "I'm here, just assigned scintillatorPlusZHits!" << G4endl;
+    }
+  if(!scintillatorPlusZHits )
+    {
+      G4cerr << "SCINTILLATOR PLUS Z HITS COLLECTION NOT FOUND" << G4endl;
+      return false;
+    }
+  else 
+    {	 
+      //G4cout << "It worked (plus Z Hits)!" << G4endl;
+    }
+  if(!scintillatorMinusZHits)
+    {
+      scintillatorMinusZHits= (K37ScintillatorHitsCollection*)GetCollection("scintillatorMinusZHC");
+      //G4cout << "I'm here, just assigned scintillatorMinusZHits" << G4endl;
+    }
+  if(!scintillatorMinusZHits)
+    {
+      G4cerr << "SCINTILLATOR MINUS Z HITS COLLECTION NOT FOUND" << G4endl;
+      return false;
+    } else 
+    {
+      //G4cout << "It worked (minus Z Hits)!" << G4endl;
+    }
+  if(!stripDetectorMinusZHits)
+    {
+      stripDetectorMinusZHits= (K37StripDetectorHitsCollection*)GetCollection("dsssdMinusZHC");
+    }
+  if(!stripDetectorMinusZHits)
+    {
+      G4cerr << "STRIP DETECTOR MINUS Z HITS COLLECTION NOT FOUND" << G4endl;
+      return false;
+    }
+  if(!stripDetectorPlusZHits)
+    {
+      stripDetectorPlusZHits= (K37StripDetectorHitsCollection*)GetCollection("dsssdPlusZHC");
+    }
+  if(!stripDetectorPlusZHits)
+    {
+      G4cerr << "STRIP DETECTOR PLUS Z HITS COLLECTION NOT FOUND" << G4endl;
+      return false;
+    }
+  return true;
 }
 
 void K37StackingAction::NewStage()
 {
+  //G4cout << "In K37StackingAction::NewStage()" << G4endl;
   // Stage 0->1: Check to see if there are hits in a telescope
   // 		 If there are then the Ar- will be released. 
   if(!this->GetPointersToHitCollections()){return;}

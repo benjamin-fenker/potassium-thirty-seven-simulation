@@ -2,10 +2,10 @@
 
 #include "K37HistogramManager.hh"
 #include "K37EventAction.hh"
-#include "K37ScintillatorPlusZHit.hh"
-#include "K37ScintillatorMinusZHit.hh"
-#include "K37StripDetectorPlusZHit.hh"
-#include "K37StripDetectorMinusZHit.hh"
+#include "K37ScintillatorHit.hh"
+//#include "K37ScintillatorMinusZHit.hh"
+#include "K37StripDetectorHit.hh"
+//#include "K37StripDetectorMinusZHit.hh"
 #include "K37MirrorHit.hh"
 #include "K37RunAction.hh"
 #include "K37ListOfVolumeNames.hh"
@@ -121,10 +121,10 @@ if(listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
 			if(fullenergy1CollID<0||dedx1CollID<0 )
 			{
 				G4String colNam;
-				fullenergy1CollID = SDman->GetCollectionID(colNam="fullenergy1Collection");
-				fullenergy2CollID = SDman->GetCollectionID(colNam="fullenergy2Collection");
-				dedx1CollID = SDman->GetCollectionID(colNam="dedx1Collection");
-				dedx2CollID = SDman->GetCollectionID(colNam="dedx2Collection");
+				fullenergy1CollID = SDman->GetCollectionID(colNam="scintillatorPlusZHC");
+				fullenergy2CollID = SDman->GetCollectionID(colNam="scintillatorMinusZHC");
+				dedx1CollID = SDman->GetCollectionID(colNam="dsssdPlusZHC");
+				dedx2CollID = SDman->GetCollectionID(colNam="dsssdMinusZHC");
 				//mirrorCollID = SDman->GetCollectionID(colNam="mirrorCollection");
 				//BTdedxID = SDman->GetCollectionID(colNam="BTdedx/eDepBTdedx");
 				//BTscintillatorID = SDman->GetCollectionID(colNam="BTScintillator/eDepBTScintillator");				
@@ -198,10 +198,10 @@ if(listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
 	if(fullenergy1CollID<0||dedx1CollID<0) return;
 	
 	G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
-	K37StripDetectorPlusZHitsCollection* DEDX1HC = 0;
-	K37StripDetectorMinusZHitsCollection* DEDX2HC = 0;
-	K37ScintillatorPlusZHitsCollection* FE1HC = 0;
-	K37ScintillatorMinusZHitsCollection* FE2HC = 0;
+	K37StripDetectorHitsCollection* DEDX1HC = 0;
+	K37StripDetectorHitsCollection* DEDX2HC = 0;
+	K37ScintillatorHitsCollection* FE1HC = 0;
+	K37ScintillatorHitsCollection* FE2HC = 0;
 	
 	//K37MirrorHitsCollection* MHC = 0;
 
@@ -211,10 +211,10 @@ if(listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
 	
 	if(HCE)
 	{
-		FE1HC = (K37ScintillatorPlusZHitsCollection*)(HCE->GetHC(fullenergy1CollID));
-		FE2HC = (K37ScintillatorMinusZHitsCollection*)(HCE->GetHC(fullenergy2CollID));
-		DEDX1HC = (K37StripDetectorPlusZHitsCollection*)(HCE->GetHC(dedx1CollID));
-		DEDX2HC = (K37StripDetectorMinusZHitsCollection*)(HCE->GetHC(dedx2CollID));
+		FE1HC = (K37ScintillatorHitsCollection*)(HCE->GetHC(fullenergy1CollID));
+		FE2HC = (K37ScintillatorHitsCollection*)(HCE->GetHC(fullenergy2CollID));
+		DEDX1HC = (K37StripDetectorHitsCollection*)(HCE->GetHC(dedx1CollID));
+		DEDX2HC = (K37StripDetectorHitsCollection*)(HCE->GetHC(dedx2CollID));
 		//MHC = (K37MirrorHitsCollection*)(HCE->GetHC(mirrorCollID)); 
 		
 		//energyMount2Map = (G4THitsMap<G4double>*)(HCE->GetHC(Mount2ID));
