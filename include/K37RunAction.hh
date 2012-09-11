@@ -19,115 +19,205 @@ class K37HistogramManager;
 
 class K37RunAction : public G4UserRunAction
 {
-  public:
-    K37RunAction(K37DetectorConstruction*, K37PrimaryGeneratorAction*, K37ListOfVolumeNames*, K37AnnihilationPosition*, K37AllPossibleEventInformation*, K37HistogramManager*);
-   ~K37RunAction();
+public:
+  K37RunAction(K37DetectorConstruction*, K37PrimaryGeneratorAction*, K37ListOfVolumeNames*, K37AnnihilationPosition*, K37AllPossibleEventInformation*, K37HistogramManager*);
+  ~K37RunAction();
 
-  public:
-    void BeginOfRunAction(const G4Run*);
-	void EndOfRunAction(const G4Run*);
-	
-	void SetAccepted		()	{ accepted++;};
-	void SetAcceptedWithSili2       ()	{ acceptedWithSili2++;};
-	void SetAcceptedWithDedx2       ()	{ acceptedWithDedx2 ++;};
-	//void SetAcceptedWithDedx2SecondaryFiredDedx         (){acceptedWithDedx2SecondaryFiredDedx++;};
-	//void SetAcceptedWithDedx2SecondaryFiredSili         (){acceptedWithDedx2SecondaryFiredSili++;};
-	//void SetAcceptedWithDedx2SecondaryFiredDedx2        (){acceptedWithDedx2SecondaryFiredDedx2++;};
-	//void SetAcceptedWithDedx2SecondaryFiredSiliAndDedx2 (){acceptedWithDedx2SecondaryFiredSiliAndDedx2++;};
-	//void SetAcceptedWithDedx2SecondaryFiredDedxAndSili  (){acceptedWithDedx2SecondaryFiredDedxAndSili++;};
-	//void SetAcceptedWithDedx2SecondaryFiredDedxAndDedx2 (){acceptedWithDedx2SecondaryFiredDedxAndDedx2++;};
-	//void SetAcceptedWithDedx2PrimaryFiredAll            (){acceptedWithDedx2SPrimaryFiredAll++;};
-	//void SetAcceptedWithDedx2SecondaryFiredAll          (){acceptedWithDedx2SecondaryFiredAll++;};
-	
-	void SetFalsePositiveWithNone				()	{falsePositiveWithNone++;};
-	void SetFalsePositiveWithNoneSecondaryFiredDedx		()	{falsePositiveWithNoneSecondaryFiredDedx++;};
-	void SetFalsePositiveWithNoneSecondaryFiredSili		()	{falsePositiveWithNoneSecondaryFiredSili++;};
-	void SetFalsePositiveWithNonePrimaryFiredBoth		()	{falsePositiveWithNonePrimaryFiredBoth++;};
-	void SetFalsePositiveWithNoneSecondaryFiredBoth		()	{falsePositiveWithNoneSecondaryFiredBoth++;};
-	
-	void SetAcceptedWithNone                  (){acceptedWithNone++;};
-	void SetAcceptedWithNoneSecondaryFiredDedx(){acceptedWithNoneSecondaryFiredDedx++;};
-	void SetAcceptedWithNoneSecondaryFiredSili(){acceptedWithNoneSecondaryFiredSili++;};
-	void SetAcceptedWithNonePrimaryFiredBoth  (){acceptedWithNonePrimaryFiredBoth++;};
-	void SetAcceptedWithNoneSecondaryFiredBoth(){acceptedWithNoneSecondaryFiredBoth++;};
-	
-	void SetAcceptedPrimaryScatteredOffHoops        (){acceptedPrimaryScatteredOffHoops++;};
-	void AddAccepted_bs				()	{ accepted_bs ++;};
-	void Add_bs					()	{ bs ++;};
-	//void SecondaryFiredSiLi         ()	{ secondaryInSiLi ++;};
-	//void SecondaryFiredDedx         ()	{ secondaryInDedx ++;};
-	//void SecondaryFiredBoth         ()	{ secondaryInBoth ++;};
-	void SetFalsePositive           ()	{ falsePositive++;};
-	void SetFalsePositiveWithSili   ()	{ falsePositiveWithSili++;};
-	void SetFalsePositiveWithDedx   ()	{ falsePositiveWithDedx++;};
-	void SetFalsePositiveWithBoth   ()	{ falsePositiveWithBoth++;};
-	void AddNonVetoed		() { nonVetoed++;};
-	void AddVetoed			() { vetoed++;};
-	void PrintEnergyLossTable       (G4String );
-	void PrintResultsToScreen       ();
-	void PrintResultsToRunstat      ();
-	void SetRecordAnnihilationPosition (G4bool _recordAnnihilationPosition){recordAnnihilationPosition = _recordAnnihilationPosition;};
-	G4bool GetRecordAnnihilationPosition  (){return recordAnnihilationPosition;};
-	void SetRecordVolumeNames (G4bool _recordVolumeNames){recordVolumeNames= _recordVolumeNames;};
-	G4bool GetRecordVolumeNames (){return recordVolumeNames;};
-	
-  private:
-	
-	
-	G4int NbofEvents; 
+public:
+  void BeginOfRunAction(const G4Run*);
+  void EndOfRunAction(const G4Run*);
 
-	G4int    accepted;
-	G4int    accepted_bs;
-	G4int    bs;
-	//G4int    secondaryInSiLi;
-	//G4int    secondaryInDedx;
-	//G4int    secondaryInBoth;
-	G4int    falsePositive;
-	G4int    falsePositiveWithSili;
-	G4int    falsePositiveWithDedx;
-	G4int    falsePositiveWithBoth;
-	G4int    acceptedWithSili2;
-	
-	G4int    acceptedWithDedx2;
-	G4int    acceptedPrimaryScatteredOffHoops;
-	
-	/*G4int    acceptedWithDedx2SecondaryFiredDedx;
-	G4int    acceptedWithDedx2SecondaryFiredSili;
-	G4int    acceptedWithDedx2SecondaryFiredDedx2;
-	G4int    acceptedWithDedx2SecondaryFiredSiliAndDedx2;
-	G4int    acceptedWithDedx2SecondaryFiredDedxAndSili;
-	G4int    acceptedWithDedx2SecondaryFiredDedxAndDedx2;
-	G4int    acceptedWithDedx2SPrimaryFiredAll;
-	G4int    acceptedWithDedx2SecondaryFiredAll;
-	*/
-	
-	G4int    acceptedWithNone;
-	G4int    acceptedWithNoneSecondaryFiredDedx;
-	G4int    acceptedWithNoneSecondaryFiredSili;
-	G4int    acceptedWithNonePrimaryFiredBoth;
-	G4int    acceptedWithNoneSecondaryFiredBoth;
-	
-	G4int    falsePositiveWithNone;
-	G4int    falsePositiveWithNoneSecondaryFiredDedx;
-	G4int    falsePositiveWithNoneSecondaryFiredSili;
-	G4int    falsePositiveWithNonePrimaryFiredBoth;
-	G4int    falsePositiveWithNoneSecondaryFiredBoth;
-	
-	G4int    vetoed;
-	G4int    nonVetoed;
-	
-	K37DetectorConstruction* detector;
-	K37PrimaryGeneratorAction* kinematic;
-	K37ListOfVolumeNames* listOfEnteredVolumes;
-	K37RunMessenger* runMessenger;
+  void SetAccepted    ()
+  {
+    accepted++;
+  };
+  void SetAcceptedWithSili2       ()
+  {
+    acceptedWithSili2++;
+  };
+  void SetAcceptedWithDedx2       ()
+  {
+    acceptedWithDedx2 ++;
+  };
+  //void SetAcceptedWithDedx2SecondaryFiredDedx         (){acceptedWithDedx2SecondaryFiredDedx++;};
+  //void SetAcceptedWithDedx2SecondaryFiredSili         (){acceptedWithDedx2SecondaryFiredSili++;};
+  //void SetAcceptedWithDedx2SecondaryFiredDedx2        (){acceptedWithDedx2SecondaryFiredDedx2++;};
+  //void SetAcceptedWithDedx2SecondaryFiredSiliAndDedx2 (){acceptedWithDedx2SecondaryFiredSiliAndDedx2++;};
+  //void SetAcceptedWithDedx2SecondaryFiredDedxAndSili  (){acceptedWithDedx2SecondaryFiredDedxAndSili++;};
+  //void SetAcceptedWithDedx2SecondaryFiredDedxAndDedx2 (){acceptedWithDedx2SecondaryFiredDedxAndDedx2++;};
+  //void SetAcceptedWithDedx2PrimaryFiredAll            (){acceptedWithDedx2SPrimaryFiredAll++;};
+  //void SetAcceptedWithDedx2SecondaryFiredAll          (){acceptedWithDedx2SecondaryFiredAll++;};
 
-	K37AnnihilationPosition* annihilationPosition;
-	K37AllPossibleEventInformation* AllEventInformation;
-	G4bool recordAnnihilationPosition;
-	G4bool recordVolumeNames;
-	G4bool recordEventInformation;
+  void SetFalsePositiveWithNone       ()
+  {
+    falsePositiveWithNone++;
+  };
+  void SetFalsePositiveWithNoneSecondaryFiredDedx   ()
+  {
+    falsePositiveWithNoneSecondaryFiredDedx++;
+  };
+  void SetFalsePositiveWithNoneSecondaryFiredSili   ()
+  {
+    falsePositiveWithNoneSecondaryFiredSili++;
+  };
+  void SetFalsePositiveWithNonePrimaryFiredBoth   ()
+  {
+    falsePositiveWithNonePrimaryFiredBoth++;
+  };
+  void SetFalsePositiveWithNoneSecondaryFiredBoth   ()
+  {
+    falsePositiveWithNoneSecondaryFiredBoth++;
+  };
 
-	K37HistogramManager * histograms;
+  void SetAcceptedWithNone                  ()
+  {
+    acceptedWithNone++;
+  };
+  void SetAcceptedWithNoneSecondaryFiredDedx()
+  {
+    acceptedWithNoneSecondaryFiredDedx++;
+  };
+  void SetAcceptedWithNoneSecondaryFiredSili()
+  {
+    acceptedWithNoneSecondaryFiredSili++;
+  };
+  void SetAcceptedWithNonePrimaryFiredBoth  ()
+  {
+    acceptedWithNonePrimaryFiredBoth++;
+  };
+  void SetAcceptedWithNoneSecondaryFiredBoth()
+  {
+    acceptedWithNoneSecondaryFiredBoth++;
+  };
+
+  void SetAcceptedPrimaryScatteredOffHoops        ()
+  {
+    acceptedPrimaryScatteredOffHoops++;
+  };
+  void AddAccepted_bs       ()
+  {
+    accepted_bs ++;
+  };
+  void Add_bs         ()
+  {
+    bs ++;
+  };
+  //void SecondaryFiredSiLi         ()  { secondaryInSiLi ++;};
+  //void SecondaryFiredDedx         ()  { secondaryInDedx ++;};
+  //void SecondaryFiredBoth         ()  { secondaryInBoth ++;};
+  void SetFalsePositive           ()
+  {
+    falsePositive++;
+  };
+  void SetFalsePositiveWithSili   ()
+  {
+    falsePositiveWithSili++;
+  };
+  void SetFalsePositiveWithDedx   ()
+  {
+    falsePositiveWithDedx++;
+  };
+  void SetFalsePositiveWithBoth   ()
+  {
+    falsePositiveWithBoth++;
+  };
+  void AddNonVetoed   ()
+  {
+    nonVetoed++;
+  };
+  void AddVetoed      ()
+  {
+    vetoed++;
+  };
+  void incrementPlusZ_vc(double vc) {
+    plusZHits_vc += vc;
+  };
+  void incrementMinusZ_vc(double vc) {
+    minusZHits_vc += vc;
+    //G4cout << "incrementing minus z by " << vc << " now total is ";
+    //G4cout << minusZHits_vc << G4endl;
+  };
+  void PrintEnergyLossTable       (G4String );
+  void PrintResultsToScreen       ();
+  void PrintResultsToRunstat      ();
+  void SetRecordAnnihilationPosition (G4bool _recordAnnihilationPosition)
+  {
+    recordAnnihilationPosition = _recordAnnihilationPosition;
+  };
+  G4bool GetRecordAnnihilationPosition  ()
+  {
+    return recordAnnihilationPosition;
+  };
+  void SetRecordVolumeNames (G4bool _recordVolumeNames)
+  {
+    recordVolumeNames= _recordVolumeNames;
+  };
+  G4bool GetRecordVolumeNames ()
+  {
+    return recordVolumeNames;
+  };
+
+private:
+
+
+  G4int NbofEvents;
+
+  G4int    accepted;
+  G4int    accepted_bs;
+  G4int    bs;
+  //G4int    secondaryInSiLi;
+  //G4int    secondaryInDedx;
+  //G4int    secondaryInBoth;
+  G4int    falsePositive;
+  G4int    falsePositiveWithSili;
+  G4int    falsePositiveWithDedx;
+  G4int    falsePositiveWithBoth;
+  G4int    acceptedWithSili2;
+
+  G4int    acceptedWithDedx2;
+  G4int    acceptedPrimaryScatteredOffHoops;
+
+  /*G4int    acceptedWithDedx2SecondaryFiredDedx;
+  G4int    acceptedWithDedx2SecondaryFiredSili;
+  G4int    acceptedWithDedx2SecondaryFiredDedx2;
+  G4int    acceptedWithDedx2SecondaryFiredSiliAndDedx2;
+  G4int    acceptedWithDedx2SecondaryFiredDedxAndSili;
+  G4int    acceptedWithDedx2SecondaryFiredDedxAndDedx2;
+  G4int    acceptedWithDedx2SPrimaryFiredAll;
+  G4int    acceptedWithDedx2SecondaryFiredAll;
+  */
+
+  G4int    acceptedWithNone;
+  G4int    acceptedWithNoneSecondaryFiredDedx;
+  G4int    acceptedWithNoneSecondaryFiredSili;
+  G4int    acceptedWithNonePrimaryFiredBoth;
+  G4int    acceptedWithNoneSecondaryFiredBoth;
+
+  G4int    falsePositiveWithNone;
+  G4int    falsePositiveWithNoneSecondaryFiredDedx;
+  G4int    falsePositiveWithNoneSecondaryFiredSili;
+  G4int    falsePositiveWithNonePrimaryFiredBoth;
+  G4int    falsePositiveWithNoneSecondaryFiredBoth;
+
+  G4double plusZHits_vc;           // Counts in +z scintillator, each weighted by
+  // the event-by-event v/c.  When +z hits, gets incremented by v/c for that event
+  G4double minusZHits_vc;       // Counts in -z scintillator, weighted by v/c
+
+  G4int    vetoed;
+  G4int    nonVetoed;
+
+  K37DetectorConstruction* detector;
+  K37PrimaryGeneratorAction* kinematic;
+  K37ListOfVolumeNames* listOfEnteredVolumes;
+  K37RunMessenger* runMessenger;
+
+  K37AnnihilationPosition* annihilationPosition;
+  K37AllPossibleEventInformation* AllEventInformation;
+  G4bool recordAnnihilationPosition;
+  G4bool recordVolumeNames;
+  G4bool recordEventInformation;
+
+  K37HistogramManager * histograms;
 };
 
 //----------------------------------
