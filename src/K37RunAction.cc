@@ -311,10 +311,10 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun)
     }
   
   JTW_Event *mytester = new JTW_Event();
-  for (G4int i = 0; i < pow(10,7); i++) {
-    mytester -> MakeEvent();
-    if (i % 1000000 == 0) G4cout << "Gen " << i << G4endl;
-  }
+  // for (G4int i = 0; i < pow(10,7); i++) {
+  //   mytester -> MakeEvent();
+  //   if (i % 1000000 == 0) G4cout << "Gen " << i << G4endl;
+  // }
 
   //G4EmCalculator emCalculator;
   //emCalculator.SetVerbose(1);
