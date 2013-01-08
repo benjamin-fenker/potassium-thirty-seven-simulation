@@ -10,8 +10,8 @@
 void JTW_Event::MakeEvent()
 {
   // Set cuts on production for testing the EV Generator
-  G4double minCosTheta = 0.99999;
-  G4double minElectronT = 1.0; // MeV --> beta_min = 0.995
+  G4double minCosTheta = -1.0;
+  G4double minElectronT = 0.0; // MeV --> beta_min = 0.995
   // radius 20 mm 98.5 mm from trap center
   electron.Theta = M_PI/2.0;
   electron.T = 0.0;
