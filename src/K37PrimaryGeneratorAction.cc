@@ -48,7 +48,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(K37DetectorConstruction* de
 
 	G4cout<<"::::::::::::::::::::::::::::::::::::::::::::::::::::::::"<<G4endl;
 	//G4cout<<"The fermi function from evGenerator is: "<<G4endl;
-	evGenerator->MakeEvent();
+	//evGenerator->MakeEvent();
 	////G4IonTable* ionTable = particleTable-> GetIonTable();
 	////ionTable->DumpTable();	
 	//particleTable->DumpTable();
@@ -72,6 +72,9 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	
 	
 	//EventVertex.set((G4RandGauss::shoot(0,1))*mm,(G4RandGauss::shoot(0,1))*mm,(G4RandGauss::shoot(0,1))*mm);
+  bool testingEVGenerator = false;
+  evGenerator->MakeEvent();
+  if (!testingEVGenerator) {
 	cloud->makeEvent();
 	EventVertex.set((cloud->xFinal())*mm,(cloud->yFinal())*mm,(cloud->zFinal())*mm);
 	//EventInformation->setMetaStableTimeOfDeath(G4RandExponential::shoot(260));
@@ -86,7 +89,7 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	{
 
 		//evMaker->MakeEvent();
-		evGenerator->MakeEvent();
+
 		rho=1;
 		vertex = new G4PrimaryVertex(EventVertex,0);
 		this->setBetaVertex();
@@ -103,7 +106,7 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 		vertex->SetPrimary(particle);
 		anEvent->AddPrimaryVertex(vertex);
 	}
-
+  }
 }
 
 G4double K37PrimaryGeneratorAction::getVelocity( G4double kineticEnergy, G4double massOfParticle)

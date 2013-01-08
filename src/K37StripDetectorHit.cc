@@ -1,5 +1,3 @@
-
-
 #include "K37StripDetectorHit.hh"
 #include "G4ios.hh"
 #include "G4VVisManager.hh"
@@ -11,6 +9,8 @@
 #include "G4AttValue.hh"
 #include "G4AttDef.hh"
 #include "G4AttCheck.hh"
+
+using std::pair;
 
 G4Allocator<K37StripDetectorHit> K37StripDetectorHitAllocator;
 
@@ -90,4 +90,57 @@ std::vector<G4AttValue>* K37StripDetectorHit::CreateAttValues() const
 void K37StripDetectorHit::Print()
 {;}
 
+void K37StripDetectorHit::addXEdepPair(G4int strip, G4double edep) {
+  if (edep < 0.0) {
+    G4cerr << "ERROR.  K37StripDetectorHit::addXEdepPair.  edep < 0.0";
+    G4cerr << G4endl;
+    exit(1);
+  }
+  xStripsEDep.insert(pair<G4int, G4double>(strip, edep));
+}
+
+void K37StripDetectorHit::addYEdepPair(G4int strip, G4double edep) {
+  if (edep < 0.0) {
+    G4cerr << "ERROR.  K37StripDetectorHit::addXEdepPair.  edep < 0.0";
+    G4cerr << G4endl;
+    exit(1);
+  }
+  yStripsEDep.insert(pair<G4int, G4double>(strip, edep));
+}
+
+void K37StripDetectorHit::setXMap(map<G4int, G4double> xMap) {
+  // First check if any edep is < 0.  That would be bad.
+  // This object will loop over all map elements
+  map<G4int, G4double>::iterator it;
+  for (it = xMap.begin(); it != xMap.end(); it++) {
+    if ((*it).second < 0.0) {
+      G4cerr << "K37StripDetectorHit::setXMap Error!!!" << G4endl;
+      G4cerr << "edep less than zero for strip " << (*it).first << G4endl;
+      exit(1);
+    }
+  }
+  xStripsEDep = xMap;
+}
+
+void K37StripDetectorHit::setYMap(map<G4int, G4double> yMap) {
+  // First check if any edep is < 0.  That would be bad.
+  // This object will loop over all map elements
+  map<G4int, G4double>::iterator it;
+  for (it = yMap.begin(); it != yMap.end(); it++) {
+    if ((*it).second < 0.0) {
+      G4cerr << "K37StripDetectorHit::setYMap Error!!!" << G4endl;
+      G4cerr << "edep less than zero for strip " << (*it).first << G4endl;
+      exit(1);
+    }
+  }
+  yStripsEDep = yMap;
+}
+
+map<G4int, G4double> K37StripDetectorHit::getXStripsEdep() {
+  return xStripsEDep;
+}
+
+map<G4int, G4double> K37StripDetectorHit::getYStripsEdep() {
+  return yStripsEDep;
+}
 

@@ -7,6 +7,8 @@
 #include "K37ListOfVolumeNames.hh"
 #include "K37AnnihilationPosition.hh"
 #include "K37AllPossibleEventInformation.hh"
+// Just need for testing
+#include "JTW_Event.hh"
 
 #include "G4Run.hh"
 #include "G4RunManager.hh"
@@ -28,8 +30,8 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
                            K37AnnihilationPosition* anhilP,
                            K37AllPossibleEventInformation* APEI,
                            K37HistogramManager * his)
-    :detector(det), kinematic(kin), listOfEnteredVolumes(list), runMessenger(0),
-    annihilationPosition( anhilP),AllEventInformation(APEI), histograms(his)
+  :detector(det), kinematic(kin), listOfEnteredVolumes(list), runMessenger(0),
+   annihilationPosition(anhilP), AllEventInformation(APEI), histograms(his)
 {
   recordAnnihilationPosition = false;
   //recordAnnihilationPosition = true;
@@ -83,7 +85,6 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
   acceptedPrimaryScatteredOffHoops = 0;
 
   runMessenger = new K37RunMessenger(this);
-
 }
 
 //----------------------------------
@@ -225,8 +226,8 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun)
   //
   G4String fileName = "K37";
   anMan->OpenFile(fileName);
-  anMan->SetFirstHistoId(1);
-
+  //anMan->SetFirstHistoId(1);
+  //anMan->SetFirstNtupleId(1);
   // Creating histograms
   //
   anMan->CreateH1("ADA Detector Scintillator","ADA Detector Scintillator",
@@ -237,12 +238,58 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun)
                   200, 0., 10000);
   anMan->CreateH1("ODA Detector Strip Detector","ODA Detector Strip Detector",
                   1000, 0., 10000);
-  // Histogram to get the cos(theta_I,e) from event generator to see if it is working
+  // Histogram to get the cos(theta_e) from event generator
   anMan->CreateH1("Electron_angle_to_pol_generated",
                   "Electron_angle_to_pol_generated",
                   100, -1.0, 1.0);
-  anMan->CreateH1("Electron energy (event generator)", "Electron energy(event generator", 1000, 0.0, 10.0);
+  anMan->CreateH1("Electron energy (event generator)",
+                  "Electron energy(event generator", 1000, 0.0, 10.0);
   anMan->CreateH1("v_over_c", "v_over_c", 100, 0.0, 1.0);
+
+  // The order with which the ntuple columns are created MUST stay the same.
+  // They are accessed simply by a number that is incremented each time one is
+  // created.  These numbers are stored in K37AnalysisNumbering.  Add to the end,
+  // but DO NOT add to the beginning and DO NOT add to the middle and DO NOT
+  // rearrange these (without rearrning the numbering).  If you must rearrange
+  // things, make sure to update the numbering!
+  
+  // One ntuple per accepted event will contain all the information of the event
+  // By "all," I mean what we will get from the detectors.  Energy deposited.
+  // Some of these also give information straight out of the event generator.
+  anMan->CreateNtuple(fileName, "Event data");
+  // +1 for plus-z detecotrs, -1 for minus-z detectors
+  anMan->CreateNtupleIColumn("detector_hit");
+  // Relativistic factor for each event
+  anMan->CreateNtupleDColumn("v_over_c");
+  // Relativistic factor directly from event generator
+  anMan->CreateNtupleDColumn("v_over_c_generated");
+  // Electron angle relative to polarization
+  anMan->CreateNtupleDColumn("theta_e_generated");
+  char ntupName[10];
+  // Each strip detector reads energy left in each of its 80 channels
+  // 2-dimensions * 40 strips/dimension * 2 detectors = 160 columns
+  for(int i = 1; i <= 40; i++) {
+    sprintf(ntupName, "SDplusZX%02d", i);
+    anMan->CreateNtupleDColumn(ntupName);
+  }
+  for(int i = 1; i <= 40; i++) {
+    sprintf(ntupName, "SDplusZY%02d", i);
+    anMan->CreateNtupleDColumn(ntupName);
+  }
+  for(int i = 1; i <= 40; i++) {
+    sprintf(ntupName, "SDminsZX%02d", i);
+    anMan->CreateNtupleDColumn(ntupName);
+  }
+  for(int i = 1; i <= 40; i++) {
+    sprintf(ntupName, "SDminsZY%02d", i);
+    anMan->CreateNtupleDColumn(ntupName);
+  }
+  // First level of accepted events:  energy in +z(-z) scintillator and strip
+  // detector and no energy in the -z(+z) detector.  Neglects low-energy
+  // back-scattered events.
+  anMan->CreateNtupleIColumn("accepted");
+  anMan->FinishNtuple();
+  // End making ntuples
 }
 
 void K37RunAction::EndOfRunAction(const G4Run* aRun)
@@ -262,6 +309,12 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun)
     {
       listOfEnteredVolumes->checkIfPrintIsNeeded(true);
     }
+  
+  JTW_Event *mytester = new JTW_Event();
+  for (G4int i = 0; i < pow(10,7); i++) {
+    mytester -> MakeEvent();
+    if (i % 1000000 == 0) G4cout << "Gen " << i << G4endl;
+  }
 
   //G4EmCalculator emCalculator;
   //emCalculator.SetVerbose(1);

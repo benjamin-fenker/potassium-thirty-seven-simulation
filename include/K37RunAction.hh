@@ -22,7 +22,6 @@ class K37RunAction : public G4UserRunAction
 public:
   K37RunAction(K37DetectorConstruction*, K37PrimaryGeneratorAction*, K37ListOfVolumeNames*, K37AnnihilationPosition*, K37AllPossibleEventInformation*, K37HistogramManager*);
   ~K37RunAction();
-
 public:
   void BeginOfRunAction(const G4Run*);
   void EndOfRunAction(const G4Run*);
@@ -156,10 +155,9 @@ public:
   {
     return recordVolumeNames;
   };
+  
 
 private:
-
-
   G4int NbofEvents;
 
   G4int    accepted;

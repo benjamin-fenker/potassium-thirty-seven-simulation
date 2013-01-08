@@ -2,11 +2,13 @@
 #ifndef K37StripDetectorHit_h
 #define K37StripDetectorHit_h 1
 
+#include <map>
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
 
+using std::map;
 
 class G4AttDef;
 
@@ -28,17 +30,25 @@ class K37StripDetectorHit : public G4VHit
       std::vector<G4AttValue>* CreateAttValues() const;
       void Print();
 
-  private:
-	G4double edep;
-	G4ThreeVector pos1;
-	G4ThreeVector pos2;
-	G4double time;
-	G4double good;
-	G4bool primary;
-	G4bool SoftwareVeto;
-	static std::map<G4String,G4AttDef> fAttDefs;
+private:
+  G4double edep;                // Total energy deposited during this hit to all the strips
+  G4ThreeVector pos1;           // Position of pre-step point
+  G4ThreeVector pos2;           // Position of post-step point
+  G4double time;                // Global Time
+  G4double good;                // 
+  G4bool primary;
+  G4bool SoftwareVeto;
+  static std::map<G4String,G4AttDef> fAttDefs;
+
+  // My new stuff starts here
+  // Key value represents the strip fired, while value is the energy deposited
+  // in that strip during this hit (step).
+  map<G4int, G4double> xStripsEDep, yStripsEDep;
+  
 
 public:
+  map<G4int, G4double> getXStripsEdep();
+  map<G4int, G4double> getYStripsEdep();
 
 	inline void SetEdep(G4double de)
 	{ edep = de; }
@@ -75,7 +85,10 @@ public:
 	inline G4double GetSoftwareVeto()
 	{ return SoftwareVeto; }
 	  
-      
+  void addXEdepPair(G4int strip, G4double edep);
+  void addYEdepPair(G4int strip, G4double edep);
+  void setXMap(map<G4int, G4double> xMap);
+  void setYMap(map<G4int, G4double> yMap);
 };
 
 typedef G4THitsCollection<K37StripDetectorHit> K37StripDetectorHitsCollection;
