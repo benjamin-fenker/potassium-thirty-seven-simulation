@@ -17,3 +17,8 @@ First after checking out the code to say ~/simulation/K37source.
 
 The purpose of the build script is to find the revesion number from svn and put it into the program so
 that there is no confusion about how old the code is. It does this by dynamically creating K37Config.hh be sure not to add this back to the repository for version control as it is dynamically generated. 
+
+There are now some tools that will help in the post simulation analysis 
+they are script files that read the generated root file. These scripts are 
+located in the rootScripts directory and can be copied to wherever they root
+files are being put. 
