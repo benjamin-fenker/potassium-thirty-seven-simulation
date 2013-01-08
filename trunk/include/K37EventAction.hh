@@ -8,6 +8,10 @@
 
 #include "G4THitsMap.hh"
 
+#include "K37StripDetectorHit.hh"
+
+using std::vector;
+
 class K37RunAction;
 class K37ListOfVolumeNames;
 class K37AllPossibleEventInformation;
@@ -41,9 +45,20 @@ public:
   {
     return accepted;
   };
-
+  // Will return beta = v/c for the particle
+  G4double GetRelativisticFactor(G4double particleMass, G4double totalE);
 private:
   //G4THitsMap<G4double>* evtMap;
+
+  // ******VERY IMPORTANT**********
+  // When using this function, always pass it the x-start
+  // for the SD you wnat to fill!!!
+  void fillSDNtuples(vector<G4double> EDep_strip, G4int ntuple_number_start);
+  // *******************************
+  vector<G4double>GetEDepVector(K37StripDetectorHitsCollection *collection,
+                                G4int coordinate);
+  vector<G4double>GetEDepVectorX(K37StripDetectorHitsCollection *collection);
+  vector<G4double>GetEDepVectorY(K37StripDetectorHitsCollection *collection);
 
   G4THitsMap<G4double>* energyBTdedxMap;
   G4THitsMap<G4double>* energyBTscintillatorMap;
@@ -143,8 +158,8 @@ private:
   G4double cosfromfunction_new;
   G4double cosfromthetaFromStart;
 
-  std::vector< G4ThreeVector > spot;
-  std::vector< G4ThreeVector > start;
+  vector< G4ThreeVector > spot;
+  vector< G4ThreeVector > start;
 
   unsigned int sizeOfListOfEnteredVolumes;
   int differenceInListSizeFromStartToEnd;

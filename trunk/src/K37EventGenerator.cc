@@ -7,8 +7,8 @@ K37EventGenerator::K37EventGenerator()
   FF = new K37FermiFunction();
   pi = 3.14159265358979323846;
   electron.Mass = 0.510998;           // MeV/c^2
-  parent.Mass = 36.97337589*931.46;     //37K
-  daughter.Mass = 36.96677632*931.46;   //37Ar
+  parent.Mass = 36.97337589*931.46;     //37K (MeV/c^2)
+  daughter.Mass = 36.96677632*931.46;   //37Ar (MeV/c^2)
   neutrino.Mass = 0.0;
 
   Zhi = 2.69001;
@@ -17,6 +17,7 @@ K37EventGenerator::K37EventGenerator()
   LittleC = 0.205207;
   LittleA = 0.657989;
 
+  // All in MeV/c^2
   QValue = -1.0 * (daughter.Mass - parent.Mass  + 2. * electron.Mass);
   electron.MaxE = (pow(parent.Mass ,2.0) + pow(electron.Mass,2.0)
                    - pow((neutrino.Mass + daughter.Mass + electron.Mass), 2.0))

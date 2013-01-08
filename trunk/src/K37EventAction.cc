@@ -2,18 +2,20 @@
 #include "K37EventAction.hh"
 #include "K37ScintillatorHit.hh"
 //#include "K37ScintillatorMinusZHit.hh"
-#include "K37StripDetectorHit.hh"
+//#include "K37StripDetectorHit.hh"
 //#include "K37StripDetectorMinusZHit.hh"
 #include "K37MirrorHit.hh"
 #include "K37RunAction.hh"
 #include "K37ListOfVolumeNames.hh"
 #include "K37AllPossibleEventInformation.hh"
 #include "K37ContainerForStripInformation.hh"
+#include "K37AnalysisNumbering.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4VHitsCollection.hh"
+#include "G4Electron.hh"
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "G4VVisManager.hh"
@@ -30,8 +32,6 @@
 
 //#include <vector>
 using namespace std;
-
-
 
 K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list, K37AllPossibleEventInformation* APEI, K37HistogramManager * his)
     :runAct(run), listOfEnteredVolumes(list), stripHandler(0), EventInformation(APEI), histograms(his)
@@ -182,13 +182,13 @@ void K37EventAction::BeginOfEventAction(const G4Event*)
 
 void K37EventAction::EndOfEventAction(const G4Event* evt)
 {
-  //
+  bool debug = false;
+  G4AnalysisManager* anMan = G4AnalysisManager::Instance();
   if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
     {
       differenceInListSizeFromStartToEnd = int (listOfEnteredVolumes->checkSizeOfList() - sizeOfListOfEnteredVolumes);
     }
   //G4cout << "Size of List" <<differenceInListSizeFromStartToEnd<< G4endl;
-
 
   if (bs_flag>0)
     {
@@ -221,10 +221,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
       //energyMount2Map = (G4THitsMap<G4double>*)(HCE->GetHC(Mount2ID));
       //energyBTdedxMap = (G4THitsMap<G4double>*)(HCE->GetHC(BTdedxID));
       //energyBTscintillatorMap = (G4THitsMap<G4double>*)(HCE->GetHC(BTscintillatorID));
-
-
     }
-
   if (FE1HC)   //If FullEnergy1HitCollection - PlusZ
     {
       int n_hit = FE1HC->entries();
@@ -239,10 +236,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
             {
               energySiLi_Secondaries+=(*FE1HC)[i]->GetEdep();
             }
-
-
         }
-
       if (energySiLi>0)
         {
           isThereEnergySili = true;
@@ -251,10 +245,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
               EventInformation->setGammaFiredScintillatorPlusZToTrue();
             }
           //G4cout<< "energySiLi: " << energySiLi << G4endl;
-
         }
     }
-
   if (FE2HC)
     {
       int n_hit = FE2HC->entries();
@@ -269,10 +261,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
             {
               energySiLi2_Secondaries+=(*FE2HC)[i]->GetEdep();
             }
-
-
         }
-
       if (energySiLi2>0)
         {
           isThereEnergySili2 = true;
@@ -280,21 +269,39 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
             {
               EventInformation->setGammaFiredScintillatorMinusZToTrue();
             }
-
           //G4cout<< "energySiLi2: " << energySiLi2 << G4endl;
         }
-
     }
-
+  
+  // Total energy stored in all the strips (each detector, each direction)
+  // Pretty redundant, but a good check for bugs
+  G4double SD_EDep_total_plusZ_X = 0.0;
+  G4double SD_EDep_total_plusZ_Y = 0.0;
+  G4double SD_EDep_total_minsZ_X = 0.0;
+  G4double SD_EDep_total_minsZ_Y = 0.0;
+      
+  // Strip-by-strip information for each detector
+  vector<G4double> SD_EDep_plusZ_X(40, 0.0), SD_EDep_plusZ_Y(40, 0.0);
+  vector<G4double> SD_EDep_minsZ_X(40, 0.0), SD_EDep_minsZ_Y(40, 0.0);
   if (DEDX2HC)  //Strip Detector Minus Z
     {
+      SD_EDep_minsZ_X = GetEDepVectorX(DEDX2HC);
+      SD_EDep_minsZ_Y = GetEDepVectorY(DEDX2HC);
+      for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_X += SD_EDep_minsZ_X[i];
+      for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_Y += SD_EDep_minsZ_Y[i];
+      if (fabs(SD_EDep_total_minsZ_X - SD_EDep_total_minsZ_Y) >
+          pow(10,-3)*keV) {
+        G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
+      }
+
       int n_hit = DEDX2HC->entries();
-      for (int i=0; i<n_hit; i++)
+      for (G4int i = 0; i < n_hit; i++)
         {
           energyDedx2 += (*DEDX2HC)[i]->GetEdep();
           if ((*DEDX2HC)[i]->GetPrimary())
             {
               energyDedx2_Primaries +=(*DEDX2HC)[i]->GetEdep();
+              // GetPos2() gets 3-vector of post-step point
               stripHandler->StoreStripInformation((*DEDX2HC)[i]->GetPos2(),(*DEDX2HC)[i]->GetEdep(),true,false);
             }
           else
@@ -302,32 +309,35 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
               energyDedx2_Secondaries +=(*DEDX2HC)[i]->GetEdep();
               stripHandler->StoreStripInformation((*DEDX2HC)[i]->GetPos2(),(*DEDX2HC)[i]->GetEdep(),false,false);
             }
-
-
         }
-
       if (energyDedx2>0)
         {
-          isThereEnergyDedx2 = true;
+          if (fabs(energyDedx2 - SD_EDep_total_minsZ_X) > pow(10, -3)*keV) {
+            G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
+          }
 
+          isThereEnergyDedx2 = true;
+          
           if (energyDedx2_Primaries ==0)
             {
               EventInformation->setGammaFiredStripDetectorMinusZToTrue();
             }
-
           //G4cout<< "energyDedx2: " << energyDedx2 << G4endl;
         }
-
     }
-
-
-  if (DEDX1HC)
+  if (DEDX1HC)                  // Strip detector plus Z
     {
+      SD_EDep_plusZ_X = GetEDepVectorX(DEDX1HC);
+      SD_EDep_plusZ_Y = GetEDepVectorY(DEDX1HC);
+      for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_X += SD_EDep_plusZ_X[i];
+      for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_Y += SD_EDep_plusZ_Y[i];
+      if (fabs(SD_EDep_total_plusZ_X - SD_EDep_total_plusZ_Y) >
+          pow(10,-3)*keV) {
+        G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
+      }
       int n_hit = DEDX1HC->entries();
       for (int i=0; i<n_hit; i++)
         {
-
-
           energyDedx += (*DEDX1HC)[i]->GetEdep();
           if ((*DEDX1HC)[i]->GetPrimary())
             {
@@ -339,41 +349,38 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
               energyDedx_Secondaries +=(*DEDX1HC)[i]->GetEdep();
               stripHandler->StoreStripInformation((*DEDX1HC)[i]->GetPos2(),(*DEDX1HC)[i]->GetEdep(),false,true);
             }
-
         }
-
       if (energyDedx>0)
         {
+          if (fabs(energyDedx - SD_EDep_total_plusZ_X) > pow(10, -3)*keV) {
+            G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
+          }
           isThereEnergyDedx = true;
-
           if (energyDedx_Primaries ==0)
             {
               EventInformation->setGammaFiredStripDetectorPlusZToTrue();
             }
           //G4cout<< "energyDedx: " << energyDedx << G4endl;
-
         }
       //G4cout<< isThereEnergySili << " " << isThereEnergySiliPrimary << " "<< isThereEnergySiliSecondary << " "<<isThereEnergyDedx << " " << isThereEnergyDedxPrimary << " "<< isThereEnergyDedxSecondary<< " " << isThereEnergySili2  << " " << isThereEnergySili2Primary << " "<< isThereEnergySili2Secondary<< " "<<isThereEnergyDedx2 << " " << isThereEnergyDedx2Primary << " "<< isThereEnergyDedx2Secondary<< G4endl;
 
-    }
-
-
-
-
-  if ((isThereEnergyDedx == true && isThereEnergySili == true && isThereEnergyDedx2 == false && isThereEnergySili2 == false) ||  (isThereEnergyDedx == false && isThereEnergySili == false && isThereEnergyDedx2 == true && isThereEnergySili2 == true ))
+    } // End strip detector plus z
+  if ((isThereEnergyDedx == true && isThereEnergySili == true && isThereEnergyDedx2 == false && isThereEnergySili2 == false)
+      ||  (isThereEnergyDedx == false && isThereEnergySili == false && isThereEnergyDedx2 == true && isThereEnergySili2 == true ))
     {
+      G4Electron *theElectron = G4Electron::ElectronDefinition();
+      G4double emass = theElectron -> GetPDGMass();
       accepted++;
+      anMan->FillNtupleIColumn(ntup_accepted, 1);
       runAct->SetAccepted();
       EventInformation->setThisIsAnAccepterEvent();
-
-
-      G4AnalysisManager* anMan = G4AnalysisManager::Instance();
-
       //runAct->SetAcceptedPrimaryScatteredOffHoops();
-
-
-
       // Note: Dedx means strip detector and SiLi means scintillator
+      // Fill all the ntuples with data from the vectors
+      fillSDNtuples(SD_EDep_plusZ_X, ntup_SD_plusZ_X_start);
+      fillSDNtuples(SD_EDep_plusZ_Y, ntup_SD_plusZ_Y_start);
+      fillSDNtuples(SD_EDep_minsZ_X, ntup_SD_minsZ_X_start);
+      fillSDNtuples(SD_EDep_minsZ_Y, ntup_SD_minsZ_Y_start);
       if (isThereEnergyDedx == true )
         {
           //stripHandler->PrintMaps();
@@ -390,27 +397,25 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
           histograms->AddRowNtuple(1);
           histograms->AddRowNtuple(0);
 
-
           //  fill histograms
-          anMan->FillH1(1,energySiLi/keV);
-          //G4cout << "Filling hist one with " << energyDedx/keV << G4endl;
-          anMan->FillH1(2,energyDedx/keV);
-          G4double emass = 510.99891; // electron mass is 511 keV/c^2
-          //          G4double vc = sqrt(1.0 - pow(emass / (energySiLi/keV), 2.0));
-          G4double vc = sqrt((energySiLi/keV)/(emass+(energySiLi/keV)));
-          runAct->incrementPlusZ_vc(vc);
+          anMan->FillH1(hist_ADA_Scintillator, energySiLi/keV);
+          anMan->FillH1(hist_ADA_StripDetector, energyDedx/keV);
+
+          runAct->incrementPlusZ_vc(GetRelativisticFactor(emass, energySiLi));
+          // Int-column 1 corresponds to plus or minus Z
+          anMan->FillNtupleIColumn(ntup_sign_z_hit, 1); 
+          anMan->FillNtupleDColumn(ntup_v_over_c,
+                                   GetRelativisticFactor(emass, energySiLi));
 
           EventInformation->setTotalEnergyInScintillator(energySiLi);
           EventInformation->setTotalEnergyInStripDetector(energyDedx);
           EventInformation->setPlusZDetectorsFiredToTrue();
           EventInformation->setStartStripDetectorTime((*DEDX1HC)[0]->GetTime());
-
           if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
             {
               listOfEnteredVolumes->setEnteredVolumeName("----------------------A", 0, 0 );
             }
-
-        }
+        } // End energy in plusZ
 
       if (isThereEnergyDedx2 == true )
         {
@@ -427,18 +432,14 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
           histograms->AddRowNtuple(3);
           histograms->AddRowNtuple(2);
 
-          //  fill histograms
-          anMan->FillH1(3,energySiLi2/keV);
-          //G4cout << "Filling hist two with " << energySiLi2/keV << G4endl;
-          anMan->FillH1(4,energyDedx2/keV);
-          //G4cout << "Filling his three with " << energyDedx2/keV << G4endl;
-          G4double emass = 510.99891; // electron mass is 511 keV/c^2
-          //          G4double vc = sqrt(1.0 - pow(emass / (energySiLi2/keV), 2.0));
-          G4double vc = sqrt((energySiLi2/keV)/(emass+(energySiLi2/keV)));
-          //G4cout << "energySiLi2 = " << energySiLi2/keV << "keV   vc = ";
-          //G4cout << vc << G4endl;
-          runAct->incrementMinusZ_vc(vc);
-
+          //  Fill histograms
+          anMan->FillH1(hist_ODA_Scintillator, energySiLi2/keV);
+          anMan->FillH1(hist_ODA_StripDetector, energyDedx2/keV);
+          runAct->incrementMinusZ_vc(GetRelativisticFactor(emass, energySiLi2));
+          anMan->FillNtupleIColumn(ntup_sign_z_hit, -1); 
+          anMan->FillNtupleDColumn(ntup_v_over_c,
+                                   GetRelativisticFactor(emass, energySiLi2));
+          // Done filling histograms
 
           EventInformation->setTotalEnergyInScintillator(energySiLi2);
           EventInformation->setTotalEnergyInStripDetector(energyDedx2);
@@ -448,9 +449,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
             {
               listOfEnteredVolumes->setEnteredVolumeName("----------------------O", 0, 0 );
             }
-        }
-
-
+        } // End energy in minusZ      
       //G4cout<< start[0].theta()<<G4endl;
       /*
         if(spot.size() >= 1)
@@ -466,9 +465,10 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
 
       //listOfEnteredVolumes->setEnteredVolumeName("----------------------" );
 
-
-
-    }
+      // Add a new row here to add a new row for only accpeted events where
+      // either there was energy in the plus or minus z detector, but not both!
+      //anMan -> AddNtupleRow();
+    } // End is it a good event
   else
     {
       if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
@@ -476,23 +476,16 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
           listOfEnteredVolumes->deleteEnteriesFromList(differenceInListSizeFromStartToEnd);
         }
     }
-
-
   if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded())
     {
       listOfEnteredVolumes->checkIfPrintIsNeeded(false);
     }
-
   if ((evt->GetEventID())%50000==0)
     {
       G4cout << ">>> End of Event " << evt->GetEventID() << G4endl;
     }
-
-
-
   spot.clear();
   start.clear();
-
   if (EventInformation->getShouldEventInformationBeRecorded())
     {
       if (EventInformation->getIsThisAnAcceptedEvent())
@@ -502,9 +495,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
         }
       EventInformation->clearEventInformation();
     }
-
-}
-
+  //  G4cout << "------------------------------" << G4endl;
+  // Add a new row here to add a new row for EVERY EVENT, even events taht were
+  // not "accepted."
+  // anMan -> AddNtupleRow();
+} // End of event action
 //----------------
 void K37EventAction::setEnteringDedx(G4ThreeVector enteringPosition)
 {
@@ -518,6 +513,69 @@ void K37EventAction::setStartingDirection(G4ThreeVector startingPosition)
 
 }
 
+void K37EventAction::fillSDNtuples(vector<G4double> EDep_strip,
+                                   G4int ntuple_number_start) {
+  // After filling up the total energy hit-by-hit, write out the event
+  // total energy for each strip.
+  bool debug = false;
+  G4AnalysisManager *anMan = G4AnalysisManager::Instance();
+  for(G4int i = 0; i < 40; i++) {
+      anMan->FillNtupleDColumn(ntuple_number_start + i,
+                               EDep_strip[i]/keV);
+      if (EDep_strip[i] > 0 && debug) {
+        G4cout << "Strip " << i << " with " << EDep_strip[i]/keV << G4endl;
+      } 
+  }
+}
 
+G4double K37EventAction::GetRelativisticFactor(G4double particleMass,
+                                               G4double totalE) {
+  return sqrt(totalE/(particleMass+totalE));
+}
 
+vector<G4double> K37EventAction::GetEDepVector(
+                                     K37StripDetectorHitsCollection *collection,
+                                     G4int coordinate) {
+  // Coordinate == 1 --> x-strips
+  // Coordinate == 2 --> y-strips 
+  // Coordinate == other --> error
+  bool debug = false;
+  bool minusZHit = false;
+  int n_hit = collection -> entries();
+  vector<G4double> totalEdep(40, 0.0);
+  for (G4int i = 0; i < n_hit; i++) {
+    map<G4int, G4double> Edep;
+    if (coordinate == 1) {
+      Edep = (*collection)[i]->getXStripsEdep();
+    } else if (coordinate == 2) {
+      Edep = (*collection)[i]->getYStripsEdep();
+    } else {
+      G4cerr << "ERROR.  ASKING FOR DIMENSION 3 FROM STRIP DETECTOR" << G4endl;
+    }
 
+    map<G4int, G4double>::iterator it;
+    // This runs every hit (>= 1 hit/event) and gets total energy
+    // for the entire event for each strip
+    for (G4int i = 1; i <= 40; i++) {
+      it = Edep.find(i);
+      // If find doesn't return the element, no energy was in that strip
+      if (it != Edep.end()) {
+        // The local arrays and ntuple numbering is zero-based while strips are
+        // numbered starting from 1 in the K37StripDetectorSD class.
+        totalEdep[i-1] += Edep.find(i)->second;
+        minusZHit = true;
+      }
+    }
+    }
+  return totalEdep;
+}
+
+vector<G4double>K37EventAction::GetEDepVectorX(
+                                K37StripDetectorHitsCollection *collection) {
+  return GetEDepVector(collection, 1);
+}
+
+vector<G4double>K37EventAction::GetEDepVectorY(
+                                K37StripDetectorHitsCollection *collection) {
+  return GetEDepVector(collection, 2);
+}

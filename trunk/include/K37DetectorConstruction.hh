@@ -113,6 +113,10 @@ private:
   G4VisAttributes * SOED_logVisAttributes;
   G4VisAttributes * coils_logVisAttributes;
   G4VisAttributes * InvisibilityCloak;
+  // Bools to turn off or on various aspects of the apparatus to simulate their
+  // individual effects
+  G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
+  G4bool makeHoops, makeElectronMCP, makeCoils;
 };
 
 #endif
