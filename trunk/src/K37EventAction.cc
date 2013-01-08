@@ -25,6 +25,7 @@
 #include <fstream>
 #include <iomanip>
 #include <math.h>
+#include <cmath>
 
 #include "K37Analysis.hh"
 
@@ -32,6 +33,7 @@
 
 //#include <vector>
 using namespace std;
+using std::pow;
 
 K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list, K37AllPossibleEventInformation* APEI, K37HistogramManager * his)
     :runAct(run), listOfEnteredVolumes(list), stripHandler(0), EventInformation(APEI), histograms(his)
@@ -290,7 +292,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
       for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_X += SD_EDep_minsZ_X[i];
       for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_Y += SD_EDep_minsZ_Y[i];
       if (fabs(SD_EDep_total_minsZ_X - SD_EDep_total_minsZ_Y) >
-          pow(10,-3)*keV) {
+          pow(10.0,-3)*keV) {
         G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
       }
 
@@ -312,7 +314,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
         }
       if (energyDedx2>0)
         {
-          if (fabs(energyDedx2 - SD_EDep_total_minsZ_X) > pow(10, -3)*keV) {
+          if (fabs(energyDedx2 - SD_EDep_total_minsZ_X) > pow(10.0, -3)*keV) {
             G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
           }
 
@@ -331,8 +333,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
       SD_EDep_plusZ_Y = GetEDepVectorY(DEDX1HC);
       for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_X += SD_EDep_plusZ_X[i];
       for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_Y += SD_EDep_plusZ_Y[i];
-      if (fabs(SD_EDep_total_plusZ_X - SD_EDep_total_plusZ_Y) >
-          pow(10,-3)*keV) {
+      if (fabs(SD_EDep_total_plusZ_X - SD_EDep_total_plusZ_Y) > pow(10.0,-3)*keV) 
+      {
         G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
       }
       int n_hit = DEDX1HC->entries();
@@ -352,7 +354,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt)
         }
       if (energyDedx>0)
         {
-          if (fabs(energyDedx - SD_EDep_total_plusZ_X) > pow(10, -3)*keV) {
+          if (fabs(energyDedx - SD_EDep_total_plusZ_X) > pow(10.0, -3)*keV) {
             G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
           }
           isThereEnergyDedx = true;
