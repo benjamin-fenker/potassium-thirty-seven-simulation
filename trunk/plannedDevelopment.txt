@@ -33,3 +33,7 @@
 6. Timing 
 	- When the Ar is implemented it would be nice to implement a timing signal
 	  for the different charge states as they hit the recoil detector. 
+7. Put in rho dependance
+        - All of the values BigA BigB and littleA have a dependance on Rho. 
+          It would be best to have those values be calculated base on Rho.
+          Currently the values are hard coded in src/K37EventGenerator.cc.
