@@ -1,14 +1,15 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
+
 #include "K37EventGenerator.hh"
 #include "K37FermiFunction.hh"
 
 K37EventGenerator::K37EventGenerator()
-    :FF(0)
-{
+  :FF(0) {
   FF = new K37FermiFunction();
   pi = 3.14159265358979323846;
   electron.Mass = 0.510998;           // MeV/c^2
-  parent.Mass = 36.97337589*931.46;     //37K (MeV/c^2)
-  daughter.Mass = 36.96677632*931.46;   //37Ar (MeV/c^2)
+  parent.Mass = 36.97337589*931.46;     // 37K (MeV/c^2)
+  daughter.Mass = 36.96677632*931.46;   // 37Ar (MeV/c^2)
   neutrino.Mass = 0.0;
 
   Zhi = 2.69001;
@@ -19,31 +20,28 @@ K37EventGenerator::K37EventGenerator()
 
   // All in MeV/c^2
   QValue = -1.0 * (daughter.Mass - parent.Mass  + 2. * electron.Mass);
-  electron.MaxE = (pow(parent.Mass ,2.0) + pow(electron.Mass,2.0)
-                   - pow((neutrino.Mass + daughter.Mass + electron.Mass), 2.0))
-                  / (2.0 * parent.Mass);
-  neutrino.MaxE = (pow(parent.Mass, 2.0) + pow(neutrino.Mass, 2.0)
-                   - pow((electron.Mass + daughter.Mass + electron.Mass), 2.0))
-                  /(2.0 * parent.Mass);
-  daughter.MaxE = (pow(parent.Mass, 2.0) + pow((daughter.Mass + electron.Mass),
-                   2.0)
-                   - pow((electron.Mass+neutrino.Mass), 2.0))
-                  /(2.0 * parent.Mass );
+  electron.MaxE = (pow(parent.Mass , 2.0) +
+                   pow(electron.Mass, 2.0) -
+                   pow((neutrino.Mass + daughter.Mass + electron.Mass), 2.0))
+    / (2.0 * parent.Mass);
+  neutrino.MaxE = (pow(parent.Mass, 2.0) +
+                   pow(neutrino.Mass, 2.0) -
+                   pow((electron.Mass + daughter.Mass + electron.Mass), 2.0))
+    /(2.0 * parent.Mass);
+  daughter.MaxE = (pow(parent.Mass, 2.0) +
+                   pow((daughter.Mass + electron.Mass), 2.0) -
+                   pow((electron.Mass+neutrino.Mass), 2.0))
+    /(2.0 * parent.Mass);
   electron.MaxT = electron.MaxE - electron.Mass;
   neutrino.MaxT = neutrino.MaxE - neutrino.Mass;
   daughter.MaxT = daughter.MaxE - daughter.Mass - electron.Mass;
 
-  //omegaFile.open ("omegaFile.txt", std::ofstream::out | std::ofstream::trunc);
-  //omegaFile.close();
-  //omegaFile.open ("omegaFile.txt", std::ofstream::out | std::ofstream::app);
-  //this ->MakeEvent();
   v_over_c_running = 0.0;
   running_num = 0.0;
   running_denom = 0.0;
 }
 
-K37EventGenerator::~K37EventGenerator()
-{
+K37EventGenerator::~K37EventGenerator() {
   G4cout << "BF LOOK HERE: total v/c = " << v_over_c_running << G4endl;
   G4cout << "num = " << running_num << " denom: " << running_denom << G4endl;
   delete FF;
