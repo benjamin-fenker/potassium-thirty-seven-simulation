@@ -1,13 +1,12 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
+
 #ifndef K37EventGenerator_H
 #define K37EventGenerator_H 1
 
-//#include <iostream>
 #include "globals.hh"
-//using std::cout;
-//u sing std::endl;
+
 class K37FermiFunction;
-struct particle
-{
+struct particle {
   G4double MaxE;             // Max Total Energy
   G4double MaxT;             // Max Kinetic Energy
   G4double Mass;             // Mass of particle
@@ -26,9 +25,8 @@ struct particle
   G4double Z;                // Z component of momentum
 };
 
-class K37EventGenerator
-{
-protected:
+class K37EventGenerator {
+ protected:
   /*int width, height;*/
   particle electron, parent, daughter, neutrino;
   G4double pi, QValue, cosBetaNeutrinoAngle, eDotJ, nDotJ, eDotn;
@@ -37,72 +35,58 @@ protected:
   G4double v_over_c_running;    // Will keep a running tally of v/c coming out
   // of event generator for testing purposes
 
-public:
+ public:
   G4double running_num;
-  G4double running_denom; 
+  G4double running_denom;
   K37EventGenerator();
-  ~K37EventGenerator();
+  virtual ~K37EventGenerator();
   virtual void MakeEvent()=0;
   /*void set_values (int a, int b)*/
   /*{ width=a; height=b; }*/
   /*virtual int area (void) =0;*/
   /*void printarea (void)*/
   /*{ cout << this->area() << endl; }*/
-  G4double eMomentumX()
-  {
+  G4double eMomentumX() {
     return electron.X;
   };
-  G4double eMomentumY()
-  {
+  G4double eMomentumY() {
     return electron.Y;
   };
-  G4double eMomentumZ()
-  {
+  G4double eMomentumZ() {
     return electron.Z;
   };
-  G4double eMomentumTheta()
-  {
+  G4double eMomentumTheta() {
     return electron.Theta;
   };
-  G4double eMomentumPhi()
-  {
+  G4double eMomentumPhi() {
     return electron.Phi;
   };
-  G4double eMomentumPmag()
-  {
+  G4double eMomentumPmag() {
     return electron.Pmag;
   };
-  G4double eKineticEnergy()
-  {
+  G4double eKineticEnergy() {
     return electron.T;
   };
 
-  G4double dMomentumX()
-  {
+  G4double dMomentumX() {
     return daughter.X;
   };
-  G4double dMomentumY()
-  {
+  G4double dMomentumY() {
     return daughter.Y;
   };
-  G4double dMomentumZ()
-  {
+  G4double dMomentumZ() {
     return daughter.Z;
   };
-  G4double dMomentumTheta()
-  {
+  G4double dMomentumTheta() {
     return daughter.Theta;
   };
-  G4double dMomentumPhi()
-  {
+  G4double dMomentumPhi() {
     return daughter.Phi;
   };
-  G4double dMomentumPmag()
-  {
+  G4double dMomentumPmag() {
     return daughter.Pmag;
   };
-  G4double dKineticEnergy()
-  {
+  G4double dKineticEnergy() {
     return daughter.T;
   };
 };

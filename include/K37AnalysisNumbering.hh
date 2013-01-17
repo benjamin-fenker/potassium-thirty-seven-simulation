@@ -1,3 +1,5 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
+
 // Since the Geant4 histogram managers insist on filling the histograms and
 // ntuples based on an integer identifier, I'll map these with variable names
 // to (hopefully) avoid confusion.
