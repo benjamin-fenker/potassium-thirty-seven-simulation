@@ -47,7 +47,7 @@ add_executable(K37 K37.cc ${sources} ${headers})
 target_link_libraries(K37 ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
-# Copy all scripts to the build directory, i.e. the directory in which we
+ # Copy all scripts to the build directory, i.e. the directory in which we
 # build K37. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #

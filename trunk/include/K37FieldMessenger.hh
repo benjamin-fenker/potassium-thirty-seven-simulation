@@ -1,3 +1,4 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
 
 #ifndef K37FieldMessenger_h
 #define K37FieldMessenger_h 1
@@ -15,26 +16,22 @@ class G4UIcmdWithoutParameter;
 class G4UIcmdWith3VectorAndUnit;
 
 
-class K37FieldMessenger: public G4UImessenger
-{
-  public:
-    K37FieldMessenger(K37ElectricFieldSetup* );
-   ~K37FieldMessenger();
-    
-    void SetNewValue(G4UIcommand*, G4String);
-    void SetNewValue(G4UIcommand*, G4int);
-    
-  private:
+class K37FieldMessenger: public G4UImessenger {
+ public:
+  explicit K37FieldMessenger(K37ElectricFieldSetup* efs);
+  ~K37FieldMessenger();
 
-    K37ElectricFieldSetup*     fEFieldSetup;
-    G4UIdirectory*             fieldDir;
-    G4UIcmdWithAnInteger*      StepperCmd;
-    G4UIcmdWithADoubleAndUnit* ElFieldCmd;
-    G4UIcmdWithADoubleAndUnit* MinStepCmd;
-    G4UIcmdWithoutParameter*   UpdateCmd;
-    G4UIcmdWith3VectorAndUnit* changeFieldCmd;
+  void SetNewValue(G4UIcommand*, G4String);
+  void SetNewValue(G4UIcommand*, G4int);
 
-
+ private:
+  K37ElectricFieldSetup*     fEFieldSetup;
+  G4UIdirectory*             fieldDir;
+  G4UIcmdWithAnInteger*      StepperCmd;
+  G4UIcmdWithADoubleAndUnit* ElFieldCmd;
+  G4UIcmdWithADoubleAndUnit* MinStepCmd;
+  G4UIcmdWithoutParameter*   UpdateCmd;
+  G4UIcmdWith3VectorAndUnit* changeFieldCmd;
 };
 
 #endif

@@ -1,4 +1,4 @@
-
+// Authors: Spencer Behling and Benjamin Fenker 2013
 
 #ifndef K37DetectorMessenger_h
 #define K37DetectorMessenger_h 1
@@ -14,22 +14,21 @@ class G4UIcmdWithoutParameter;
 
 //-----------------------------
 
-class K37DetectorMessenger: public G4UImessenger
-{
-  public:
-    K37DetectorMessenger(K37DetectorConstruction*);
-   ~K37DetectorMessenger();
-    
-    void SetNewValue(G4UIcommand*, G4String);
-    
-  private:
-    K37DetectorConstruction* myDetector;
-    
-    G4UIdirectory*	geometryDir;
-    G4UIcmdWithAString*	ChangeMirrorMaterial;    
-    G4UIcmdWithABool*   ShouldTheMirrorBeWFEDM;    
-    G4UIcmdWithoutParameter* UpdateGeometryCommand;    
-    G4UIcmdWithoutParameter* PrintAvailableMaterials;    
+class K37DetectorMessenger: public G4UImessenger {
+ public:
+  explicit  K37DetectorMessenger(K37DetectorConstruction* dc);
+  ~K37DetectorMessenger();
+
+  void SetNewValue(G4UIcommand*, G4String);
+
+ private:
+  K37DetectorConstruction* myDetector;
+
+  G4UIdirectory*        geometryDir;
+  G4UIcmdWithAString*   ChangeMirrorMaterial;
+  G4UIcmdWithABool*   ShouldTheMirrorBeWFEDM;
+  G4UIcmdWithoutParameter* UpdateGeometryCommand;
+  G4UIcmdWithoutParameter* PrintAvailableMaterials;
 };
 
 //-----------------------------

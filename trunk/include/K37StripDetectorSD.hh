@@ -1,7 +1,9 @@
-
+// Authors: Spencer Behling and Benjamin Fenker 2013
 
 #ifndef K37StripDetectorSD_h
 #define K37StripDetectorSD_h 1
+
+#include <map>
 
 #include "G4VSensitiveDetector.hh"
 #include "K37StripDetectorHit.hh"
@@ -10,21 +12,20 @@ class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
-class K37StripDetectorSD : public G4VSensitiveDetector
-{
-public:
-  K37StripDetectorSD(G4String name);
+class K37StripDetectorSD : public G4VSensitiveDetector {
+ public:
+  explicit K37StripDetectorSD(G4String name);
   ~K37StripDetectorSD();
-  
+
   void Initialize(G4HCofThisEvent*HCE);
-  G4bool ProcessHits(G4Step*aStep,G4TouchableHistory*ROhist);
-  void EndOfEvent(G4HCofThisEvent* HCE);
+  G4bool ProcessHits(G4Step*aStep, G4TouchableHistory* ROhist);
+  // void EndOfEvent(G4HCofThisEvent* HCE);
   void clear();
   void DrawAll();
   void PrintAll();
   void SetupParameters(G4ThreeVector pos, G4int num, G4double width);
   // Fills placementInWorld, numStrips, stripWidth
-private:
+ private:
   map<G4int, G4double> MapOfEDep(G4int preStrip, G4int postStrip,
                                  G4double prePos, G4double postPos,
                                  G4double totalEDep);

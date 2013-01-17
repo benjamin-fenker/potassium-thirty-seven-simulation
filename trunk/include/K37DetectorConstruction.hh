@@ -1,8 +1,12 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
+
 #ifndef K37DetectorConstruction_h
 #define K37DetectorConstruction_h 1
 
-#include "G4VUserDetectorConstruction.hh"
 #include <CLHEP/Vector/Rotation.h>
+
+#include "G4VUserDetectorConstruction.hh"
+#include "G4SDManager.hh"
 #include "globals.hh"
 
 class G4VPhysicalVolume;
@@ -14,38 +18,30 @@ class G4LogicalVolume;
 class K37DetectorMessenger;
 class K37ElectricFieldSetup;
 class HepRotation;
-//class G4UserLimits;
 
-class K37DetectorConstruction : public G4VUserDetectorConstruction
-{
-public:
+class K37DetectorConstruction : public G4VUserDetectorConstruction {
+ public:
   K37DetectorConstruction();
   ~K37DetectorConstruction();
 
-public:
+ public:
   G4VPhysicalVolume* Construct();
-  const G4VPhysicalVolume* GetphysiWorld()
-  {
+  const G4VPhysicalVolume* GetphysiWorld() {
     return world_phys;
   };
-  G4Material*  GetMirrorMaterial()
-  {
+  G4Material*  GetMirrorMaterial() {
     return MirrorMaterial;
   };
-  G4double GetDistanceToTrap()
-  {
+  G4double GetDistanceToTrap() {
     return 10.0;
   }
-  G4double GetDeDxRadius()
-  {
+  G4double GetDeDxRadius() {
     return 10.0;
   }
-  G4double GetSubtraction()
-  {
+  G4double GetSubtraction() {
     return 10.0;
   }
-  void SetWFEDM_MirrorCut(G4bool value)
-  {
+  void SetWFEDM_MirrorCut(G4bool value) {
     shouldTheMirrorBeWFEDMCut = value;
   }
 
@@ -53,10 +49,17 @@ public:
   void SetMirrorMaterial(G4String);
   void PrintMaterialList();
 
-private:
-
+ private:
   G4VPhysicalVolume* ConstructK37Experiment();
+  void ConstructScintillators(G4SDManager* SDman);
+  void ConstructStripDetectors(G4SDManager* SDman);
+  void ConstructChamber();      // Not a sensitive detector
+  void ConstructMirrors();      // Not a sensitive detector
+  void ConstructHoops();        // Not a sensitive detector
+  void ConstructElectronMCP();  // Not a sensitive detector (yet!)
+  void ConstructCoils();        // Not a sensitive detector
   void DefineMaterials();
+
   G4VPhysicalVolume* world_phys;    // pointer to the physical World
   K37DetectorMessenger* detectorMessenger;  // pointer to the Messenger
   G4LogicalVolume * mirror_log;
@@ -74,7 +77,8 @@ private:
   G4Material*   MCPMaterial;
   G4Trd * MM_CollimatorCut_sol;
   K37ElectricFieldSetup* fEmFieldSetup;     // pointer to the field helper
-  G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut = true or straight cut = false
+  G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
+  // = true or straight cut = false
   CLHEP::HepRotation* changeZtoX;
   CLHEP::HepRotation* changeZto45;
   CLHEP::HepRotation* changeZtoNeg45;

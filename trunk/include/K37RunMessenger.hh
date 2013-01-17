@@ -1,3 +1,4 @@
+// Authors: Spencer Behling and Benjamin Fenker 2013
 
 #ifndef K37RunMessenger_h
 #define K37RunMessenger_h 1
@@ -16,24 +17,20 @@ class G4UIcmdWithABool;
 
 //---------------------------------
 
-class K37RunMessenger: public G4UImessenger
-{
-  public:
-
-   K37RunMessenger(K37RunAction* );
+class K37RunMessenger: public G4UImessenger {
+ public:
+  explicit K37RunMessenger(K37RunAction* ra);
   ~K37RunMessenger();
 
-   void SetNewValue(G4UIcommand* ,G4String );
+  void SetNewValue(G4UIcommand*, G4String);
 
-  private:
-
-   K37RunAction*              	runAction;
-   G4UIdirectory*             	RunDirectory;
-   G4UIcmdWithAnInteger* 	SaveFilesCommand;    
-   G4UIcmdWithAString* 		printEnergyLossTable;    
-   G4UIcmdWithABool* 		printAnnihilation;
-   G4UIcmdWithABool* 		printTheVolumeNames;
- 
+ private:
+  K37RunAction*                 runAction;
+  G4UIdirectory*                RunDirectory;
+  G4UIcmdWithAnInteger*         SaveFilesCommand;
+  G4UIcmdWithAString*           printEnergyLossTable;
+  G4UIcmdWithABool*             printAnnihilation;
+  G4UIcmdWithABool*             printTheVolumeNames;
 };
 
 #endif
