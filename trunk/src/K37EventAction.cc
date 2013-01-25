@@ -29,12 +29,12 @@
 
 #include "K37Analysis.hh"
 
-#define PI 3.14159265
-
 using std::pow;
 using std::ofstream;
 using std::setw;
 using std::left;
+
+extern G4bool fillAllSDData;
 
 K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
                                K37AllPossibleEventInformation* APEI,
@@ -350,10 +350,12 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
-    fillSDNtuples(SD_EDep_plusZ_X, ntup_SD_plusZ_X_start);
-    fillSDNtuples(SD_EDep_plusZ_Y, ntup_SD_plusZ_Y_start);
-    fillSDNtuples(SD_EDep_minsZ_X, ntup_SD_minsZ_X_start);
-    fillSDNtuples(SD_EDep_minsZ_Y, ntup_SD_minsZ_Y_start);
+    if (fillAllSDData) {
+      fillSDNtuples(SD_EDep_plusZ_X, ntup_SD_plusZ_X_start);
+      fillSDNtuples(SD_EDep_plusZ_Y, ntup_SD_plusZ_Y_start);
+      fillSDNtuples(SD_EDep_minsZ_X, ntup_SD_minsZ_X_start);
+      fillSDNtuples(SD_EDep_minsZ_Y, ntup_SD_minsZ_Y_start);
+    }
     if (isThereEnergyDedx == true) {
       // stripHandler->PrintMaps();
       stripHandler->PassThePlusZDetectors();
@@ -463,7 +465,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     EventInformation->clearEventInformation();
   }
   //  G4cout << "------------------------------" << G4endl;
-  // Add a new row here to add a new row for EVERY EVENT, even events taht were
+  // Add a new row here to add a new row for EVERY EVENT, even events that were
   // not "accepted."
   // anMan -> AddNtupleRow();
 }  // End of event action

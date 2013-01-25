@@ -52,26 +52,24 @@ K37DetectorConstruction::K37DetectorConstruction()
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), MM_CollimatorCut_sol(0),
-      fEmFieldSetup(0), shouldTheMirrorBeWFEDMCut(false), changeZtoX(0),
-      changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
-      changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),
-      changeYtoBeamAxisForLPP1(0), changeYtoBeamAxisForLPP2(0),
-      changeYtoBeamAxisForLPP3(0), changeYtoBeamAxisForLPP4(0),
-      rotationForOpticalPumpingBeams1(0), rotationForOpticalPumpingBeams2(0),
-      RFDRotation(0), FFRFRotation(0), MirrorRotation(0), MirrorCutRotation(0),
-      MMRotation(0), hoopRotation(0), world_log(0),
-      scint_logVisAttributes_plusZ(0), scint_logVisAttributes_minusZ(0),
-      dedx_logVisAttributes(0), dedx_logVisAttributes_minusZ(0),
-      dedxFrame_logVisAttributes(0), chamber_logVisAttributes(0),
-      OPRF_logVisAttributes(0), RFD_logVisAttributes(0),
-      beryllium_logVisAttributes(0), FFRF_logVisAttributes(0),
-      mirror_logVisAttributes(0), MM_logVisAttributes(0),
-      cut_ESP_logVisAttributes(0), hoop7_logVisAttributes(0),
-      SOED_logVisAttributes(0), coils_logVisAttributes(0),
-      InvisibilityCloak(0) {
+      shouldTheMirrorBeWFEDMCut(false), changeZtoX(0), changeZto45(0),
+      changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0), changeZtoNeg62(0),
+      changeZtoNeg118(0), changeYtoBeamAxis(0), changeYtoBeamAxisForLPP1(0),
+      changeYtoBeamAxisForLPP2(0), changeYtoBeamAxisForLPP3(0),
+      changeYtoBeamAxisForLPP4(0), rotationForOpticalPumpingBeams1(0),
+      rotationForOpticalPumpingBeams2(0), RFDRotation(0), FFRFRotation(0),
+      MirrorRotation(0), MirrorCutRotation(0), MMRotation(0), hoopRotation(0),
+      world_log(0), scint_logVisAttributes_plusZ(0),
+      scint_logVisAttributes_minusZ(0), dedx_logVisAttributes(0),
+      dedx_logVisAttributes_minusZ(0), dedxFrame_logVisAttributes(0),
+      chamber_logVisAttributes(0), OPRF_logVisAttributes(0),
+      RFD_logVisAttributes(0), beryllium_logVisAttributes(0),
+      FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
+      MM_logVisAttributes(0), cut_ESP_logVisAttributes(0),
+      hoop7_logVisAttributes(0), SOED_logVisAttributes(0),
+      coils_logVisAttributes(0), InvisibilityCloak(0) {
     this-> DefineMaterials();
     detectorMessenger = new K37DetectorMessenger(this);
-    fEmFieldSetup = new K37ElectricFieldSetup();
     InvisibilityCloak = new G4VisAttributes(false);
     // ******SET CONSTRUCTION FLAGS HERE**************************************
     makeScintillators = true;     // Must be true!
@@ -85,7 +83,6 @@ K37DetectorConstruction::K37DetectorConstruction()
 
 K37DetectorConstruction::~K37DetectorConstruction() {
     delete detectorMessenger;
-    delete fEmFieldSetup;
     delete MM_CollimatorCut_sol;
     delete changeZtoX;
     delete changeZto45;

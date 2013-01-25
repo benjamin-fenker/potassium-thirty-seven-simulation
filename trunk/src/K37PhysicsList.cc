@@ -27,10 +27,6 @@
 
 K37PhysicsList::K37PhysicsList()
   : G4VUserPhysicsList(), theDecayProcess(0) {
-  const G4double kilovoltPerCentimeter = 1.0*kilovolt/(1.*cm);
-  new G4UnitDefinition("KVperCM", "KVperCM", "ElectricField",
-                       kilovoltPerCentimeter);
-
   defaultCutValue = 1.0*cm;
   SetVerboseLevel(1);
   stepLimiter = new G4StepLimiter();

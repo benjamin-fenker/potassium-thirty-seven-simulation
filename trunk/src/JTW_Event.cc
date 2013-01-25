@@ -9,24 +9,26 @@
 #include "globals.hh"
 #include "Randomize.hh"
 
+extern G4bool fillEvGenData;
+
 void JTW_Event::MakeEvent() {
   // Set cuts on production for testing the EV Generator
-  G4double minCosTheta = -1.0;
-  G4double minElectronT = 0.0;  // MeV --> beta_min = 0.995
+  G4double minCosTheta = 0.0;
+  G4double minElectronT = 0.0*electron.MaxT;  // MeV --> beta_min = 0.995
   // radius 20 mm 98.5 mm from trap center
   electron.Theta = M_PI/2.0;
-  electron.T = 0.0;
-  //  while((fabs(cos(electron.Theta)) < minCosTheta)) {
+  electron.T = -10.0;
   while ((electron.T < minElectronT) ||
         (fabs(cos(electron.Theta)) < minCosTheta)) {
     while (true) {
       testOmega = 3.*G4UniformRand();
+      // testOmega = 30.0*G4UniformRand(); // What's the right value here!?
       while (true) {
         while (true) {
           // For faster testing:
-          electron.T = electron.MaxT;
-          electron.T -=  (electron.MaxT - minElectronT) * G4UniformRand();
-          //  electron.T = electron.MaxT*G4UniformRand(); // MeV
+          electron.T = 0.1*electron.MaxT;
+          // electron.T -=  (electron.MaxT - minElectronT) * G4UniformRand();
+          // electron.T = electron.MaxT*G4UniformRand(); // MeV
           electron.E = electron.T + electron.Mass;   // MeV
           electron.PmagSquared = (electron.T+electron.Mass)*
             (electron.T+electron.Mass) -
@@ -37,11 +39,11 @@ void JTW_Event::MakeEvent() {
           // Picks mu from -1 to 1 uniformly
           // mu = 1.0 - 2.0*G4UniformRand();
           // Picks mu uniformly from abs(mu) = minCosTheta to 1
-          mu = 1.0 - (1.0-minCosTheta)*G4UniformRand();
+          // mu = 1.0 - (1.0-minCosTheta)*G4UniformRand();
+          mu = 1.0;
           if (G4UniformRand() > 0.5) mu *= -1.0;
           electron.Theta = acos(mu);
-          //                electron.Theta = acos (1.0 - 2.0*G4UniformRand());
-          electron.Phi = 2.0*pi*G4UniformRand();
+          electron.Phi = 2.0*M_PI*G4UniformRand();
 
           // x = r*sin(Theta)*cos(Phi)
           // y = r*sin(Theta)*sin(Phi)
@@ -56,7 +58,7 @@ void JTW_Event::MakeEvent() {
           electron.Z = electron.Pmag*electron.unitZ;
 
           neutrino.Theta = acos(1.0 - 2.0*G4UniformRand());
-          neutrino.Phi = 2.0*pi*G4UniformRand();
+          neutrino.Phi = 2.0*M_PI*G4UniformRand();
           neutrino.unitX = sin(neutrino.Theta)*cos(neutrino.Phi);
           neutrino.unitY = sin(neutrino.Theta)*sin(neutrino.Phi);
           neutrino.unitZ = cos(neutrino.Theta);
@@ -72,13 +74,14 @@ void JTW_Event::MakeEvent() {
             (parent.Mass - electron.E + electron.Pmag * cosBetaNeutrinoAngle);
 
           if (neutrino.E < neutrino.MaxE) {
+            // G4cout << "Broke out neutrino" << G4endl;
             break;
           }
 
           continue;
         }  // Innermost while(true)
 
-        neutrino.T = neutrino.E;
+        neutrino.T = neutrino.E;        // Massless neutrino
         neutrino.Pmag = neutrino.E;
 
         neutrino.X = neutrino.Pmag*neutrino.unitX;
@@ -106,9 +109,10 @@ void JTW_Event::MakeEvent() {
         daughter.Theta =  acos(daughter.Z/daughter.Pmag);
         daughter.Phi =  atan2(daughter.Y, daughter.X);
         if (daughter.Phi < 0.0) {
-          daughter.Phi = 2.0*pi + daughter.Phi;
+          daughter.Phi = 2.0*M_PI + daughter.Phi;
         }
         if (daughter.E < daughter.MaxE) {
+          // G4cout << "broke out (daughter)" << G4endl;
           break;
         }
         continue;
@@ -121,9 +125,7 @@ void JTW_Event::MakeEvent() {
       eDotn = electron.X*neutrino.X + electron.Y*neutrino.Y +
         electron.Z*neutrino.Z;
 
-      // (1.0/(pow((2.0*pi),5.0)))
-      // (1.0/(4.0*pow(pi,3.0)))
-      Omega = (1.0/(4.0*pow(pi, 3.0)))
+      Omega = (1.0/(4.0*pow(M_PI, 3.0)))
         *(FF->getVFF(electron.T))
         *electron.Pmag
         *electron.E
@@ -134,10 +136,8 @@ void JTW_Event::MakeEvent() {
               + LittleC*eDotJ*nDotJ/(electron.E*neutrino.E)
               + BigA*eDotJ/electron.E
               + BigB*nDotJ/neutrino.E);
-
-      // omegaFile<< Omega << G4endl;
-
       if (Omega >= testOmega) {
+        // G4cout << "Broke out (omega)! " << G4endl;
         break;
       }
       continue;
@@ -153,15 +153,39 @@ void JTW_Event::MakeEvent() {
   // G4cout << (electron.T/electron.Mass)+1.0 << "\t E = " << electron.E;
   // G4cout << "\t--> gamma = " << electron.E/electron.Mass << "\tbeta = ";
   // G4cout << v_over_c << G4endl;
+  // G4cout << "Used in calculation: " << eDotJ/electron.E << G4endl;
 
   // Fill up histogram to check that event generator makes sense
   G4AnalysisManager *anMan = G4AnalysisManager::Instance();
   running_denom += fabs(v_over_c*cos(electron.Theta));
-  anMan -> FillH1(hist_e_angle_to_pol_generated, cos(electron.Theta));
-  anMan -> FillH1(hist_e_energy_generated, electron.E);
-  anMan -> FillH1(hist_v_over_c_generated, v_over_c);
-  anMan -> FillNtupleDColumn(ntup_v_over_c_generated, v_over_c);
-  anMan -> FillNtupleDColumn(ntup_theta_e_generated, cos(electron.Theta));
-  // G4cout << "mu_generated = " << cos(electron.Theta) << G4endl;
-  anMan -> AddNtupleRow();
+  if (cos(electron.Theta) > 0.0) {
+    numPlus++;
+  } else {
+    numMins++;
+  }
+  if (fillEvGenData) {
+    anMan -> FillH1(hist_e_angle_to_pol_generated, cos(electron.Theta));
+    anMan -> FillH1(hist_e_energy_generated, electron.E);
+    anMan -> FillH1(hist_v_over_c_generated, v_over_c);
+    anMan -> FillNtupleDColumn(ntup_v_over_c_generated, v_over_c);
+    anMan -> FillNtupleDColumn(ntup_theta_e_generated, cos(electron.Theta));
+    anMan -> FillNtupleDColumn(ntup_omega, Omega);
+    anMan -> FillNtupleDColumn(ntup_electron_kinetic_energy_gen, electron.T);
+    anMan -> AddNtupleRow();
+  }
 }     // End makeEvent
+
+void JTW_Event::ResetGeneratedCounters() {
+  numPlus = 0.0;
+  numMins = 0.0;
+}
+
+G4int JTW_Event::GetNumMins() {
+  return numMins;
+}
+
+G4int JTW_Event::GetNumPlus() {
+  return numPlus;
+}
+
+

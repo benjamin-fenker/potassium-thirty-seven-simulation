@@ -4,7 +4,7 @@
 
 #include "K37HistogramManager.hh"
 #include "K37RunAction.hh"
-#include "K37RunMessenger.hh"
+
 #include "K37EventAction.hh"
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37DetectorConstruction.hh"
@@ -22,6 +22,10 @@
 #include "G4EmCalculator.hh"
 
 #include "K37Analysis.hh"
+
+G4bool fillEvGenData = true;
+G4bool fillAllSDData = true;
+
 
 //----------------------------------
 
@@ -84,6 +88,8 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
 
   acceptedPrimaryScatteredOffHoops = 0;
 
+  outFileName = "K37test";  // The extension (.root) is added by the analysis
+  // manager automatically
   runMessenger = new K37RunMessenger(this);
 }
 
@@ -215,8 +221,9 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   // Open an output file
   //
-  G4String fileName = "K37";
-  anMan->OpenFile(fileName);
+  // G4String fileName = "K37";
+  G4cout << "Opening file: " << outFileName << G4endl;
+  anMan->OpenFile(outFileName);
   // anMan->SetFirstHistoId(1);
   // anMan->SetFirstNtupleId(1);
   // Creating histograms
@@ -232,7 +239,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // Histogram to get the cos(theta_e) from event generator
   anMan->CreateH1("Electron_angle_to_pol_generated",
                   "Electron_angle_to_pol_generated",
-                  100, -1.0, 1.0);
+                  100, -1.1, 1.1);
   anMan->CreateH1("Electron energy (event generator)",
                   "Electron energy(event generator", 1000, 0.0, 10.0);
   anMan->CreateH1("v_over_c", "v_over_c", 100, 0.0, 1.0);
@@ -247,39 +254,39 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // One ntuple per accepted event will contain all the information of the event
   // By "all," I mean what we will get from the detectors.  Energy deposited.
   // Some of these also give information straight out of the event generator.
-  anMan->CreateNtuple(fileName, "Event data");
-  // +1 for plus-z detecotrs, -1 for minus-z detectors
-  anMan->CreateNtupleIColumn("detector_hit");
-  // Relativistic factor for each event
-  anMan->CreateNtupleDColumn("v_over_c");
-  // Relativistic factor directly from event generator
+  anMan->CreateNtuple(outFileName, "Event data");
+  anMan -> CreateNtupleDColumn("T_e_generated");
   anMan->CreateNtupleDColumn("v_over_c_generated");
-  // Electron angle relative to polarization
   anMan->CreateNtupleDColumn("theta_e_generated");
-  char ntupName[10];
+  anMan -> CreateNtupleDColumn("omega");
+  anMan->CreateNtupleIColumn("detector_hit");
+  anMan->CreateNtupleDColumn("v_over_c");
+  char ntupName[11];
   // Each strip detector reads energy left in each of its 80 channels
   // 2-dimensions * 40 strips/dimension * 2 detectors = 160 columns
-  for (int i = 1; i <= 40; i++) {
+  for (G4int i = 1; i <= 40; i++) {
     snprintf(ntupName, sizeof(ntupName), "SDplusZX%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
-  for (int i = 1; i <= 40; i++) {
+  for (G4int i = 1; i <= 40; i++) {
     snprintf(ntupName, sizeof(ntupName), "SDplusZY%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
-  for (int i = 1; i <= 40; i++) {
+  for (G4int i = 1; i <= 40; i++) {
     snprintf(ntupName, sizeof(ntupName), "SDminsZX%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
-  for (int i = 1; i <= 40; i++) {
+  for (G4int i = 1; i <= 40; i++) {
     snprintf(ntupName, sizeof(ntupName), "SDminsZY%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
   // First level of accepted events:  energy in +z(-z) scintillator and strip
   // detector and no energy in the -z(+z) detector.  Neglects low-energy
-  // back-scattered events.
-  anMan->CreateNtupleIColumn("accepted");
-  anMan->FinishNtuple();
+  // back-scattered eventsxo.
+  anMan -> CreateNtupleIColumn("accepted");
+
+  anMan -> CreateNtupleDColumn("T_e_generated");
+  anMan -> FinishNtuple();
   // End making ntuples
 }
 
@@ -298,11 +305,29 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
   }
 
   // JTW_Event *mytester = new JTW_Event();
-  // for (G4int i = 0; i < pow(10,7); i++) {
-  //   mytester -> MakeEvent();
-  //   if (i % 1000000 == 0) G4cout << "Gen " << i << G4endl;
+  // FILE *f = fopen("RecheckA_beta.dat", "a");
+  // if (!f) G4cout << "COULDN'T OPEN FILE" << G4endl;
+  // G4int numIter = 25000;
+  // for (G4int j = 0; j < numIter; j++) {
+  //   G4int power = 2;
+  //   for (G4int i = 0; i < 2*pow(10, power); i++) {
+  //     mytester -> MakeEvent();
+  //         if (i %  static_cast<int>(pow(10, power-1)) == 0) {
+  //           // G4cout << "Gen " << i << G4endl;
+  //         }
+  //   }
+  //   // G4cout << "Writing to file..." << G4endl;
+  //   // G4cout << mytester -> GetNumPlus() << "\t" << mytester -> GetNumMins()
+  //   //        << G4endl;
+  //   fprintf(f, "%d\t%d\n", mytester -> GetNumPlus(),
+  //           mytester -> GetNumMins());
+  //   mytester -> ResetGeneratedCounters();
+  //   if (j % 1000 == 0) {
+  //     G4cout << j << G4endl;
+  //   }
   // }
 
+  // fclose(f);
   // G4EmCalculator emCalculator;
   // emCalculator.SetVerbose(1);
   // G4ParticleDefinition* particle = kinematic -> GetParticleGun() ->
@@ -311,12 +336,18 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
   G4AnalysisManager *anMan = G4AnalysisManager::Instance();
   // save histograms
   //
-  anMan->Write();
-  anMan->CloseFile();
-  G4cout << "Closed histograms." << G4endl;
-  G4cout << "Total v/c N+ = " << plusZHits_vc << G4endl;
-  G4cout << "Total v/c N- = " << minusZHits_vc << G4endl;
-  delete G4AnalysisManager::Instance();
+  if (true) {
+    G4cout << "Closing histograms........." << G4endl;
+    anMan->Write();
+    anMan->CloseFile();
+    G4cout << "Closed histograms." << G4endl;
+    G4cout << "Total v/c N+ = " << plusZHits_vc << G4endl;
+    G4cout << "Total v/c N- = " << minusZHits_vc << G4endl;
+    delete G4AnalysisManager::Instance();
+  } else {
+    G4cout << "WARNING...Not closing histograms after run!" << G4endl;
+  }
+  G4cout << "Last line of EORA" << G4endl;
 }
 
 void K37RunAction::PrintEnergyLossTable(G4String materialChoice) {

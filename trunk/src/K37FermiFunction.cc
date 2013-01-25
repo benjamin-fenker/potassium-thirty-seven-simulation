@@ -19,7 +19,6 @@ K37FermiFunction::K37FermiFunction(double zChoice, double aChoice)
   A = aChoice;
   Z = zChoice;
   R = 2.5896E-3 *(1.2*pow(A, (1./3.)));
-  Pi = 3.14159265358979;
   alpha = 1./137.036;
   gamma = sqrt(1.-(alpha*alpha*Z*Z));
   twoGammaPlusTwo = 2.*(gamma + 1.);
@@ -36,7 +35,7 @@ G4double K37FermiFunction::getVFF(G4double kineticEnergyChoice) {
   W = (T/massOfElectron) + 1.;
   p = sqrt((W*W) - 1.);
   alphaZWoverP = (alpha*Z*W)/p;
-  exponentResult = exp(Pi*alphaZWoverP);
+  exponentResult = exp(M_PI*alphaZWoverP);
   twoPR = 2.*p*R;
   powerResult = pow(twoPR, twoGammaMinusTwo);
   ratio = (CGF->absSquaredComplexGamma('g', gamma, alphaZWoverP))/

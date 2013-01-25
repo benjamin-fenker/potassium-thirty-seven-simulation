@@ -9,6 +9,9 @@
 #include "G4ios.hh"
 #include "globals.hh"
 
+extern G4bool fillEvGenData;
+extern G4bool fillAllSDData;
+
 //---------------------------------
 
 K37RunMessenger::K37RunMessenger(K37RunAction* RA)
@@ -19,15 +22,17 @@ K37RunMessenger::K37RunMessenger(K37RunAction* RA)
 
   SaveFilesCommand = new G4UIcmdWithAnInteger("/K37/RunControls/saveFiles",
                                               this);
-  SaveFilesCommand->SetParameterName("saveFiles", true);
-  SaveFilesCommand->SetRange("saveFiles>=0 && saveFiles<=3");
-  SaveFilesCommand->SetGuidance("Tells K37 what files should be made");
-  SaveFilesCommand->SetGuidance("saveFiles= 0 nothing saved");
-  SaveFilesCommand->SetGuidance("saveFiles= 1 runstat saved");
-  SaveFilesCommand->SetGuidance("saveFiles= 2 opt.1 + Detector Energies saved");
-  SaveFilesCommand->SetGuidance("saveFiles= 3 opt.2 + Hit Volume Names  saved");
-  SaveFilesCommand->SetDefaultValue(0);
-  SaveFilesCommand->AvailableForStates(G4State_PreInit, G4State_Idle);
+  SaveFilesCommand -> SetParameterName("saveFiles", true);
+  SaveFilesCommand -> SetRange("saveFiles>=0 && saveFiles<=3");
+  SaveFilesCommand -> SetGuidance("Tells K37 what files should be made");
+  SaveFilesCommand -> SetGuidance("saveFiles= 0 nothing saved");
+  SaveFilesCommand -> SetGuidance("saveFiles= 1 runstat saved");
+  SaveFilesCommand ->
+      SetGuidance("saveFiles= 2 opt.1 + Detector Energies saved");
+  SaveFilesCommand ->
+      SetGuidance("saveFiles= 3 opt.2 + Hit Volume Names  saved");
+  SaveFilesCommand -> SetDefaultValue(0);
+  SaveFilesCommand -> AvailableForStates(G4State_PreInit, G4State_Idle);
 
   printEnergyLossTable =
     new G4UIcmdWithAString("/K37/RunControls/printEnergyLossTable", this);
@@ -35,28 +40,49 @@ K37RunMessenger::K37RunMessenger(K37RunAction* RA)
     SetGuidance("Print the energy Loss Table for e+ in Materials");
   printEnergyLossTable ->
     SetGuidance("Material choices listed by /K37/geometry/printMaterialList");
-  printEnergyLossTable->SetParameterName("material", true);
-  printEnergyLossTable->SetDefaultValue("SiliconCarbide");
-  // printEnergyLossTable->SetCandidates("GlassyCarbon SiliconCarbide");
-  // printEnergyLossTable->AvailableForStates(G4State_PreInit,G4State_Idle);
-  printEnergyLossTable->AvailableForStates(G4State_Idle);
+  printEnergyLossTable -> SetParameterName("material", true);
+  printEnergyLossTable -> SetDefaultValue("SiliconCarbide");
+  // printEnergyLossTable -> SetCandidates("GlassyCarbon SiliconCarbide");
+  // printEnergyLossTable -> AvailableForStates(G4State_PreInit,G4State_Idle);
+  printEnergyLossTable -> AvailableForStates(G4State_Idle);
 
   printAnnihilation =
     new G4UIcmdWithABool("/K37/RunControls/printAnnihilation", this);
   printAnnihilation ->
-    SetGuidance("Will cause the coordinates from the annihilation.");
-  printAnnihilation ->SetGuidance("to be written to the file annihilation.txt");
-  printAnnihilation ->SetParameterName("annihil", true);
-  printAnnihilation ->SetDefaultValue(false);
-  printAnnihilation ->AvailableForStates(G4State_Idle);
+    SetGuidance("Will cause the coordinates from the annihilation");
+  printAnnihilation ->
+      SetGuidance("to be written to the file annihilation.txt");
+  printAnnihilation -> SetParameterName("annihil", true);
+  printAnnihilation -> SetDefaultValue(false);
+  printAnnihilation -> AvailableForStates(G4State_Idle);
 
   printTheVolumeNames =
     new G4UIcmdWithABool("/K37/RunControls/printTheVolumeNames", this);
-  printTheVolumeNames->SetGuidance("Will cause the list of VolumeNames to be ");
-  printTheVolumeNames->SetGuidance("printed to the file volumeNames.txt");
-  printTheVolumeNames->SetParameterName("pTheNames", true);
-  printTheVolumeNames->SetDefaultValue(false);
-  printTheVolumeNames->AvailableForStates(G4State_Idle);
+  printTheVolumeNames -> SetGuidance("Will cause VolumeNames to be");
+  printTheVolumeNames -> SetGuidance("printed to the file volumeNames.txt");
+  printTheVolumeNames -> SetParameterName("pTheNames", true);
+  printTheVolumeNames -> SetDefaultValue(false);
+  printTheVolumeNames -> AvailableForStates(G4State_Idle);
+
+  setFillEvGenData =
+      new G4UIcmdWithABool("/K37/RunControls/fillEvGenData", this);
+  setFillEvGenData -> SetGuidance("Will fill (or not) event generator ntuples");
+  setFillEvGenData -> SetParameterName("psetFillEvGenData", true);
+  setFillEvGenData -> SetDefaultValue(true);
+  setFillEvGenData -> AvailableForStates(G4State_Idle);
+
+  setFillAllSDData =
+      new G4UIcmdWithABool("/K37/RunControls/fillAllSDData", this);
+  setFillAllSDData -> SetGuidance("Will fill (or not) event generator ntuples");
+  setFillAllSDData -> SetParameterName("psetFillAllSDData", true);
+  setFillAllSDData -> SetDefaultValue(true);
+  setFillAllSDData -> AvailableForStates(G4State_Idle);
+
+  setFileName = new G4UIcmdWithAString("/K37/RunControls/setFilename", this);
+  setFileName -> SetGuidance("Enter output filename without extension");
+  setFileName -> SetParameterName("filename", true);
+  setFileName -> SetDefaultValue("K37");
+  setFileName -> AvailableForStates(G4State_Idle);
 }
 
 //---------------------------------
@@ -67,6 +93,9 @@ K37RunMessenger::~K37RunMessenger() {
   delete printEnergyLossTable;
   delete printAnnihilation;
   delete printTheVolumeNames;
+  delete setFileName;
+  delete setFillEvGenData;
+  delete setFillAllSDData;
 }
 
 //---------------------------------
@@ -85,6 +114,18 @@ void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   if (command == printTheVolumeNames) {
     runAction -> SetRecordVolumeNames(printTheVolumeNames ->
                                       GetNewBoolValue(newValues));
+  }
+
+  if (command == setFillEvGenData) {
+    fillEvGenData = setFillEvGenData -> GetNewBoolValue(newValues);
+  }
+
+  if (command == setFillAllSDData) {
+    fillAllSDData = setFillAllSDData -> GetNewBoolValue(newValues);
+  }
+
+  if (command == setFileName) {
+    runAction -> setFileName(newValues);
   }
 }
 
