@@ -2,21 +2,34 @@
 
 #include "K37EventGenerator.hh"
 #include "K37FermiFunction.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4Electron.hh"
+#include "G4Proton.hh"
+#include "G4Gamma.hh"
+#include "G4UnitsTable.hh"
 
 K37EventGenerator::K37EventGenerator()
   :FF(0) {
+  // G4Electron *ele = G4Electron::ElectronDefinition();
+  // G4double Mass_e = ele -> GetPDGMass();
+
   FF = new K37FermiFunction();
-  pi = 3.14159265358979323846;
   electron.Mass = 0.510998;           // MeV/c^2
   parent.Mass = 36.97337589*931.46;     // 37K (MeV/c^2)
   daughter.Mass = 36.96677632*931.46;   // 37Ar (MeV/c^2)
   neutrino.Mass = 0.0;
 
   Zhi = 2.69001;
-  BigA = -0.573938;
-  BigB = -0.779145;
-  LittleC = 0.205207;
-  LittleA = 0.657989;
+  //  BigA = -0.573938;
+  BigA = -0.5;
+  //  BigA = 0.0;
+  // BigA = -1.0;
+  // BigB = -0.779145;
+  BigB = 0.0;
+  // LittleC = 0.205207;
+  LittleC = 0.0;
+  // LittleA = 0.657989;
+  LittleA = 0.0;
 
   // All in MeV/c^2
   QValue = -1.0 * (daughter.Mass - parent.Mass  + 2. * electron.Mass);
@@ -42,7 +55,7 @@ K37EventGenerator::K37EventGenerator()
 }
 
 K37EventGenerator::~K37EventGenerator() {
-  G4cout << "BF LOOK HERE: total v/c = " << v_over_c_running << G4endl;
-  G4cout << "num = " << running_num << " denom: " << running_denom << G4endl;
+  // G4cout << "BF LOOK HERE: total v/c = " << v_over_c_running << G4endl;
+  // G4cout << "num = " << running_num << " denom: " << running_denom << G4endl;
   delete FF;
 }

@@ -78,7 +78,8 @@ K37ElectricFieldSetup::~K37ElectricFieldSetup() {
 void K37ElectricFieldSetup::UpdateField() {
   SetStepper();
 
-  G4cout << "The minimal step is equal to " << fMinStep/mm << " mm" << G4endl;
+  // G4cout << "The minimal step is equal to " << fMinStep/mm
+  //        << " mm" << G4endl;
 
   fFieldManager -> SetDetectorField(fEMfield);
 
@@ -103,7 +104,7 @@ void K37ElectricFieldSetup::SetStepper() {
   G4int nvar = 8;
 
   if (fStepper) delete fStepper;
-
+  G4cout << "For electric field tracking...";
   switch (fStepperType) {
   case 0:
     fStepper = new G4ExplicitEuler(fEquation, nvar);

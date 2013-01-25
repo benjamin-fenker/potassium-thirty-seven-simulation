@@ -10,7 +10,6 @@
 K37ComplexGammaFunction::K37ComplexGammaFunction()
   : Real_1(0), Real_0(0), Imaginary_1(0), NA(0), Z1(0), TH(0), GR(0), GI(0),
     T(0), GR1(0), GI1(0), TH1(0), SR(0), SI(0), Z2(0), TH2(0), G0(0) {
-  PI = 3.141592653589793;
   coefficients[0] = 8.333333333333333e-2;
   coefficients[1] = -2.777777777777778e-3;
   coefficients[2] = 7.936507936507937e-4;
@@ -55,7 +54,7 @@ void K37ComplexGammaFunction::computeK37ComplexGammaFunction(char choice,
   Z1 = sqrt(std::pow(Real_0, 2.0)+std::pow(Imaginary, 2.0));
   TH = std::atan(Imaginary/Real_0);
 
-  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*PI);
+  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*M_PI);
   GI = TH*(Real_0-0.5)+Imaginary*log(Z1)-Imaginary;
 
   for (int K =1; K <=10; ++K) {
@@ -81,17 +80,17 @@ void K37ComplexGammaFunction::computeK37ComplexGammaFunction(char choice,
   if (Real_1 < 0.0) {
     Z1 = sqrt(Real*Real+Imaginary*Imaginary);
     TH1 = atan(Imaginary/Real);
-    SR = -sin(PI*Real)*cosh(PI*Imaginary);
-    SI = -cos(PI*Real)*sinh(PI*Imaginary);
+    SR = -sin(M_PI*Real)*cosh(M_PI*Imaginary);
+    SI = -cos(M_PI*Real)*sinh(M_PI*Imaginary);
     Z2 = sqrt(SR*SR+SI*SI);
     TH2 = atan(SI/SR);
     // G4cout<< "It is here" << G4endl;
     // G4cout<< Z1<<"  "<< TH1<< "  "<< SR << G4endl;
     if (SR < 0.0) {
-      TH2 += PI;
+      TH2 += M_PI;
     }
 
-    GR = log(PI/(Z1*Z2))-GR;
+    GR = log(M_PI/(Z1*Z2))-GR;
     GI = -TH1-TH2-GI;
     Real = Real_1;
     Imaginary = Imaginary_1;
@@ -133,7 +132,7 @@ double K37ComplexGammaFunction::realPart(char choice, double Real,
   Z1 = sqrt(std::pow(Real_0, 2.0)+std::pow(Imaginary, 2.0));
   TH  = std::atan(Imaginary/Real_0);
 
-  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*PI);
+  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*M_PI);
   GI = TH*(Real_0-0.5)+Imaginary*log(Z1)-Imaginary;
 
   for (int K =1; K <=10; ++K) {
@@ -156,16 +155,16 @@ double K37ComplexGammaFunction::realPart(char choice, double Real,
   if (Real_1 < 0.0) {
     Z1 = sqrt(Real*Real+Imaginary*Imaginary);
     TH1 = atan(Imaginary/Real);
-    SR = -sin(PI*Real)*cosh(PI*Imaginary);
-    SI = -cos(PI*Real)*sinh(PI*Imaginary);
+    SR = -sin(M_PI*Real)*cosh(M_PI*Imaginary);
+    SI = -cos(M_PI*Real)*sinh(M_PI*Imaginary);
     Z2 = sqrt(SR*SR+SI*SI);
     TH2 = atan(SI/SR);
 
     if (SR < 0.0) {
-      TH2 += PI;
+      TH2 += M_PI;
     }
 
-    GR = log(PI/(Z1*Z2))-GR;
+    GR = log(M_PI/(Z1*Z2))-GR;
     GI = -TH1-TH2-GI;
     Real = Real_1;
     Imaginary = Imaginary_1;
@@ -203,7 +202,7 @@ double K37ComplexGammaFunction::absSquaredComplexGamma(char choice, double Real,
   Z1 = sqrt(std::pow(Real_0, 2.0)+std::pow(Imaginary, 2.0));
   TH  = std::atan(Imaginary/Real_0);
 
-  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*PI);
+  GR = (Real_0-0.5)*log(Z1)-TH*Imaginary-Real_0+0.5*log(2.0*M_PI);
   GI = TH*(Real_0-0.5)+Imaginary*log(Z1)-Imaginary;
 
   for (int K =1; K <=10; ++K) {
@@ -227,16 +226,16 @@ double K37ComplexGammaFunction::absSquaredComplexGamma(char choice, double Real,
   if (Real_1 < 0.0) {
     Z1 = sqrt(Real*Real+Imaginary*Imaginary);
     TH1 = atan(Imaginary/Real);
-    SR = -sin(PI*Real)*cosh(PI*Imaginary);
-    SI = -cos(PI*Real)*sinh(PI*Imaginary);
+    SR = -sin(M_PI*Real)*cosh(M_PI*Imaginary);
+    SI = -cos(M_PI*Real)*sinh(M_PI*Imaginary);
     Z2 = sqrt(SR*SR+SI*SI);
     TH2 = atan(SI/SR);
 
     if (SR < 0.0) {
-      TH2+=PI;
+      TH2+=M_PI;
     }
 
-    GR = log(PI/(Z1*Z2))-GR;
+    GR = log(M_PI/(Z1*Z2))-GR;
     GI = -TH1-TH2-GI;
     Real = Real_1;
     Imaginary = Imaginary_1;

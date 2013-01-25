@@ -1,5 +1,7 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
+#include "globals.hh"
+
 #include "K37FieldMessenger.hh"
 
 #include "K37ElectricFieldSetup.hh"
@@ -10,11 +12,13 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithoutParameter.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
-
+#include "G4UnitsTable.hh"
 //------------------------------------------------
 
 K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
   :fEFieldSetup(pEMfield) {
+  new  G4UnitDefinition("kilovolt/cm", "kV/cm", "Electric field", kilovolt/cm);
+
   fieldDir = new G4UIdirectory("/K37/field/");
   fieldDir->SetGuidance("F02 field tracking control.");
 
@@ -45,17 +49,16 @@ K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
   MinStepCmd->SetDefaultUnit("mm");
   MinStepCmd->AvailableForStates(G4State_Idle);
 
-  changeFieldCmd =
-    new G4UIcmdWith3VectorAndUnit("/K37/field/changeField", this);
-  changeFieldCmd ->SetGuidance("The field can be changed by inputting");
-  changeFieldCmd ->SetGuidance("a ThreeVector with a unit");
+  changeFieldCmd = new G4UIcmdWith3VectorAndUnit("/K37/field/changeField",
+                                                 this);
+  changeFieldCmd -> SetGuidance("The field can be changed by inputting");
+  changeFieldCmd -> SetGuidance("a ThreeVector with a unit");
   changeFieldCmd -> SetParameterName("fieldValueX", "fieldValueY",
                                      "fieldValueZ", false, false);
   // The .hh file give the purpose of the booleans ----
   // (const char * theNameX,const char * theNameY,const char * theNameZ, G4bool
   // omittable,G4bool currentAsDefault)
-
-  changeFieldCmd ->SetDefaultUnit("KVperCM");
+  changeFieldCmd -> SetDefaultUnit("kV/cm");
   changeFieldCmd -> AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 

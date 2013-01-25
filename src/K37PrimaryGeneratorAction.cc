@@ -31,9 +31,8 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   gunMessenger = new K37PrimaryGeneratorMessenger(this);
   insideCollimator = detector->GetSubtraction();
   distanceToTrap =detector->GetDistanceToTrap();
-  G4cout <<"Subtraction: " << insideCollimator << " Distance to Trap (cm): "
-         << distanceToTrap << G4endl;
-  G4cout << "****************************************************" << G4endl;
+  // G4cout <<"Subtraction: " << insideCollimator << " Distance to Trap (cm): "
+  //        << distanceToTrap << G4endl;
 
   // G4int n_particle = 1;
   // particleGun = new G4ParticleGun(n_particle);
@@ -46,13 +45,11 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
   ion = particleTable->GetIon(18, 37, 0);
 
-  G4cout << ":::::::::::::::::::::::::::::::::::::::::::::::::" << G4endl;
   // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
   // evGenerator->MakeEvent();
   // G4IonTable* ionTable = particleTable-> GetIonTable();
   // ionTable->DumpTable();
   // particleTable->DumpTable();
-  G4cout << ":::::::::::::::::::::::::::::::::::::::::::::::::" << G4endl;
 }
 
 K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
