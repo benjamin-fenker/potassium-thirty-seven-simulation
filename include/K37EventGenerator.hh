@@ -29,7 +29,7 @@ class K37EventGenerator {
  protected:
   /*int width, height;*/
   particle electron, parent, daughter, neutrino;
-  G4double pi, QValue, cosBetaNeutrinoAngle, eDotJ, nDotJ, eDotn;
+  G4double QValue, cosBetaNeutrinoAngle, eDotJ, nDotJ, eDotn;
   G4double Omega, testOmega, Zhi, BigA, BigB, LittleC, LittleA;
   K37FermiFunction* FF;
   G4double v_over_c_running;    // Will keep a running tally of v/c coming out

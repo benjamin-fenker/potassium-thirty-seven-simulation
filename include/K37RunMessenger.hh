@@ -25,12 +25,15 @@ class K37RunMessenger: public G4UImessenger {
   void SetNewValue(G4UIcommand*, G4String);
 
  private:
-  K37RunAction*                 runAction;
-  G4UIdirectory*                RunDirectory;
-  G4UIcmdWithAnInteger*         SaveFilesCommand;
-  G4UIcmdWithAString*           printEnergyLossTable;
-  G4UIcmdWithABool*             printAnnihilation;
-  G4UIcmdWithABool*             printTheVolumeNames;
+  K37RunAction* runAction;
+  G4UIdirectory* RunDirectory;
+  G4UIcmdWithAnInteger* SaveFilesCommand;
+  G4UIcmdWithAString* printEnergyLossTable;
+  G4UIcmdWithAString* setFileName;
+  G4UIcmdWithABool* printAnnihilation;
+  G4UIcmdWithABool* printTheVolumeNames;
+  G4UIcmdWithABool* setFillEvGenData;
+  G4UIcmdWithABool* setFillAllSDData;
 };
 
 #endif

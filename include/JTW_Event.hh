@@ -6,4 +6,9 @@ class JTW_Event: public K37EventGenerator {
  public:
   /*int area (){ return (width * height / 2); };*/
   void MakeEvent();
+  void ResetGeneratedCounters();
+  G4int GetNumMins();
+  G4int GetNumPlus();
+ private:
+  G4int numMins, numPlus;
 };
