@@ -20,13 +20,24 @@
 #define hist_v_over_c_generated 6
 
 // Numbering of ntuples is independent of histogram numbering
-#define ntup_sign_z_hit 0
-#define ntup_v_over_c 1
-#define ntup_v_over_c_generated 2
-#define ntup_theta_e_generated 3
-#define ntup_SD_plusZ_X_start 4
-#define ntup_SD_plusZ_Y_start 44
-#define ntup_SD_minsZ_X_start 84
-#define ntup_SD_minsZ_Y_start 124
-#define ntup_accepted 164
+// Event generator ntuples
+#define ntup_electron_kinetic_energy_gen 0
+#define ntup_v_over_c_generated 1
+#define ntup_theta_e_generated 2
+#define ntup_omega 3
+
+// Scintillator ntuples
+#define ntup_sign_z_hit 4
+#define ntup_v_over_c 5
+
+// Strip detector ntuples
+#define ntup_SD_plusZ_X_start 6
+#define ntup_SD_plusZ_Y_start 46
+#define ntup_SD_minsZ_X_start 86
+#define ntup_SD_minsZ_Y_start 126
+
+// Other ntuples
+#define ntup_accepted 166
+
+
 #endif  // INCLUDE_K37ANALYSISNUMBERING_H_

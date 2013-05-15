@@ -76,7 +76,6 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4Material* Hoop7Material;
   G4Material*   MCPMaterial;
   G4Trd * MM_CollimatorCut_sol;
-  K37ElectricFieldSetup* fEmFieldSetup;     // pointer to the field helper
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
   // = true or straight cut = false
   CLHEP::HepRotation* changeZtoX;

@@ -20,7 +20,6 @@ class K37FermiFunction {
   G4double A;                 // mass number of isotope
   G4double R;                 // Radius of the nucleus
   G4double Z;                 // Charge of isotope negative for beta minus decay
-  G4double Pi;                // pi
   G4double alpha;
   G4double gamma;
   G4double twoGammaPlusTwo;

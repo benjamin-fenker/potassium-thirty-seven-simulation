@@ -4,6 +4,7 @@
 #define K37RunAction_h 1
 
 #include "G4UserRunAction.hh"
+#include "K37RunMessenger.hh"
 #include "globals.hh"
 
 //----------------------------------
@@ -12,7 +13,7 @@ class G4Run;
 class K37DetectorConstruction;
 class K37PrimaryGeneratorAction;
 class K37ListOfVolumeNames;
-class K37RunMessenger;
+// class K37RunMessenger;
 class K37AnnihilationPosition;
 class K37AllPossibleEventInformation;
 class K37HistogramManager;
@@ -144,7 +145,9 @@ class K37RunAction : public G4UserRunAction {
   G4bool GetRecordVolumeNames() {
     return recordVolumeNames;
   };
-
+  void setFileName(G4String newName) {
+    outFileName = newName;
+  }
 
  private:
   G4int NbofEvents;
@@ -206,6 +209,12 @@ class K37RunAction : public G4UserRunAction {
   G4bool recordEventInformation;
 
   K37HistogramManager * histograms;
+
+  // ROOT output filename
+  G4String outFileName;
+
+  // Event generator testing 1/18/2013
+  G4int numPlus, numMinus;
 };
 
 //----------------------------------

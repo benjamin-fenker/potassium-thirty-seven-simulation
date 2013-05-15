@@ -44,9 +44,9 @@
 using std::ofstream;
 
 int main(int argc, char** argv) {
-  G4cout << "=================================" << G4endl;
-  G4cout << "This is K37 revesion " << K37_VERSION << G4endl;
-  G4cout << "=================================" << G4endl;
+  // G4cout << "=================================" << G4endl;
+  // G4cout << "This is K37 revesion " << K37_VERSION << G4endl;
+  // G4cout << "=================================" << G4endl;
   // G4bool shouldwe = 0;
   // G4bool nowewont = 0;
   // G4bool yeswewill = 0;
@@ -130,9 +130,7 @@ int main(int argc, char** argv) {
   if (result != 0) G4cout << "Could not remove detectors.root." << G4endl;
 
 #ifdef G4VIS_USE
-  G4cout << "About to make a vismanager." << G4endl;
   G4VisManager* visManager = new G4VisExecutive();
-  G4cout << "Check" << G4endl;
   visManager->Initialize();
   G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID();
   model->SetDefault("cyan");
@@ -144,7 +142,6 @@ int main(int argc, char** argv) {
   visManager->RegisterModel(model);
   visManager->SelectTrajectoryModel(model->Name());
 #endif
-  G4cout << "Phew.  Made it" << G4endl;
 
   // Get the pointer to the User Interface manager
   //

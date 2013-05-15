@@ -18,7 +18,6 @@ class K37ComplexGammaFunction {
   G4double squaredRealGamma(G4double);
 
  private:
-  G4double PI;
   G4double coefficients[kComplexGammeFunctionCoefficientsSize];
   G4double Real_1;
   G4double Real_0;
