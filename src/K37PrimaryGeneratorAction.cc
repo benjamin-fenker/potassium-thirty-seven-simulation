@@ -43,6 +43,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   positron = particleTable->FindParticle(particleName="e+");
   electron = particleTable->FindParticle(particleName="e-");
   Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
+
   ion = particleTable->GetIon(18, 37, 0);
 
   // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
@@ -79,7 +80,6 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
 
     if (randomFlag == "on") {
       // evMaker->MakeEvent();
-
       rho = 1;
       vertex = new G4PrimaryVertex(EventVertex, 0);
       this->setBetaVertex();
@@ -119,9 +119,11 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
 }
 
 void K37PrimaryGeneratorAction::setDaughterVertex() {
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition *daughter = particleTable -> FindParticle("Ar37Minus");
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4PrimaryParticle* particle =
-    new G4PrimaryParticle(ion, evGenerator->dMomentumX(),
+    new G4PrimaryParticle(daughter, evGenerator->dMomentumX(),
                           evGenerator->dMomentumY(), evGenerator->dMomentumZ());
   vertex->SetPrimary(particle);
 }

@@ -18,6 +18,7 @@
 #include "G4IonParametrisedLossModel.hh"
 #include "G4StepLimiter.hh"
 #include "G4UserSpecialCuts.hh"
+#include "G4DecayTable.hh"
 
 #include "K37PhysicsList.hh"
 #include "K37ArNeutralDefinition.hh"
@@ -84,6 +85,9 @@ void K37PhysicsList::ConstructDecay() {
     G4ParticleDefinition* particle = theParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
     if (theDecayProcess->IsApplicable(*particle)) {
+      // G4cout << particle -> GetParticleName() << G4endl;
+      // G4DecayTable *table = particle -> GetDecayTable();
+      // if (table) table -> DumpInfo();
       pmanager ->AddProcess(theDecayProcess);
       // set ordering for PostStepDoIt and AtRestDoIt
       pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);

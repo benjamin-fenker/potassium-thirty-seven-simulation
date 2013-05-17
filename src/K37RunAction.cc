@@ -236,7 +236,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
                   200, 0., 10000);
   anMan->CreateH1("ODA Detector Strip Detector", "ODA Detector Strip Detector",
                   1000, 0., 10000);
-  // Histogram to get the cos(theta_e) from event generator
+  //  Histogram to get the cos(theta_e) from event generator
   anMan->CreateH1("Electron_angle_to_pol_generated",
                   "Electron_angle_to_pol_generated",
                   100, -1.1, 1.1);
@@ -254,39 +254,42 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // One ntuple per accepted event will contain all the information of the event
   // By "all," I mean what we will get from the detectors.  Energy deposited.
   // Some of these also give information straight out of the event generator.
-  anMan->CreateNtuple(outFileName, "Event data");
+  anMan->CreateNtuple("ntuple", "Event data");
   anMan -> CreateNtupleDColumn("T_e_generated");
   anMan->CreateNtupleDColumn("v_over_c_generated");
   anMan->CreateNtupleDColumn("theta_e_generated");
   anMan -> CreateNtupleDColumn("omega");
   anMan->CreateNtupleIColumn("detector_hit");
   anMan->CreateNtupleDColumn("v_over_c");
-  char ntupName[11];
+  char ntupName[15];
   // Each strip detector reads energy left in each of its 80 channels
   // 2-dimensions * 40 strips/dimension * 2 detectors = 160 columns
   for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "SDplusZX%02d", i);
+    //    snprintf(ntupName, sizeof(ntupName), "SDplusZX%02d", i);
+    snprintf(ntupName, sizeof(ntupName), "STRIP_UX_%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
   for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "SDplusZY%02d", i);
+    snprintf(ntupName, sizeof(ntupName), "STRIP_UY_%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
   for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "SDminsZX%02d", i);
+    snprintf(ntupName, sizeof(ntupName), "STRIP_LX_%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
   for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "SDminsZY%02d", i);
+    snprintf(ntupName, sizeof(ntupName), "STRIP_LY_%02d", i);
     anMan->CreateNtupleDColumn(ntupName);
   }
   // First level of accepted events:  energy in +z(-z) scintillator and strip
   // detector and no energy in the -z(+z) detector.  Neglects low-energy
   // back-scattered eventsxo.
   anMan -> CreateNtupleIColumn("accepted");
-
   anMan -> CreateNtupleDColumn("T_e_generated");
   anMan -> FinishNtuple();
+  anMan -> CreateNtupleDColumn("TDC_SCINT_TOP");
+  anMan -> CreateNtupleDColumn("TDC_SCINT_BOTTOM");
+
   // End making ntuples
 }
 

@@ -26,9 +26,10 @@ K37Ar37Neutral* K37Ar37Neutral::Definition() {
         //             stable         lifetime    decay table
         //             shortlived      subType    anti_encoding
         //             excitation
+
         anInstance = new G4Ions(
                  name,      34.434330043344002*GeV,       0.0*MeV,  0.0*eplus,
-                    0,                          +1,             0,
+                    3,                          +1,             0,
                     0,                           0,             0,
             "nucleus",                           0,           +37,  1000180370,
                  true,                        -1.0,          NULL,

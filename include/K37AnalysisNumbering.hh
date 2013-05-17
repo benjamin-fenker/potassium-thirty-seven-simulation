@@ -38,6 +38,7 @@
 
 // Other ntuples
 #define ntup_accepted 166
-
+#define ntup_tdc_scint_top 167
+#define ntup_tdc_scint_bottom 168
 
 #endif  // INCLUDE_K37ANALYSISNUMBERING_H_

@@ -56,7 +56,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructChamber();      // Not a sensitive detector
   void ConstructMirrors();      // Not a sensitive detector
   void ConstructHoops();        // Not a sensitive detector
-  void ConstructElectronMCP();  // Not a sensitive detector (yet!)
+  void ConstructElectronMCP(G4SDManager *sd_man);
   void ConstructCoils();        // Not a sensitive detector
   void DefineMaterials();
 

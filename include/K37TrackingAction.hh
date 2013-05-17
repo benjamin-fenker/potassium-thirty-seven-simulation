@@ -11,7 +11,7 @@ class K37TrackingAction : public G4UserTrackingAction {
   K37TrackingAction() {}
   virtual ~K37TrackingAction() {}
 
-  // virtual void PreUserTrackingAction(const G4Track*);
+  void PreUserTrackingAction(const G4Track*);
 };
 
 #endif
