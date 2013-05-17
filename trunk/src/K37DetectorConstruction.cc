@@ -8,6 +8,7 @@
 #include "K37MirrorSD.hh"
 #include "K37StripDetectorSD.hh"
 #include "K37ElectricFieldSetup.hh"
+#include "K37ElectronMCPSD.hh"
 
 // materials
 #include "G4Material.hh"
@@ -142,7 +143,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
       created. This will lead to what I believe to be a better organization of
       the code because every aspect of a volume will no be localized so that
       volumes can be added and subtracted more easily.
-      -----------------------------------------------------------------------------*/
+      ------------------------------------------------------------------------*/
     G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
     G4double world_x = 1.0*m;
@@ -161,7 +162,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeChamber) ConstructChamber();
     if (makeMirrors) ConstructMirrors();
     if (makeHoops) ConstructHoops();
-    if (makeElectronMCP) ConstructElectronMCP();
+    if (makeElectronMCP) ConstructElectronMCP(SDman);
     if (makeCoils) ConstructCoils();
     if (makeCoils) {
     }  // End if(makeCoils)
@@ -1089,7 +1090,7 @@ void K37DetectorConstruction::ConstructHoops() {
                     hoop_1_log, "hoop_1_phys", world_log, false, 0);
 }  // End construct hoops
 
-void K37DetectorConstruction::ConstructElectronMCP() {
+void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   G4double SOED_rmax = 80./2.*mm;
   G4double SOED_rmin = 0     *mm;
   G4double SOED_dz   = 10./2.*mm;
@@ -1105,6 +1106,12 @@ void K37DetectorConstruction::ConstructElectronMCP() {
   SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.1, 0.8, 0.8));
   SOED_logVisAttributes-> SetForceSolid(true);
   SOED_log -> SetVisAttributes(SOED_logVisAttributes);
+  
+  // Set up sensitive detector
+  K37ElectronMCPSD *electron_mcp_sd =
+      new K37ElectronMCPSD("/mydet/electron_mcp");
+  sd_man -> AddNewDetector(electron_mcp_sd);
+  SOED_log -> SetSensitiveDetector(electron_mcp_sd);
 }  // End construct EMCP
 
 void K37DetectorConstruction::ConstructCoils() {

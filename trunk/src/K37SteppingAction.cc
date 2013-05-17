@@ -26,8 +26,7 @@ K37SteppingAction::K37SteppingAction(K37EventAction* event,
     annihilationPosition(anhilP), AllTheInformation(APEI) {
 }
 
-K37SteppingAction::~K37SteppingAction() {
-}
+K37SteppingAction::~K37SteppingAction() {}
 
 void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
   G4Track * theTrack = theStep->GetTrack();
@@ -39,8 +38,9 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
   // G4cout<<"IT WORKS LIKE A CHARM"<<G4endl;
   // }
   /*
-    if(theTrack->GetParentID()==0 && theTrack->GetTrackStatus()!=fStopAndKill && (theTrack->GetPosition().x())/mm > 100)
-    {
+    if(theTrack -> GetParentID() == 0 &&
+    theTrack->GetTrackStatus() != fStopAndKill &&
+    (theTrack->GetPosition().x())/mm > 100) {
     ofstream zpos;
     zpos.open ("alive.txt", ofstream::out | ofstream::app);
     zpos.setf( std::ios::fixed, std::ios::floatfield );
@@ -284,5 +284,3 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
   theTrack->SetTrackStatus(fSuspend);
   */
 }
-
-

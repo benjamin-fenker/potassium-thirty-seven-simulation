@@ -19,6 +19,10 @@ K37Ar37Minus* K37Ar37Minus::Definition() {
     G4Ions* anInstance = reinterpret_cast<G4Ions*>(pTable->FindParticle(name));
     // G4ParticleDefinition* anInstance =
     //   reinterpret_cast< G4ParticleDefinition*>(pTable->FindParticle(name));
+    // create Decay Table
+    G4DecayTable* table = new G4DecayTable();
+    // create decay channel: Ar37Minus -> Ar + e-
+
     if (anInstance ==0) {
         // create particle
         //
@@ -32,20 +36,12 @@ K37Ar37Minus* K37Ar37Minus::Definition() {
         //             excitation
       anInstance = new G4Ions(name, 34.4348410923*GeV, 2.5315e-27*GeV,
                               -1.0*eplus, 0, +1, 0, 0, 0, 0, "nucleus", 0, +37,
-                              1000180370, false, 260.0*ns, NULL, false,
+                              1000180370, false, 0.01*ns, table, false,
                               "static", -1000180370, 0.0);
-
-        // create Decay Table
-        G4DecayTable* table = new G4DecayTable();
-        // create decay channel: Ar37Minus -> Ar + e-
-        G4PhaseSpaceDecayChannel* mode =
-          new G4PhaseSpaceDecayChannel("Ar37Minus", 1, 2, "Ar37Neutral", "e-");
-
-        table->Insert(mode);
-        // delete mode;
-
-        anInstance->SetDecayTable(table);
     }
+    G4PhaseSpaceDecayChannel* mode =
+        new G4PhaseSpaceDecayChannel("Ar37Minus", 1.0, 2, "Ar37Neutral", "e-");
+    table -> Insert(mode);
     theInstance = reinterpret_cast<K37Ar37Minus*>(anInstance);
     return theInstance;
 }

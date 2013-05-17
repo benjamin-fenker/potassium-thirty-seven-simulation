@@ -30,20 +30,13 @@ class K37EventAction : public G4UserEventAction {
  public:
   void BeginOfEventAction(const G4Event*);
   void EndOfEventAction(const G4Event*);
-  void BackscatterFlag() {
-    bs_flag = 1;
-  };
+  void BackscatterFlag() {bs_flag = 1;};
   void setEnteringDedx(G4ThreeVector);
   void setStartingDirection(G4ThreeVector);
-  void setScatterOffHoopFlag() {
-    primaryScatteredOffHoops = true;
-  };
-  void SetAccepted() {
-    accepted = 0;
-  };
-  G4double GetAccepted() {
-    return accepted;
-  };
+  void setScatterOffHoopFlag() {primaryScatteredOffHoops = true;};
+  void SetAccepted() {accepted = 0;};
+  void PrintEvent(const G4Event*);
+  G4double GetAccepted() {return accepted;};
   // Will return beta = v/c for the particle
   G4double GetRelativisticFactor(G4double particleMass, G4double totalE);
 
@@ -65,7 +58,6 @@ class K37EventAction : public G4UserEventAction {
   // G4THitsMap<G4double>* energyMirror2Map;
   // G4THitsMap<G4double>* energyBeryllium2Map;
   // G4THitsMap<G4double>* energyDedx2Map;
-  // G4THitsMap<G4double>* energySiLi2Map;
   // G4THitsMap<G4double>* energyMountMap;
   // G4THitsMap<G4double>* energyBerylliumMap;
   // G4THitsMap<G4double>* energyFaceMap;
@@ -92,12 +84,16 @@ class K37EventAction : public G4UserEventAction {
   G4int FaceID;
 
   G4double energyMirror;
-  G4double energySiLi;
-  G4double energySiLi_Secondaries;
-  G4double energySiLi_Primaries;
-  G4double energySiLi2;
-  G4double energySiLi2_Secondaries;
-  G4double energySiLi2_Primaries;
+  G4double energy_upper_scintillator;
+  G4double energy_upper_scintillator_secondaries;
+  G4double energy_upper_scintillator_primaries;
+  G4double energy_lower_scintillator;
+  G4double energy_lower_scintillator_secondaries;
+  G4double energy_lower_scintillator_primaries;
+
+  // Time of first hit in each detector
+  G4double time_upper_scintillator;
+  G4double time_lower_scintillator;
 
   G4double energyDedx;
   G4double energyDedx_Primaries;
@@ -112,7 +108,6 @@ class K37EventAction : public G4UserEventAction {
   G4double energyMirror2;
   G4double energyBeryllium2;
   // G4double energyDedx2;
-  // G4double energySiLi2;
   G4double energyMount;
   G4double energyBeryllium;
   G4double energyFace;

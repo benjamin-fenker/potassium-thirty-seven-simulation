@@ -21,8 +21,7 @@ K37StackingAction::K37StackingAction()
 
 //-----------------------------------------------
 
-K37StackingAction::~K37StackingAction()
-{}
+K37StackingAction::~K37StackingAction() {}
 
 //-----------------------------------------------
 
@@ -41,12 +40,11 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
     classification = fUrgent;
   }
   if (particleType == K37Ar37Minus::Ar37MinusDefinition()) {
-    classification = fWaiting;
+    classification = fUrgent;
   }
   if (particleType == K37Ar37Neutral::Ar37NeutralDefinition()) {
-    classification = fKill;
+    classification = fUrgent;
   }
-
   return classification;
 }
 

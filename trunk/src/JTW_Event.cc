@@ -171,7 +171,7 @@ void JTW_Event::MakeEvent() {
     anMan -> FillNtupleDColumn(ntup_theta_e_generated, cos(electron.Theta));
     anMan -> FillNtupleDColumn(ntup_omega, Omega);
     anMan -> FillNtupleDColumn(ntup_electron_kinetic_energy_gen, electron.T);
-    anMan -> AddNtupleRow();
+    // anMan -> AddNtupleRow();
   }
 }     // End makeEvent
 

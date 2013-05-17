@@ -56,13 +56,16 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   // BTdedxID= -1;
   // BTscintillatorID= -1;
 
-  energySiLi = 0;
-  energySiLi_Primaries = 0;
-  energySiLi_Secondaries = 0;
+  energy_upper_scintillator = 0;
+  energy_upper_scintillator_primaries = 0;
+  energy_upper_scintillator_secondaries = 0;
 
-  energySiLi2 = 0;
-  energySiLi2_Primaries = 0;
-  energySiLi2_Secondaries = 0;
+  energy_lower_scintillator = 0;
+  energy_lower_scintillator_primaries = 0;
+  energy_lower_scintillator_secondaries = 0;
+
+  time_upper_scintillator = 0.0;
+  time_lower_scintillator = 0.0;
 
   energyDedx = 0;
   energyDedx_Primaries = 0;
@@ -127,13 +130,16 @@ void K37EventAction::BeginOfEventAction(const G4Event*) {
     dedx2CollID = SDman->GetCollectionID(colNam="dsssdMinusZHC");
   }
 
-  energySiLi = 0;
-  energySiLi_Primaries = 0;
-  energySiLi_Secondaries = 0;
+  energy_upper_scintillator = 0;
+  energy_upper_scintillator_primaries = 0;
+  energy_upper_scintillator_secondaries = 0;
 
-  energySiLi2 = 0;
-  energySiLi2_Primaries = 0;
-  energySiLi2_Secondaries = 0;
+  energy_lower_scintillator = 0;
+  energy_lower_scintillator_primaries = 0;
+  energy_lower_scintillator_secondaries = 0;
+
+  time_upper_scintillator = 0.0;
+  time_lower_scintillator = 0.0;
 
   energyDedx = 0;
   energyDedx_Primaries = 0;
@@ -191,11 +197,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // if(fullenergy1CollID<0||dedx1CollID<0||mirrorCollID<0) return;
   if (fullenergy1CollID <0 || dedx1CollID < 0) return;
 
-  G4HCofThisEvent * HCE = evt->GetHCofThisEvent();
+  G4HCofThisEvent * hit_collection = evt->GetHCofThisEvent();
   K37StripDetectorHitsCollection* DEDX1HC = 0;
   K37StripDetectorHitsCollection* DEDX2HC = 0;
-  K37ScintillatorHitsCollection* FE1HC = 0;
-  K37ScintillatorHitsCollection* FE2HC = 0;
+  K37ScintillatorHitsCollection* upper_scintillator_hit_collection = 0;
+  K37ScintillatorHitsCollection* lower_scintillator_hit_collection = 0;
 
   // K37MirrorHitsCollection* MHC = 0;
 
@@ -203,54 +209,74 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // energyBTdedxMap=0;
   // energyBTscintillatorMap=0;
 
-  if (HCE) {
-    FE1HC =
-      static_cast<K37ScintillatorHitsCollection*>(HCE ->
+  if (hit_collection) {
+    upper_scintillator_hit_collection =
+      static_cast<K37ScintillatorHitsCollection*>(hit_collection ->
                                                   GetHC(fullenergy1CollID));
-    FE2HC =
-      static_cast<K37ScintillatorHitsCollection*>(HCE ->
+    lower_scintillator_hit_collection =
+      static_cast<K37ScintillatorHitsCollection*>(hit_collection ->
                                                   GetHC(fullenergy2CollID));
     DEDX1HC =
-      static_cast<K37StripDetectorHitsCollection*>(HCE -> GetHC(dedx1CollID));
+      static_cast<K37StripDetectorHitsCollection*>(hit_collection ->
+                                                   GetHC(dedx1CollID));
     DEDX2HC =
-      static_cast<K37StripDetectorHitsCollection*>(HCE->GetHC(dedx2CollID));
-    // MHC = (K37MirrorHitsCollection*)(HCE->GetHC(mirrorCollID));
+      static_cast<K37StripDetectorHitsCollection*>(hit_collection ->
+                                                   GetHC(dedx2CollID));
+    // MHC = (K37MirrorHitsCollection*)(hit_collection->GetHC(mirrorCollID));
   }
-  if (FE1HC) {  // If FullEnergy1HitCollection - PlusZ
-    int n_hit = FE1HC->entries();
+
+  // If FullEnergy1HitCollection - PlusZ
+  if (upper_scintillator_hit_collection) {
+    int n_hit = upper_scintillator_hit_collection->entries();
+    K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++) {
-      energySiLi += (*FE1HC)[i]->GetEdep();
-      if ((*FE1HC)[i]->GetPrimary()) {
-        energySiLi_Primaries +=(*FE1HC)[i]->GetEdep();
+      // Get the hit
+      hit = (*upper_scintillator_hit_collection)[i];
+
+      energy_upper_scintillator += hit->GetEdep();
+      if (hit->GetPrimary()) {
+        energy_upper_scintillator_primaries += hit -> GetEdep();
       } else {
-        energySiLi_Secondaries+=(*FE1HC)[i]->GetEdep();
+        energy_upper_scintillator_secondaries += hit -> GetEdep();
       }
     }
-    if (energySiLi>0) {
+    if (energy_upper_scintillator>0) {
+      time_upper_scintillator = hit -> GetTime();
       isThereEnergySili = true;
-      if (energySiLi_Primaries == 0) {
+      if (energy_upper_scintillator_primaries == 0) {
         EventInformation->setGammaFiredScintillatorPlusZToTrue();
       }
-      // G4cout<< "energySiLi: " << energySiLi << G4endl;
     }
   }
-  if (FE2HC) {
-    int n_hit = FE2HC->entries();
+  if (lower_scintillator_hit_collection) {
+    int n_hit = lower_scintillator_hit_collection->entries();
+    K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++) {
-      energySiLi2 += (*FE2HC)[i]->GetEdep();
-      if ((*FE2HC)[i]->GetPrimary()) {
-        energySiLi2_Primaries +=(*FE2HC)[i]->GetEdep();
+      hit = (*lower_scintillator_hit_collection)[i];
+      energy_lower_scintillator += hit -> GetEdep();
+      if (hit -> GetPrimary()) {
+        energy_lower_scintillator_primaries += hit -> GetEdep();
       } else {
-        energySiLi2_Secondaries+=(*FE2HC)[i]->GetEdep();
+        energy_lower_scintillator_secondaries += hit -> GetEdep();
       }
     }
-    if (energySiLi2>0) {
+    if (energy_lower_scintillator>0) {
+      time_lower_scintillator = hit -> GetEdep();
       isThereEnergySili2 = true;
-      if (energySiLi2_Primaries == 0) {
+      if (energy_lower_scintillator_primaries == 0) {
         EventInformation->setGammaFiredScintillatorMinusZToTrue();
       }
-      // G4cout<< "energySiLi2: " << energySiLi2 << G4endl;
     }
+  }
+
+  K37ScintillatorHit *first_hit = 0;
+  if (energy_upper_scintillator > 0.0) {
+    first_hit = (*upper_scintillator_hit_collection)[0];
+    time_upper_scintillator = first_hit -> GetTime();
+  }
+  if (energy_lower_scintillator > 0.0) {
+    first_hit = (*lower_scintillator_hit_collection)[0];
+    time_lower_scintillator = first_hit -> GetTime();
   }
 
   // Total energy stored in all the strips (each detector, each direction)
@@ -280,12 +306,12 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         energyDedx2_Primaries +=(*DEDX2HC)[i]->GetEdep();
         // GetPos2() gets 3-vector of post-step point
         stripHandler -> StoreStripInformation((*DEDX2HC)[i] -> GetPos2(),
-                                              (*DEDX2HC)[i]->GetEdep(),
+                                              (*DEDX2HC)[i] -> GetEdep(),
                                               true, false);
       } else {
         energyDedx2_Secondaries +=(*DEDX2HC)[i]->GetEdep();
         stripHandler -> StoreStripInformation((*DEDX2HC)[i] -> GetPos2(),
-                                              (*DEDX2HC)[i]->GetEdep(),
+                                              (*DEDX2HC)[i] -> GetEdep(),
                                               false, false);
       }
     }
@@ -337,16 +363,22 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       // G4cout<< "energyDedx: " << energyDedx << G4endl;
     }
   }  // End strip detector plus z
+
   if ((isThereEnergyDedx == true && isThereEnergySili == true &&
        isThereEnergyDedx2 == false && isThereEnergySili2 == false) ||
       (isThereEnergyDedx == false && isThereEnergySili == false &&
        isThereEnergyDedx2 == true && isThereEnergySili2 == true)) {
+
     G4Electron *theElectron = G4Electron::ElectronDefinition();
     G4double emass = theElectron -> GetPDGMass();
     accepted++;
     anMan->FillNtupleIColumn(ntup_accepted, 1);
     runAct->SetAccepted();
     EventInformation->setThisIsAnAccepterEvent();
+    anMan -> FillNtupleDColumn(ntup_tdc_scint_top,
+                               time_upper_scintillator/ns);
+    anMan -> FillNtupleDColumn(ntup_tdc_scint_bottom,
+                               time_lower_scintillator/ns);
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
@@ -364,25 +396,27 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       detectorADA.open("detectorADA.txt", ofstream::out | ofstream::app);
       detectorADA.setf(std::ios::fixed, std::ios::floatfield);
       detectorADA << setw(15) << left << energyDedx/keV << setw(15) << left
-                  << energySiLi/keV << G4endl;
+                  << energy_upper_scintillator/keV << G4endl;
       detectorADA.close();
 
-      histograms->FillNtuple(1, 0, energySiLi);
+      histograms->FillNtuple(1, 0, energy_upper_scintillator);
       histograms->FillNtuple(0, 0, energyDedx);
       histograms->AddRowNtuple(1);
       histograms->AddRowNtuple(0);
 
       //  fill histograms
-      anMan->FillH1(hist_ADA_Scintillator, energySiLi/keV);
+      anMan->FillH1(hist_ADA_Scintillator, energy_upper_scintillator/keV);
       anMan->FillH1(hist_ADA_StripDetector, energyDedx/keV);
 
-      runAct->incrementPlusZ_vc(GetRelativisticFactor(emass, energySiLi));
+      runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
+                                                    energy_upper_scintillator));
       // Int-column 1 corresponds to plus or minus Z
-      anMan->FillNtupleIColumn(ntup_sign_z_hit, 1);
-      anMan->FillNtupleDColumn(ntup_v_over_c,
-                               GetRelativisticFactor(emass, energySiLi));
+      anMan -> FillNtupleIColumn(ntup_sign_z_hit, 1);
+      anMan -> FillNtupleDColumn(ntup_v_over_c,
+                               GetRelativisticFactor(emass,
+                                                 energy_upper_scintillator));
 
-      EventInformation->setTotalEnergyInScintillator(energySiLi);
+      EventInformation->setTotalEnergyInScintillator(energy_upper_scintillator);
       EventInformation->setTotalEnergyInStripDetector(energyDedx);
       EventInformation->setPlusZDetectorsFiredToTrue();
       EventInformation->setStartStripDetectorTime((*DEDX1HC)[0]->GetTime());
@@ -399,24 +433,28 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       detectorODA.open("detectorODA.txt", ofstream::out | ofstream::app);
       detectorODA.setf(std::ios::fixed, std::ios::floatfield);
       detectorODA << setw(15)<< left << energyDedx2/keV << setw(15) << left
-                  << energySiLi2/keV << G4endl;
+                  << energy_lower_scintillator/keV << G4endl;
       detectorODA.close();
 
-      histograms->FillNtuple(3, 0, energySiLi2);
+      histograms->FillNtuple(3, 0, energy_lower_scintillator);
       histograms->FillNtuple(2, 0, energyDedx2);
       histograms->AddRowNtuple(3);
       histograms->AddRowNtuple(2);
 
       //  Fill histograms
-      anMan->FillH1(hist_ODA_Scintillator, energySiLi2/keV);
-      anMan->FillH1(hist_ODA_StripDetector, energyDedx2/keV);
-      runAct->incrementMinusZ_vc(GetRelativisticFactor(emass, energySiLi2));
-      anMan->FillNtupleIColumn(ntup_sign_z_hit, -1);
-      anMan->FillNtupleDColumn(ntup_v_over_c,
-                               GetRelativisticFactor(emass, energySiLi2));
+      anMan -> FillH1(hist_ODA_Scintillator, energy_lower_scintillator/keV);
+      anMan -> FillH1(hist_ODA_StripDetector, energyDedx2/keV);
+      runAct ->
+          incrementMinusZ_vc(GetRelativisticFactor(emass,
+                                                   energy_lower_scintillator));
+      anMan -> FillNtupleIColumn(ntup_sign_z_hit, -1);
+      anMan -> FillNtupleDColumn(ntup_v_over_c,
+                               GetRelativisticFactor(emass,
+                                                 energy_lower_scintillator));
       // Done filling histograms
 
-      EventInformation->setTotalEnergyInScintillator(energySiLi2);
+      EventInformation ->
+          setTotalEnergyInScintillator(energy_lower_scintillator);
       EventInformation->setTotalEnergyInStripDetector(energyDedx2);
       EventInformation->setStartStripDetectorTime((*DEDX2HC)[0]->GetTime());
 
@@ -442,7 +480,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
     // Add a new row here to add a new row for only accpeted events where
     // either there was energy in the plus or minus z detector, but not both!
-    // anMan -> AddNtupleRow();
+    anMan -> AddNtupleRow();
   } else {  // End is it a good event
     if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
       listOfEnteredVolumes ->
@@ -464,6 +502,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     EventInformation->clearEventInformation();
   }
+  // PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;
   // Add a new row here to add a new row for EVERY EVENT, even events that were
   // not "accepted."
@@ -540,4 +579,47 @@ vector<G4double>K37EventAction::GetEDepVectorX(
 vector<G4double>K37EventAction::GetEDepVectorY(
                                 K37StripDetectorHitsCollection *collection) {
   return GetEDepVector(collection, 2);
+}
+
+void K37EventAction::PrintEvent(const G4Event *event) {
+  G4TrajectoryContainer *trajectory_container =
+      event -> GetTrajectoryContainer();
+  if (!trajectory_container) {
+    G4cout << "Failed to get trajectory container!" << G4endl;
+    return;
+  }
+  G4int number_vertices = event -> GetNumberOfPrimaryVertex();
+  G4int number_trajectories = trajectory_container -> entries();
+  G4int charge, parent_id, id;
+  G4ParticleDefinition *p_def = 0;
+  G4Trajectory *trajectory = 0;
+  G4String name;
+
+
+  G4cout << "************************************" << G4endl;
+  G4cout << "Event ID " << event -> GetEventID()  << " has "
+         << number_vertices << " primary vertices" << " and "
+         << number_trajectories/* << "(" << trajectory_container -> size()
+                                  << ") trajectories" */<< G4endl;
+  for (G4int i = 0; i < number_vertices; i++) {
+    p_def = event -> GetPrimaryVertex(i) -> GetPrimary(0) -> GetG4code();
+    name = p_def -> GetParticleName();
+    charge = p_def -> GetPDGCharge();
+    G4cout << "Vertex " << i << " has primary particle: " << name
+           << " (" << charge << ") " << G4endl;
+  }
+  G4cout << G4endl;
+  for (G4int i = 0; i < number_trajectories; i++) {
+    trajectory = (G4Trajectory*)((*trajectory_container)[i]);
+    // trajectory -> ShowTrajectory();
+    name = trajectory -> GetParticleName();
+    charge = trajectory -> GetCharge();
+    id = trajectory -> GetTrackID();
+    parent_id = trajectory -> GetParentID();
+    G4cout << "Trajectory " << id << " --- " << name << " (" << charge << ") "
+           << "came from PID " << parent_id << G4endl;
+  }
+  G4cout << "************************************" << G4endl;
+  // G4int j;
+  // G4cin >> j;
 }
