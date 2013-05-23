@@ -502,7 +502,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     EventInformation->clearEventInformation();
   }
-  // PrintEvent(evt);
+  PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;
   // Add a new row here to add a new row for EVERY EVENT, even events that were
   // not "accepted."
@@ -582,6 +582,10 @@ vector<G4double>K37EventAction::GetEDepVectorY(
 }
 
 void K37EventAction::PrintEvent(const G4Event *event) {
+  if (!event) {
+    G4cout << "Event invalid!" << G4endl;
+    return;
+  }
   G4TrajectoryContainer *trajectory_container =
       event -> GetTrajectoryContainer();
   if (!trajectory_container) {

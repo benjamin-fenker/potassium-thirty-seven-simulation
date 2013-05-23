@@ -34,6 +34,7 @@ K37ElectricFieldSetup::K37ElectricFieldSetup()
   :fChordFinder(0), fStepper(0), fIntgrDriver(0), fFieldMessenger(0) {
   fEMfield = new G4UniformElectricField(G4ThreeVector(0.0, 1.0*kilovolt/cm,
                                                       0.0));
+  G4cout << "Making field!" << G4endl;
   fFieldMessenger = new K37FieldMessenger(this);
   fEquation = new G4EqMagElectricField(fEMfield);
   fMinStep     = 0.010*mm;  // minimal step of 10 microns
@@ -161,7 +162,8 @@ void K37ElectricFieldSetup::SetStepper() {
 //
 
 void K37ElectricFieldSetup::SetFieldValue(G4double fieldValue) {
-  G4ThreeVector fieldVector(0.0, 0.0, fieldValue);
+  // G4ThreeVector fieldVector(0.0, 0.0, fieldValue);
+  G4ThreeVector fieldVector(0.0, fieldValue, 0.0);
 
   SetFieldValue(fieldVector);
 }

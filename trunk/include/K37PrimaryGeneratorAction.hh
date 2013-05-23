@@ -33,12 +33,11 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   // G4ParticleGun* GetParticleGun() {return particleGun;};
   G4double getVelocity(G4double kineticEnergy,
                        G4double massOfParticle = 0.510998);
-  void setRandomFlag(G4String val) {
-    randomFlag = val;
-  }
+  void setRandomFlag(G4String val) {randomFlag = val;}
+  void SetRecoil(G4String val) {use_recoil_ = val;}
   void setBetaVertex();
   void setDaughterVertex();
-
+  void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
  private:
   G4double      distanceToTrap;
   // G4ParticleGun*      particleGun;
@@ -52,6 +51,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4ParticleDefinition* Ar37MinusParticle;
   G4ParticleDefinition* ion;
 
+  G4String use_recoil_;
   K37DetectorConstruction* detector;
   // K37EventMaker*     evMaker;
   G4String      randomFlag;  // flag for a random momentum direction
