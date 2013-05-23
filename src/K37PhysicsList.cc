@@ -23,6 +23,7 @@
 #include "K37PhysicsList.hh"
 #include "K37ArNeutralDefinition.hh"
 #include "K37ArMinusDefinition.hh"
+#include "K37ArPlusOneDefinition.hh"
 
 //----------------------------------------------------------------------------
 
@@ -61,7 +62,8 @@ void K37PhysicsList::ConstructParticle() {
   // Ar37Neutral && Ar37Minus
   K37Ar37Neutral:: Ar37NeutralDefinition();
   K37Ar37Minus:: Ar37MinusDefinition();
-
+  K37Ar37PlusOne::Ar37PlusOneDefinition();
+  
   G4IonConstructor iConstructor;
   iConstructor.ConstructParticle();
 }
@@ -133,7 +135,7 @@ void K37PhysicsList::ConstructEM() {
       ionIoni->SetEmModel(new G4IonParametrisedLossModel());
       ionIoni->SetStepFunction(0.1, 20*um);
       pmanager->AddProcess(ionIoni, -1, 2, 2);
-    } else if (particleName == "Ar37Neutral") {
+    } else if (particleName == "Ar37Neutral" || particleName == "Ar37PlusOne") {
       // OBJECT may be dynamically created as either a GenericIon or nucleus
       // G4Nucleus exists and therefore has particle type nucleus
       // genericIon:

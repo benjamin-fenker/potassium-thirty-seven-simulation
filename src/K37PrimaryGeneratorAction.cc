@@ -17,7 +17,8 @@
 #include "G4ParticleDefinition.hh"
 #include "G4DecayTable.hh"
 #include "G4PhaseSpaceDecayChannel.hh"
-
+#include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 #include "globals.hh"
 #include "Randomize.hh"
 
@@ -91,6 +92,7 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
                                           evGenerator->dMomentumY(),
                                           evGenerator->dMomentumZ()));
+      SetSOelectronVertices(anEvent, 2);
     } else {
       vertex = new G4PrimaryVertex(EventVertex, 0);
       G4PrimaryParticle* particle =
@@ -120,7 +122,7 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
 
 void K37PrimaryGeneratorAction::setDaughterVertex() {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition *daughter = particleTable -> FindParticle("Ar37Minus");
+  G4ParticleDefinition *daughter = particleTable -> FindParticle("Ar37PlusOne");
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4PrimaryParticle* particle =
     new G4PrimaryParticle(daughter, evGenerator->dMomentumX(),
@@ -128,3 +130,38 @@ void K37PrimaryGeneratorAction::setDaughterVertex() {
   vertex->SetPrimary(particle);
 }
 
+void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
+                                                      G4int num_so_electrons) {
+  G4bool debug = true;
+  for (G4int i = 0; i < num_so_electrons; i++) {
+    G4double kinetic_energy = -1.0, total_energy, momentum, mu, phi, theta;
+    G4double px, py, pz;
+    // Ar binding energy is 15.7 eV and SOE have around this energy
+    // The 5.0 eV width is a total guess
+    while (kinetic_energy < 0.0) {
+      kinetic_energy = CLHEP::RandGauss::shoot(15.7*eV, 5.0*eV);
+    }
+    total_energy = kinetic_energy + electron_mass_c2;
+
+    momentum = sqrt((total_energy * total_energy) -
+                    (electron_mass_c2 * electron_mass_c2));
+    mu = 1.0 - 2.0*G4UniformRand();
+    theta = acos(mu);
+    phi = 2.0*M_PI*G4UniformRand();
+    px = momentum * sin(theta) * cos(phi);
+    py = momentum * sin(theta) * sin(phi);
+    pz = momentum * cos(theta);
+    if (debug) {
+      G4cout << "SOE " << i << G4endl;
+      G4cout << "\tT = " << G4BestUnit(kinetic_energy, "Energy") << "\tE = "
+             << G4BestUnit(total_energy, "Energy") << "\tP = "
+             << momentum << G4endl;
+      G4cout << "\ttheta = " << theta << "\tphi = " << phi << G4endl;
+      G4cout << "\tpx = " << px << "\tpy = " << py << "\tpz = " << pz << G4endl;
+    }
+    G4PrimaryParticle *particle = new G4PrimaryParticle(electron, px, py, pz);
+    vertex = new G4PrimaryVertex(EventVertex, 0); // 0 means occurs at t = 0
+    vertex -> SetPrimary(particle);
+    ev -> AddPrimaryVertex(vertex);
+  }
+}

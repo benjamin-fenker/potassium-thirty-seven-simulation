@@ -35,11 +35,11 @@ K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
   UpdateCmd->SetGuidance("if you changed geometrical value(s).");
   UpdateCmd->AvailableForStates(G4State_Idle);
 
-  ElFieldCmd = new G4UIcmdWithADoubleAndUnit("/K37/field/setFieldZ", this);
+  ElFieldCmd = new G4UIcmdWithADoubleAndUnit("/K37/field/setFieldY", this);
   ElFieldCmd->SetGuidance("Define uniform Electric field.");
-  ElFieldCmd->SetGuidance("Electric field will be in Z direction.");
+  ElFieldCmd->SetGuidance("Electric field will be in Y direction.");
   ElFieldCmd->SetGuidance("Value of Electric field has to be given in volt/m");
-  ElFieldCmd->SetParameterName("Ez", false, false);
+  ElFieldCmd->SetParameterName("Ey", false, false);
   ElFieldCmd->SetDefaultUnit("volt/m");
   ElFieldCmd->AvailableForStates(G4State_Idle);
 

@@ -9,6 +9,7 @@
 #include "K37StripDetectorSD.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37ElectronMCPSD.hh"
+#include "K37RecoilMCPSD.hh"
 
 // materials
 #include "G4Material.hh"
@@ -68,7 +69,8 @@ K37DetectorConstruction::K37DetectorConstruction()
       FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
       MM_logVisAttributes(0), cut_ESP_logVisAttributes(0),
       hoop7_logVisAttributes(0), SOED_logVisAttributes(0),
-      coils_logVisAttributes(0), InvisibilityCloak(0) {
+      coils_logVisAttributes(0), InvisibilityCloak(0),
+      rmcp_logVisAttributes_(0) {
     this-> DefineMaterials();
     detectorMessenger = new K37DetectorMessenger(this);
     InvisibilityCloak = new G4VisAttributes(false);
@@ -80,6 +82,7 @@ K37DetectorConstruction::K37DetectorConstruction()
     makeHoops = true;
     makeElectronMCP = true;
     makeCoils = true;
+    make_r_mcp_ = true;
 }
 
 K37DetectorConstruction::~K37DetectorConstruction() {
@@ -164,8 +167,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeHoops) ConstructHoops();
     if (makeElectronMCP) ConstructElectronMCP(SDman);
     if (makeCoils) ConstructCoils();
-    if (makeCoils) {
-    }  // End if(makeCoils)
+    if (make_r_mcp_) ConstructRecoilMCP(SDman);
     return world_phys;
 }
 
@@ -1113,6 +1115,33 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   sd_man -> AddNewDetector(electron_mcp_sd);
   SOED_log -> SetSensitiveDetector(electron_mcp_sd);
 }  // End construct EMCP
+
+void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
+  G4double rmcp_rmax = 83./2.*mm;
+  G4double rmcp_rmin = 0     *mm;
+  G4double rmcp_dz   = 10./2.*mm;
+  G4double rmcp_start_phi = 0.    *deg;
+  G4double rmcp_d_phi = 360.  *deg;
+  G4double rmcp_z_pos = 102.0 * mm;
+
+  G4Tubs * rmcp_sol = new G4Tubs("rmcp_sol", rmcp_rmin, rmcp_rmax,  rmcp_dz,
+                                 rmcp_start_phi, rmcp_d_phi);
+  G4LogicalVolume * rmcp_log = new G4LogicalVolume(rmcp_sol, MCPMaterial,
+                                                   "rmcp_log", 0, 0, 0);
+  new G4PVPlacement(changeZtoX, G4ThreeVector(0., rmcp_z_pos, 0), rmcp_log,
+                    "rmcp_phys", world_log, false, 0);
+  rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.7, 0.2, 0.2));
+  rmcp_logVisAttributes_ -> SetForceSolid(true);
+  rmcp_log -> SetVisAttributes(rmcp_logVisAttributes_);
+  
+  // Set up sensitive detector
+  K37RecoilMCPSD *electron_mcp_sd =
+      new K37RecoilMCPSD("/mydet/recoil_mcp");
+  sd_man -> AddNewDetector(electron_mcp_sd);
+  rmcp_log -> SetSensitiveDetector(electron_mcp_sd);
+}
+
+
 
 void K37DetectorConstruction::ConstructCoils() {
   G4double coils_rmax = 198./2. *mm;

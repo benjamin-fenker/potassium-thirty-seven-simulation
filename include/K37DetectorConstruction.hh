@@ -57,6 +57,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructMirrors();      // Not a sensitive detector
   void ConstructHoops();        // Not a sensitive detector
   void ConstructElectronMCP(G4SDManager *sd_man);
+  void ConstructRecoilMCP(G4SDManager *sd_man);
   void ConstructCoils();        // Not a sensitive detector
   void DefineMaterials();
 
@@ -116,10 +117,11 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VisAttributes * SOED_logVisAttributes;
   G4VisAttributes * coils_logVisAttributes;
   G4VisAttributes * InvisibilityCloak;
+  G4VisAttributes * rmcp_logVisAttributes_;
   // Bools to turn off or on various aspects of the apparatus to simulate their
   // individual effects
   G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
-  G4bool makeHoops, makeElectronMCP, makeCoils;
+  G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_;
 };
 
 #endif

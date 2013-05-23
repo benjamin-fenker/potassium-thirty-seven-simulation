@@ -37,11 +37,11 @@ void JTW_Event::MakeEvent() {
 
           G4double mu;    // cos(electron.Theta)
           // Picks mu from -1 to 1 uniformly
-          // mu = 1.0 - 2.0*G4UniformRand();
+          mu = 1.0 - 2.0*G4UniformRand();
           // Picks mu uniformly from abs(mu) = minCosTheta to 1
           // mu = 1.0 - (1.0-minCosTheta)*G4UniformRand();
-          mu = 1.0;
-          if (G4UniformRand() > 0.5) mu *= -1.0;
+          // mu = 1.0;
+          // if (G4UniformRand() > 0.5) mu *= -1.0;
           electron.Theta = acos(mu);
           electron.Phi = 2.0*M_PI*G4UniformRand();
 

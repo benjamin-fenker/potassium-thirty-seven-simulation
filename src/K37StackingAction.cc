@@ -11,6 +11,7 @@
 #include "G4ParticleTypes.hh"
 #include "K37ArMinusDefinition.hh"
 #include "K37ArNeutralDefinition.hh"
+#include "K37ArPlusOneDefinition.hh"
 
 //-----------------------------------------------
 
@@ -43,6 +44,9 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
     classification = fUrgent;
   }
   if (particleType == K37Ar37Neutral::Ar37NeutralDefinition()) {
+    classification = fUrgent;
+  }
+  if (particleType == K37Ar37PlusOne::Ar37PlusOneDefinition()) {
     classification = fUrgent;
   }
   return classification;
