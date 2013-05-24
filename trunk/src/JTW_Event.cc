@@ -16,7 +16,7 @@ void JTW_Event::MakeEvent() {
   G4double minCosTheta = 0.0;
   G4double minElectronT = 0.0*electron.MaxT;  // MeV --> beta_min = 0.995
   // radius 20 mm 98.5 mm from trap center
-  electron.Theta = M_PI/2.0;
+  // electron.Theta = M_PI/2.0;
   electron.T = -10.0;
   while ((electron.T < minElectronT) ||
         (fabs(cos(electron.Theta)) < minCosTheta)) {
@@ -26,9 +26,9 @@ void JTW_Event::MakeEvent() {
       while (true) {
         while (true) {
           // For faster testing:
-          electron.T = 0.1*electron.MaxT;
+          // electron.T = 0.1*electron.MaxT;
           // electron.T -=  (electron.MaxT - minElectronT) * G4UniformRand();
-          // electron.T = electron.MaxT*G4UniformRand(); // MeV
+          electron.T = electron.MaxT*G4UniformRand(); // MeV
           electron.E = electron.T + electron.Mass;   // MeV
           electron.PmagSquared = (electron.T+electron.Mass)*
             (electron.T+electron.Mass) -

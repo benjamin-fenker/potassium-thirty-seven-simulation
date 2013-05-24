@@ -107,6 +107,10 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   VetoedEvent = false;
   primaryScatteredOffHoops = false;
 
+  upper_scintillator_threshold = 0.0 * keV;
+  lower_scintillator_threshold = 0.0 * keV;
+  electron_mcp_threshold = 0.0 * keV;
+  
   // vector< double > spot;
 }
 
@@ -502,7 +506,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     EventInformation->clearEventInformation();
   }
-  PrintEvent(evt);
+  // PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;
   // Add a new row here to add a new row for EVERY EVENT, even events that were
   // not "accepted."

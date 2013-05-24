@@ -132,7 +132,7 @@ void K37PrimaryGeneratorAction::setDaughterVertex() {
 
 void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
                                                       G4int num_so_electrons) {
-  G4bool debug = true;
+  G4bool debug = false;
   for (G4int i = 0; i < num_so_electrons; i++) {
     G4double kinetic_energy = -1.0, total_energy, momentum, mu, phi, theta;
     G4double px, py, pz;

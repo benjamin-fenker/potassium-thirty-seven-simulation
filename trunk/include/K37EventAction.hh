@@ -52,6 +52,9 @@ class K37EventAction : public G4UserEventAction {
                                 G4int coordinate);
   vector<G4double>GetEDepVectorX(K37StripDetectorHitsCollection *collection);
   vector<G4double>GetEDepVectorY(K37StripDetectorHitsCollection *collection);
+  bool EventPassesTrigger(double upper_scintillator_energy,
+                          double lower_scintillator_energy,
+                          double electron_mcp_energy);
 
   G4THitsMap<G4double>* energyBTdedxMap;
   G4THitsMap<G4double>* energyBTscintillatorMap;
@@ -160,6 +163,10 @@ class K37EventAction : public G4UserEventAction {
   int differenceInListSizeFromStartToEnd;
   K37AllPossibleEventInformation* EventInformation;
   K37HistogramManager * histograms;
+
+  double upper_scintillator_threshold;
+  double lower_scintillator_threshold;
+  double electron_mcp_threshold;
 };
 
 #endif
