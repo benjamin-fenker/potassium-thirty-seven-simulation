@@ -32,8 +32,9 @@
 
 K37ElectricFieldSetup::K37ElectricFieldSetup()
   :fChordFinder(0), fStepper(0), fIntgrDriver(0), fFieldMessenger(0) {
-  fEMfield = new G4UniformElectricField(G4ThreeVector(0.0, 1.0*kilovolt/cm,
-                                                      0.0));
+  fElFieldValue = G4ThreeVector(0.0, 350.0*volt/cm, 0.0);
+  fEMfield = new G4UniformElectricField(fElFieldValue);
+
   G4cout << "Making field!" << G4endl;
   fFieldMessenger = new K37FieldMessenger(this);
   fEquation = new G4EqMagElectricField(fEMfield);
@@ -48,8 +49,9 @@ K37ElectricFieldSetup::K37ElectricFieldSetup()
 
 K37ElectricFieldSetup::K37ElectricFieldSetup(G4ThreeVector pFV)
   : fChordFinder(0), fStepper(0), fIntgrDriver(0) {
+  fElFieldValue = pFV;
   fEMfield = new G4UniformElectricField(pFV);
-  // VGetGlobalFieldManager()->CreateChordFinder(this);
+
 
   fFieldMessenger = new K37FieldMessenger(this);
   fEquation = new G4EqMagElectricField(fEMfield);
@@ -164,7 +166,6 @@ void K37ElectricFieldSetup::SetStepper() {
 void K37ElectricFieldSetup::SetFieldValue(G4double fieldValue) {
   // G4ThreeVector fieldVector(0.0, 0.0, fieldValue);
   G4ThreeVector fieldVector(0.0, fieldValue, 0.0);
-
   SetFieldValue(fieldVector);
 }
 
@@ -176,9 +177,10 @@ void K37ElectricFieldSetup::SetFieldValue(G4double fieldValue) {
 void K37ElectricFieldSetup::SetFieldValue(G4ThreeVector fieldVector) {
   // Find the Field Manager for the global field
   //  G4FieldManager* fieldMgr= GetGlobalFieldManager();
-
+  fElFieldValue = fieldVector;
   if (fieldVector != G4ThreeVector(0., 0., 0.)) {
     if (fEMfield) delete fEMfield;
+
     fEMfield = new  G4UniformElectricField(fieldVector);
 
     if (fEquation) delete fEquation;
@@ -201,6 +203,9 @@ void K37ElectricFieldSetup::SetFieldValue(G4ThreeVector fieldVector) {
   }
 }
 
+G4ThreeVector K37ElectricFieldSetup::GetConstantFieldValue() {
+  return fElFieldValue;
+}
 //--------------------------------------------------------------------
 //
 //  Utility method

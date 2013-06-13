@@ -66,7 +66,7 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
 
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   bool testingEVGenerator = false;
-  evGenerator->MakeEvent();
+  evGenerator->MakeEvent(-1.0, -1.0);
   if (!testingEVGenerator) {
     cloud->makeEvent();
     EventVertex.set((cloud->xFinal())*mm, (cloud->yFinal())*mm,
@@ -160,7 +160,7 @@ void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
       G4cout << "\tpx = " << px << "\tpy = " << py << "\tpz = " << pz << G4endl;
     }
     G4PrimaryParticle *particle = new G4PrimaryParticle(electron, px, py, pz);
-    vertex = new G4PrimaryVertex(EventVertex, 0); // 0 means occurs at t = 0
+    vertex = new G4PrimaryVertex(EventVertex, 0);  // 0 means occurs at t = 0
     vertex -> SetPrimary(particle);
     ev -> AddPrimaryVertex(vertex);
   }

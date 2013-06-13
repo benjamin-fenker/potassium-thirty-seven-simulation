@@ -4,8 +4,9 @@
 #define K37RunMessenger_h 1
 
 #include "globals.hh"
-#include "G4UImessenger.hh"
 #include "G4ios.hh"
+#include "G4UIcmdWithABool.hh"
+#include "G4UImessenger.hh"
 
 //---------------------------------
 

@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#include <algorithm>
 #include <iomanip>
 #include <cmath>
 
@@ -15,6 +16,9 @@
 #include "K37AllPossibleEventInformation.hh"
 #include "K37ContainerForStripInformation.hh"
 #include "K37AnalysisNumbering.hh"
+#include "K37RecoilMCPHit.hh"
+#include "K37ElectronMCPHit.hh"
+
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4HCofThisEvent.hh"
@@ -26,9 +30,11 @@
 #include "G4SDManager.hh"
 #include "G4UImanager.hh"
 #include "G4ios.hh"
+#include "G4UnitsTable.hh"
 
 #include "K37Analysis.hh"
 
+using std::min;
 using std::pow;
 using std::ofstream;
 using std::setw;
@@ -52,21 +58,10 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   dedx2CollID = -1;
   // mirrorCollID = -1;
   // Mount2ID = -1;
-
+  recoil_mcp_collection_id = -1;
+  electron_mcp_collection_id = -1;
   // BTdedxID= -1;
   // BTscintillatorID= -1;
-
-  energy_upper_scintillator = 0;
-  energy_upper_scintillator_primaries = 0;
-  energy_upper_scintillator_secondaries = 0;
-
-  energy_lower_scintillator = 0;
-  energy_lower_scintillator_primaries = 0;
-  energy_lower_scintillator_secondaries = 0;
-
-  time_upper_scintillator = 0.0;
-  time_lower_scintillator = 0.0;
-
   energyDedx = 0;
   energyDedx_Primaries = 0;
   energyDedx_Secondaries = 0;
@@ -78,8 +73,6 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   // energyMount2=0;
   // energyBTdedx=0;
   // energyBTscintillator=0;
-
-  // energyMirror=0;
 
   accepted = 0;
   interesting = 0;
@@ -107,10 +100,11 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   VetoedEvent = false;
   primaryScatteredOffHoops = false;
 
-  upper_scintillator_threshold = 0.0 * keV;
-  lower_scintillator_threshold = 0.0 * keV;
-  electron_mcp_threshold = 0.0 * keV;
-  
+  upper_scintillator_threshold_ = 0.0 * keV;
+  lower_scintillator_threshold_ = 0.0 * keV;
+  electron_mcp_threshold_ = 0.0 * keV;
+
+  event_messenger_ = new K37EventMessenger(this);
   // vector< double > spot;
 }
 
@@ -118,7 +112,10 @@ K37EventAction::~K37EventAction() {
   delete stripHandler;
 }
 
-void K37EventAction::BeginOfEventAction(const G4Event*) {
+void K37EventAction::BeginOfEventAction(const G4Event* ev) {
+  if (ev -> GetEventID() % 100000 == 0) {
+    G4cout << "Event " << ev -> GetEventID() << G4endl;
+  }
   // spot.clear();
   if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
     sizeOfListOfEnteredVolumes = listOfEnteredVolumes->checkSizeOfList();
@@ -132,18 +129,11 @@ void K37EventAction::BeginOfEventAction(const G4Event*) {
     fullenergy2CollID = SDman->GetCollectionID(colNam="scintillatorMinusZHC");
     dedx1CollID = SDman->GetCollectionID(colNam="dsssdPlusZHC");
     dedx2CollID = SDman->GetCollectionID(colNam="dsssdMinusZHC");
+    recoil_mcp_collection_id = SDman -> GetCollectionID(colNam="rMCP_HC");
+    electron_mcp_collection_id = SDman -> GetCollectionID(colNam="eMCP_HC");
+    G4cout << "rMCP Collection ID is: " << recoil_mcp_collection_id << G4endl;
+    G4cout << "eMCP Collection ID is: " << electron_mcp_collection_id << G4endl;
   }
-
-  energy_upper_scintillator = 0;
-  energy_upper_scintillator_primaries = 0;
-  energy_upper_scintillator_secondaries = 0;
-
-  energy_lower_scintillator = 0;
-  energy_lower_scintillator_primaries = 0;
-  energy_lower_scintillator_secondaries = 0;
-
-  time_upper_scintillator = 0.0;
-  time_lower_scintillator = 0.0;
 
   energyDedx = 0;
   energyDedx_Primaries = 0;
@@ -153,7 +143,6 @@ void K37EventAction::BeginOfEventAction(const G4Event*) {
   energyDedx2_Primaries = 0;
   energyDedx2_Secondaries = 0;
 
-  // energyMirror=0;
 
   // energyMount2=0;
   // energyBTdedx=0;
@@ -186,32 +175,47 @@ void K37EventAction::BeginOfEventAction(const G4Event*) {
 }
 
 void K37EventAction::EndOfEventAction(const G4Event* evt) {
+  G4double energy_upper_scintillator = 0;
+  G4double energy_upper_scintillator_secondaries = 0;
+  G4double energy_upper_scintillator_primaries = 0;
+  G4double energy_lower_scintillator = 0;
+  G4double energy_lower_scintillator_secondaries = 0;
+  G4double energy_lower_scintillator_primaries = 0;
+
+  G4double time_upper_scintillator = 0.0;
+  G4double time_lower_scintillator = 0.0;
+
+  // Total energy stored in all the strips (each detector, each direction)
+  // Pretty redundant, but a good check for bugs
+  G4double sd_energy_total_plusZ_X = 0.0;
+  G4double sd_energy_total_plusZ_Y = 0.0;
+  G4double sd_energy_total_minsZ_X = 0.0;
+  G4double sd_energy_total_minsZ_Y = 0.0;
+
+  // Strip-by-strip information for each detector
+  vector<G4double> sd_energy_plusZ_X(40, 0.0), sd_energy_plusZ_Y(40, 0.0);
+  vector<G4double> sd_energy_minsZ_X(40, 0.0), sd_energy_minsZ_Y(40, 0.0);
+
+  // rMCP info
+  G4double recoil_mcp_x_pos;
+  G4double recoil_mcp_z_pos;
+  G4double recoil_mcp_time;
+
+  // eMCP info
+  G4double electron_mcp_time;
+
   G4AnalysisManager* anMan = G4AnalysisManager::Instance();
-  if (listOfEnteredVolumes -> getShouldVolumeNamesBeRecorded()) {
-    differenceInListSizeFromStartToEnd =
-      static_cast<int> (listOfEnteredVolumes->checkSizeOfList() -
-                        sizeOfListOfEnteredVolumes);
-  }
-  // G4cout << "Size of List" <<differenceInListSizeFromStartToEnd<< G4endl;
 
-  if (bs_flag>0) {
-    runAct->Add_bs();
-  }
-
-  // if(fullenergy1CollID<0||dedx1CollID<0||mirrorCollID<0) return;
-  if (fullenergy1CollID <0 || dedx1CollID < 0) return;
+  if (fullenergy1CollID < 0 || dedx1CollID < 0) return;
 
   G4HCofThisEvent * hit_collection = evt->GetHCofThisEvent();
-  K37StripDetectorHitsCollection* DEDX1HC = 0;
-  K37StripDetectorHitsCollection* DEDX2HC = 0;
+  K37StripDetectorHitsCollection* upper_sd_hit_collection = 0;
+  K37StripDetectorHitsCollection* lower_sd_hit_collection = 0;
   K37ScintillatorHitsCollection* upper_scintillator_hit_collection = 0;
   K37ScintillatorHitsCollection* lower_scintillator_hit_collection = 0;
-
-  // K37MirrorHitsCollection* MHC = 0;
-
-  // energyMount2Map = 0;
-  // energyBTdedxMap=0;
-  // energyBTscintillatorMap=0;
+  K37RecoilMCPHitsCollection* recoil_mcp_hit_collection = 0;
+  K37ElectronMCPHitsCollection* electron_mcp_hit_collection = 0;
+  // G4THitsCollection<K37RecoilMCPHit> *recoil_mcp_hit_collection = 0;
 
   if (hit_collection) {
     upper_scintillator_hit_collection =
@@ -220,23 +224,29 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     lower_scintillator_hit_collection =
       static_cast<K37ScintillatorHitsCollection*>(hit_collection ->
                                                   GetHC(fullenergy2CollID));
-    DEDX1HC =
+    upper_sd_hit_collection =
       static_cast<K37StripDetectorHitsCollection*>(hit_collection ->
                                                    GetHC(dedx1CollID));
-    DEDX2HC =
+    lower_sd_hit_collection =
       static_cast<K37StripDetectorHitsCollection*>(hit_collection ->
                                                    GetHC(dedx2CollID));
-    // MHC = (K37MirrorHitsCollection*)(hit_collection->GetHC(mirrorCollID));
+    recoil_mcp_hit_collection =
+        static_cast<K37RecoilMCPHitsCollection*>(hit_collection ->
+                                              GetHC(recoil_mcp_collection_id));
+    electron_mcp_hit_collection =
+        static_cast<K37ElectronMCPHitsCollection*>(hit_collection ->
+                                           GetHC(electron_mcp_collection_id));
   }
 
-  // If FullEnergy1HitCollection - PlusZ
+  // ***************************************************************************
+  // Get the energy deposited in the upper scintillator
+  // ***************************************************************************
   if (upper_scintillator_hit_collection) {
     int n_hit = upper_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++) {
       // Get the hit
       hit = (*upper_scintillator_hit_collection)[i];
-
       energy_upper_scintillator += hit->GetEdep();
       if (hit->GetPrimary()) {
         energy_upper_scintillator_primaries += hit -> GetEdep();
@@ -252,6 +262,10 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       }
     }
   }
+
+  // ***************************************************************************
+  // Get all the energy deposited in the lower scintillator
+  // ***************************************************************************
   if (lower_scintillator_hit_collection) {
     int n_hit = lower_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
@@ -273,124 +287,132 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
   }
 
-  K37ScintillatorHit *first_hit = 0;
-  if (energy_upper_scintillator > 0.0) {
-    first_hit = (*upper_scintillator_hit_collection)[0];
-    time_upper_scintillator = first_hit -> GetTime();
-  }
-  if (energy_lower_scintillator > 0.0) {
-    first_hit = (*lower_scintillator_hit_collection)[0];
-    time_lower_scintillator = first_hit -> GetTime();
-  }
-
-  // Total energy stored in all the strips (each detector, each direction)
-  // Pretty redundant, but a good check for bugs
-  G4double SD_EDep_total_plusZ_X = 0.0;
-  G4double SD_EDep_total_plusZ_Y = 0.0;
-  G4double SD_EDep_total_minsZ_X = 0.0;
-  G4double SD_EDep_total_minsZ_Y = 0.0;
-
-  // Strip-by-strip information for each detector
-  vector<G4double> SD_EDep_plusZ_X(40, 0.0), SD_EDep_plusZ_Y(40, 0.0);
-  vector<G4double> SD_EDep_minsZ_X(40, 0.0), SD_EDep_minsZ_Y(40, 0.0);
-  if (DEDX2HC) {  // Strip Detector Minus Z
-    SD_EDep_minsZ_X = GetEDepVectorX(DEDX2HC);
-    SD_EDep_minsZ_Y = GetEDepVectorY(DEDX2HC);
-    for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_X += SD_EDep_minsZ_X[i];
-    for (int i = 0; i < 40; i++) SD_EDep_total_minsZ_Y += SD_EDep_minsZ_Y[i];
-    if (fabs(SD_EDep_total_minsZ_X - SD_EDep_total_minsZ_Y) >
+  // ***************************************************************************
+  // Get all the energy deposited in the upper strip detector
+  // ***************************************************************************
+  if (upper_sd_hit_collection) {                // Strip detector plus Z
+    sd_energy_plusZ_X = GetEDepVectorX(upper_sd_hit_collection);
+    sd_energy_plusZ_Y = GetEDepVectorY(upper_sd_hit_collection);
+    for (int i = 0; i < 40; i++) {
+      sd_energy_total_plusZ_X += sd_energy_plusZ_X[i];
+      sd_energy_total_plusZ_Y += sd_energy_plusZ_Y[i];
+    }
+    if (fabs(sd_energy_total_plusZ_X - sd_energy_total_plusZ_Y) >
         pow(10.0, -3)*keV) {
       G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
-    }
-
-    int n_hit = DEDX2HC->entries();
-    for (G4int i = 0; i < n_hit; i++) {
-      energyDedx2 += (*DEDX2HC)[i]->GetEdep();
-      if ((*DEDX2HC)[i]->GetPrimary()) {
-        energyDedx2_Primaries +=(*DEDX2HC)[i]->GetEdep();
-        // GetPos2() gets 3-vector of post-step point
-        stripHandler -> StoreStripInformation((*DEDX2HC)[i] -> GetPos2(),
-                                              (*DEDX2HC)[i] -> GetEdep(),
-                                              true, false);
-      } else {
-        energyDedx2_Secondaries +=(*DEDX2HC)[i]->GetEdep();
-        stripHandler -> StoreStripInformation((*DEDX2HC)[i] -> GetPos2(),
-                                              (*DEDX2HC)[i] -> GetEdep(),
-                                              false, false);
-      }
-    }
-    if (energyDedx2>0) {
-      if (fabs(energyDedx2 - SD_EDep_total_minsZ_X) > pow(10.0, -3)*keV) {
-        G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
-      }
-
-      isThereEnergyDedx2 = true;
-
-      if (energyDedx2_Primaries ==0) {
-        EventInformation->setGammaFiredStripDetectorMinusZToTrue();
-      }
-      // G4cout<< "energyDedx2: " << energyDedx2 << G4endl;
-    }
-  }
-  if (DEDX1HC) {                // Strip detector plus Z
-    SD_EDep_plusZ_X = GetEDepVectorX(DEDX1HC);
-    SD_EDep_plusZ_Y = GetEDepVectorY(DEDX1HC);
-    for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_X += SD_EDep_plusZ_X[i];
-    for (int i = 0; i < 40; i++) SD_EDep_total_plusZ_Y += SD_EDep_plusZ_Y[i];
-    if (fabs(SD_EDep_total_plusZ_X - SD_EDep_total_plusZ_Y) >
-        pow(10.0, -3)*keV) {
-      G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
-    }
-    int n_hit = DEDX1HC->entries();
-    for (int i = 0; i < n_hit; i++) {
-      energyDedx += (*DEDX1HC)[i]->GetEdep();
-      if ((*DEDX1HC)[i]->GetPrimary()) {
-        energyDedx_Primaries +=(*DEDX1HC)[i]->GetEdep();
-        stripHandler -> StoreStripInformation((*DEDX1HC)[i] -> GetPos2(),
-                                              (*DEDX1HC)[i] -> GetEdep(),
-                                              true, true);
-      } else {
-        energyDedx_Secondaries +=(*DEDX1HC)[i]->GetEdep();
-        stripHandler -> StoreStripInformation((*DEDX1HC)[i]->GetPos2(),
-                                              (*DEDX1HC)[i]->GetEdep(),
-                                              false, true);
-      }
-    }
-    if (energyDedx>0) {
-      if (fabs(energyDedx - SD_EDep_total_plusZ_X) > pow(10.0, -3)*keV) {
-        G4cout << "ERROR.  SPENCERS'S WAY != MY WAY" << G4endl;
-      }
-      isThereEnergyDedx = true;
-      if (energyDedx_Primaries ==0) {
-        EventInformation->setGammaFiredStripDetectorPlusZToTrue();
-      }
-      // G4cout<< "energyDedx: " << energyDedx << G4endl;
     }
   }  // End strip detector plus z
 
-  if ((isThereEnergyDedx == true && isThereEnergySili == true &&
-       isThereEnergyDedx2 == false && isThereEnergySili2 == false) ||
-      (isThereEnergyDedx == false && isThereEnergySili == false &&
-       isThereEnergyDedx2 == true && isThereEnergySili2 == true)) {
+  // ***************************************************************************
+  // Get all the energy deposited in the lower strip detector
+  // ***************************************************************************
+  if (lower_sd_hit_collection) {  // Strip Detector Minus Z
+    sd_energy_minsZ_X = GetEDepVectorX(lower_sd_hit_collection);
+    sd_energy_minsZ_Y = GetEDepVectorY(lower_sd_hit_collection);
+    for (int i = 0; i < 40; i++) {
+      sd_energy_total_minsZ_X += sd_energy_minsZ_X[i];
+      sd_energy_total_minsZ_Y += sd_energy_minsZ_Y[i];
+    }
+    if (fabs(sd_energy_total_minsZ_X - sd_energy_total_minsZ_Y) >
+        pow(10.0, -3)*keV) {
+      G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
+    }
+  }
+
+  K37ScintillatorHit *first_hit = 0;
+  if (energy_upper_scintillator > upper_scintillator_threshold_) {
+    first_hit = (*upper_scintillator_hit_collection)[0];
+    time_upper_scintillator = first_hit -> GetTime();
+  } else {
+    time_upper_scintillator = 0.0;
+  }
+  if (energy_lower_scintillator > lower_scintillator_threshold_) {
+    first_hit = (*lower_scintillator_hit_collection)[0];
+    time_lower_scintillator = first_hit -> GetTime();
+  } else {
+    time_lower_scintillator = 0.0;
+  }
+
+  // ***************************************************************************
+  // Get all the info the the recoil MCP detector
+  // Use only the first hit
+  // ***************************************************************************
+  if (recoil_mcp_hit_collection) {      // rMCP
+    if (recoil_mcp_hit_collection -> entries() > 0) {
+      K37RecoilMCPHit *hit = (*recoil_mcp_hit_collection)[0];
+      recoil_mcp_x_pos = hit -> GetXPos();
+      recoil_mcp_z_pos = hit -> GetZPos();
+      recoil_mcp_time  = hit -> GetTime();
+      // G4cout << "Recoil MCP hit at x = "
+      //        << G4BestUnit(recoil_mcp_x_pos, "Length") << " and y = "
+      //        << G4BestUnit(recoil_mcp_z_pos, "Length") << G4endl;
+    } else {
+      // G4cout << "Got no hits in rMCP!" << G4endl;
+      recoil_mcp_x_pos = 0.0;
+      recoil_mcp_z_pos = 0.0;
+      recoil_mcp_time  = 0.0;
+    }
+  }
+
+  // ***************************************************************************
+  // Get all the info the the electron MCP detector
+  // Use only the first hit
+  // ***************************************************************************
+  if (electron_mcp_hit_collection) {      // rMCP
+    if (electron_mcp_hit_collection -> entries() > 0) {
+      K37ElectronMCPHit *hit = (*electron_mcp_hit_collection)[0];
+      electron_mcp_time = hit -> GetTime();
+    } else {
+      G4cout << "Got no hits in eMCP!" << G4endl;
+      electron_mcp_time = 0.0;
+    }
+  }
+
+  if (EventPassesTrigger(energy_upper_scintillator, energy_lower_scintillator,
+                         -1.0)) {
+    // G4cout << "Event passes my trigger with energy "
+    //        << G4BestUnit(energy_upper_scintillator, "Energy") << " / "
+    //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"
+    //        << G4BestUnit(energy_lower_scintillator, "Energy") << " / "
+    //        << G4BestUnit(energyDedx2, "Energy") << G4endl;
+
+    G4double trigTime = pow(10, 10);
+    if (time_upper_scintillator > 0.0) {  // Then its above threshold
+      trigTime = min(trigTime, time_upper_scintillator/ns);
+    }
+    if (time_lower_scintillator > 0.0) {  // Then its above threhsold
+      trigTime = min(trigTime, time_lower_scintillator/ns);
+    }
 
     G4Electron *theElectron = G4Electron::ElectronDefinition();
     G4double emass = theElectron -> GetPDGMass();
     accepted++;
-    anMan->FillNtupleIColumn(ntup_accepted, 1);
     runAct->SetAccepted();
+
+
+    anMan->FillNtupleIColumn(ntup_accepted, 1);
     EventInformation->setThisIsAnAccepterEvent();
     anMan -> FillNtupleDColumn(ntup_tdc_scint_top,
                                time_upper_scintillator/ns);
     anMan -> FillNtupleDColumn(ntup_tdc_scint_bottom,
                                time_lower_scintillator/ns);
+    anMan -> FillNtupleDColumn(ntup_qdc_scint_top,
+                               energy_upper_scintillator/keV);
+    anMan -> FillNtupleDColumn(ntup_qdc_scint_bottom,
+                               energy_lower_scintillator/keV);
+    anMan -> FillNtupleDColumn(ntup_rmcp_x_pos, recoil_mcp_x_pos/mm);
+    anMan -> FillNtupleDColumn(ntup_rmcp_z_pos, recoil_mcp_z_pos/mm);
+    anMan -> FillNtupleDColumn(ntup_rmcp_time, recoil_mcp_time/ns);
+    anMan -> FillNtupleDColumn(ntup_emcp_time, electron_mcp_time/ns);
+
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
     if (fillAllSDData) {
-      fillSDNtuples(SD_EDep_plusZ_X, ntup_SD_plusZ_X_start);
-      fillSDNtuples(SD_EDep_plusZ_Y, ntup_SD_plusZ_Y_start);
-      fillSDNtuples(SD_EDep_minsZ_X, ntup_SD_minsZ_X_start);
-      fillSDNtuples(SD_EDep_minsZ_Y, ntup_SD_minsZ_Y_start);
+      fillSDNtuples(sd_energy_plusZ_X, ntup_SD_plusZ_X_start);
+      fillSDNtuples(sd_energy_plusZ_Y, ntup_SD_plusZ_Y_start);
+      fillSDNtuples(sd_energy_minsZ_X, ntup_SD_minsZ_X_start);
+      fillSDNtuples(sd_energy_minsZ_Y, ntup_SD_minsZ_Y_start);
     }
     if (isThereEnergyDedx == true) {
       // stripHandler->PrintMaps();
@@ -420,10 +442,12 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
                                GetRelativisticFactor(emass,
                                                  energy_upper_scintillator));
 
-      EventInformation->setTotalEnergyInScintillator(energy_upper_scintillator);
-      EventInformation->setTotalEnergyInStripDetector(energyDedx);
-      EventInformation->setPlusZDetectorsFiredToTrue();
-      EventInformation->setStartStripDetectorTime((*DEDX1HC)[0]->GetTime());
+      EventInformation ->
+          setTotalEnergyInScintillator(energy_upper_scintillator);
+      EventInformation -> setTotalEnergyInStripDetector(energyDedx);
+      EventInformation -> setPlusZDetectorsFiredToTrue();
+      EventInformation ->
+          setStartStripDetectorTime((*upper_sd_hit_collection)[0] -> GetTime());
       if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
         listOfEnteredVolumes -> setEnteredVolumeName("----------------------A",
                                                      0, 0);
@@ -456,55 +480,21 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
                                GetRelativisticFactor(emass,
                                                  energy_lower_scintillator));
       // Done filling histograms
-
       EventInformation ->
           setTotalEnergyInScintillator(energy_lower_scintillator);
-      EventInformation->setTotalEnergyInStripDetector(energyDedx2);
-      EventInformation->setStartStripDetectorTime((*DEDX2HC)[0]->GetTime());
+      EventInformation -> setTotalEnergyInStripDetector(energyDedx2);
+      EventInformation ->
+          setStartStripDetectorTime((*lower_sd_hit_collection)[0]->GetTime());
 
       if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
         listOfEnteredVolumes -> setEnteredVolumeName("----------------------O",
                                                      0, 0);
       }
     }  // End energy in minusZ
-    // G4cout<< start[0].theta()<<G4endl;
-    /*
-      if(spot.size() >= 1)
-      {
-      std::ofstream thetaOut;
-      thetaOut.open ("theta.txt", std::ofstream::out | std::ofstream::app);
-      thetaOut << setw (15) << left << start[0].theta()<< setw (15) << left << spot[0].theta()<< G4endl;
-      thetaOut.close();
-
-      //G4cout<<start[0].theta()<< " "<<spot[0].theta()<< G4endl;
-      }
-    */
-
-    // listOfEnteredVolumes->setEnteredVolumeName("----------------------" );
 
     // Add a new row here to add a new row for only accpeted events where
     // either there was energy in the plus or minus z detector, but not both!
     anMan -> AddNtupleRow();
-  } else {  // End is it a good event
-    if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
-      listOfEnteredVolumes ->
-        deleteEnteriesFromList(differenceInListSizeFromStartToEnd);
-    }
-  }
-  if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
-    listOfEnteredVolumes->checkIfPrintIsNeeded(false);
-  }
-  if ((evt->GetEventID())%50000 == 0) {
-    G4cout << ">>> End of Event " << evt->GetEventID() << G4endl;
-  }
-  spot.clear();
-  start.clear();
-  if (EventInformation->getShouldEventInformationBeRecorded()) {
-    if (EventInformation->getIsThisAnAcceptedEvent()) {
-      EventInformation->EndOfEventActions();
-      EventInformation->printEventInformation();
-    }
-    EventInformation->clearEventInformation();
   }
   // PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;
@@ -521,7 +511,7 @@ void K37EventAction::setStartingDirection(G4ThreeVector startingPosition) {
   start.push_back(startingPosition);
 }
 
-void K37EventAction::fillSDNtuples(vector<G4double> EDep_strip,
+void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,
                                    G4int ntuple_number_start) {
   // After filling up the total energy hit-by-hit, write out the event
   // total energy for each strip.
@@ -529,9 +519,9 @@ void K37EventAction::fillSDNtuples(vector<G4double> EDep_strip,
   G4AnalysisManager *anMan = G4AnalysisManager::Instance();
   for (G4int i = 0; i < 40; i++) {
     anMan->FillNtupleDColumn(ntuple_number_start + i,
-                             EDep_strip[i]/keV);
-    if (EDep_strip[i] > 0 && debug) {
-      G4cout << "Strip " << i << " with " << EDep_strip[i]/keV << G4endl;
+                             energy_strip[i]/keV);
+    if (energy_strip[i] > 0 && debug) {
+      G4cout << "Strip " << i << " with " << energy_strip[i]/keV << G4endl;
     }
   }
 }
@@ -607,8 +597,7 @@ void K37EventAction::PrintEvent(const G4Event *event) {
   G4cout << "************************************" << G4endl;
   G4cout << "Event ID " << event -> GetEventID()  << " has "
          << number_vertices << " primary vertices" << " and "
-         << number_trajectories/* << "(" << trajectory_container -> size()
-                                  << ") trajectories" */<< G4endl;
+         << number_trajectories << G4endl;
   for (G4int i = 0; i < number_vertices; i++) {
     p_def = event -> GetPrimaryVertex(i) -> GetPrimary(0) -> GetG4code();
     name = p_def -> GetParticleName();
@@ -618,7 +607,7 @@ void K37EventAction::PrintEvent(const G4Event *event) {
   }
   G4cout << G4endl;
   for (G4int i = 0; i < number_trajectories; i++) {
-    trajectory = (G4Trajectory*)((*trajectory_container)[i]);
+    trajectory = reinterpret_cast<G4Trajectory*>((*trajectory_container)[i]);
     // trajectory -> ShowTrajectory();
     name = trajectory -> GetParticleName();
     charge = trajectory -> GetCharge();
@@ -630,4 +619,12 @@ void K37EventAction::PrintEvent(const G4Event *event) {
   G4cout << "************************************" << G4endl;
   // G4int j;
   // G4cin >> j;
+}
+
+bool K37EventAction::EventPassesTrigger(double upper_scintillator_energy,
+                                        double lower_scintillator_energy,
+                                        double electron_mcp_energy) {
+  return (upper_scintillator_energy > upper_scintillator_threshold_ ||
+          lower_scintillator_energy > lower_scintillator_threshold_ ||
+          electron_mcp_energy > electron_mcp_threshold_);
 }

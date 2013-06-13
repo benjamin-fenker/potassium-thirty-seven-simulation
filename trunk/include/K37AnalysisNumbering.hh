@@ -40,5 +40,10 @@
 #define ntup_accepted 166
 #define ntup_tdc_scint_top 167
 #define ntup_tdc_scint_bottom 168
-
+#define ntup_qdc_scint_top 169
+#define ntup_qdc_scint_bottom 170
+#define ntup_rmcp_x_pos 171
+#define ntup_rmcp_z_pos 172
+#define ntup_rmcp_time 173
+#define ntup_emcp_time 174
 #endif  // INCLUDE_K37ANALYSISNUMBERING_H_

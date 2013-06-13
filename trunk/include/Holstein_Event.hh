@@ -5,5 +5,6 @@
 class Holstein_Event: public K37EventGenerator {
  public:
   /*int area (void) { return (width * height); };*/
+  void MakeEvent(G4double polarization, G4double alignment);
   void MakeEvent();
 };

@@ -11,15 +11,17 @@
 
 #include "G4THitsMap.hh"
 
+#include "K37EventMessenger.hh"
 #include "K37StripDetectorHit.hh"
 
 using std::vector;
 
-class K37RunAction;
-class K37ListOfVolumeNames;
 class K37AllPossibleEventInformation;
 class K37ContainerForStripInformation;
+class K37EventMessenger;
 class K37HistogramManager;
+class K37ListOfVolumeNames;
+class K37RunAction;
 
 class K37EventAction : public G4UserEventAction {
  public:
@@ -27,18 +29,22 @@ class K37EventAction : public G4UserEventAction {
                  K37AllPossibleEventInformation* apei, K37HistogramManager* hm);
   ~K37EventAction();
 
- public:
   void BeginOfEventAction(const G4Event*);
   void EndOfEventAction(const G4Event*);
-  void BackscatterFlag() {bs_flag = 1;};
+  void BackscatterFlag() {bs_flag = 1;}
   void setEnteringDedx(G4ThreeVector);
   void setStartingDirection(G4ThreeVector);
-  void setScatterOffHoopFlag() {primaryScatteredOffHoops = true;};
-  void SetAccepted() {accepted = 0;};
+  void setScatterOffHoopFlag() {primaryScatteredOffHoops = true;}
+  void SetAccepted() {accepted = 0;}
   void PrintEvent(const G4Event*);
-  G4double GetAccepted() {return accepted;};
+  G4double GetAccepted() {return accepted;}
   // Will return beta = v/c for the particle
   G4double GetRelativisticFactor(G4double particleMass, G4double totalE);
+  void SetUpperScintillatorThreshold(double t)
+  {upper_scintillator_threshold_ = t;}
+  void SetLowerScintillatorThreshold(double t)
+  {lower_scintillator_threshold_ = t;}
+  void SetElectronMCPthreshold(double t) {electron_mcp_threshold_ = t;}
 
  private:
   // G4THitsMap<G4double>* evtMap;
@@ -74,7 +80,8 @@ class K37EventAction : public G4UserEventAction {
   G4int dedx1CollID;
   G4int dedx2CollID;
   G4int mirrorCollID;
-
+  G4int recoil_mcp_collection_id;
+  G4int electron_mcp_collection_id;
   G4int BTdedxID;
   G4int BTscintillatorID;
 
@@ -85,18 +92,6 @@ class K37EventAction : public G4UserEventAction {
   G4int MountID;
   G4int BerylliumID;
   G4int FaceID;
-
-  G4double energyMirror;
-  G4double energy_upper_scintillator;
-  G4double energy_upper_scintillator_secondaries;
-  G4double energy_upper_scintillator_primaries;
-  G4double energy_lower_scintillator;
-  G4double energy_lower_scintillator_secondaries;
-  G4double energy_lower_scintillator_primaries;
-
-  // Time of first hit in each detector
-  G4double time_upper_scintillator;
-  G4double time_lower_scintillator;
 
   G4double energyDedx;
   G4double energyDedx_Primaries;
@@ -164,9 +159,11 @@ class K37EventAction : public G4UserEventAction {
   K37AllPossibleEventInformation* EventInformation;
   K37HistogramManager * histograms;
 
-  double upper_scintillator_threshold;
-  double lower_scintillator_threshold;
-  double electron_mcp_threshold;
+  double upper_scintillator_threshold_;
+  double lower_scintillator_threshold_;
+  double electron_mcp_threshold_;
+
+  K37EventMessenger *event_messenger_;
 };
 
 #endif

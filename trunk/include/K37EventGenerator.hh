@@ -41,6 +41,7 @@ class K37EventGenerator {
   K37EventGenerator();
   virtual ~K37EventGenerator();
   virtual void MakeEvent()=0;
+  virtual void MakeEvent(G4double polarization, G4double alignment)  = 0;
   /*void set_values (int a, int b)*/
   /*{ width=a; height=b; }*/
   /*virtual int area (void) =0;*/
