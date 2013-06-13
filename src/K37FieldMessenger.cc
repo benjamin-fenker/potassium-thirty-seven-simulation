@@ -60,6 +60,10 @@ K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
   // omittable,G4bool currentAsDefault)
   changeFieldCmd -> SetDefaultUnit("kV/cm");
   changeFieldCmd -> AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  print_field_cmd = new G4UIcmdWithoutParameter("/K37/field/print", this);
+  print_field_cmd -> SetGuidance("Print the current electric field");
+  print_field_cmd -> AvailableForStates(G4State_Idle);
 }
 
 //------------------------------------------------
@@ -89,6 +93,12 @@ void K37FieldMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
   }
   if (command == changeFieldCmd) {
     fEFieldSetup->SetFieldValue(changeFieldCmd->GetNew3VectorValue(newValue));
+  }
+  if (command == print_field_cmd) {
+    G4ThreeVector field = fEFieldSetup -> GetConstantFieldValue();
+    G4cout << "X: " << G4BestUnit(field.x(), "Electric field") << G4endl;
+    G4cout << "Y: " << G4BestUnit(field.y(), "Electric field") << G4endl;
+    G4cout << "Z: " << G4BestUnit(field.z(), "Electric field") << G4endl;
   }
 }
 

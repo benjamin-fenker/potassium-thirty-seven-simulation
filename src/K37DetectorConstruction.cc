@@ -1098,20 +1098,21 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   G4double SOED_dz   = 10./2.*mm;
   G4double SOED_Sphi = 0.    *deg;
   G4double SOED_Dphi = 360.  *deg;
-
+  G4double SOED_z_pos = -82.0 *mm;     // 82 mm
   G4Tubs * SOED_sol = new G4Tubs("SOED_sol", SOED_rmin, SOED_rmax,  SOED_dz,
                                  SOED_Sphi, SOED_Dphi);
   G4LogicalVolume * SOED_log = new G4LogicalVolume(SOED_sol, MCPMaterial,
                                                    "SOED_log", 0, 0, 0);
-  new G4PVPlacement(changeZtoX, G4ThreeVector(0., -82.0*mm, 0), SOED_log,
+  new G4PVPlacement(changeZtoX, G4ThreeVector(0., SOED_z_pos, 0), SOED_log,
                     "SOED_phys", world_log, false, 0);
   SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.1, 0.8, 0.8));
   SOED_logVisAttributes-> SetForceSolid(true);
   SOED_log -> SetVisAttributes(SOED_logVisAttributes);
-  
+
   // Set up sensitive detector
   K37ElectronMCPSD *electron_mcp_sd =
       new K37ElectronMCPSD("/mydet/electron_mcp");
+
   sd_man -> AddNewDetector(electron_mcp_sd);
   SOED_log -> SetSensitiveDetector(electron_mcp_sd);
 }  // End construct EMCP
@@ -1133,12 +1134,12 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
   rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.7, 0.2, 0.2));
   rmcp_logVisAttributes_ -> SetForceSolid(true);
   rmcp_log -> SetVisAttributes(rmcp_logVisAttributes_);
-  
+
   // Set up sensitive detector
-  K37RecoilMCPSD *electron_mcp_sd =
+  K37RecoilMCPSD *recoil_mcp_sd =
       new K37RecoilMCPSD("/mydet/recoil_mcp");
-  sd_man -> AddNewDetector(electron_mcp_sd);
-  rmcp_log -> SetSensitiveDetector(electron_mcp_sd);
+  sd_man -> AddNewDetector(recoil_mcp_sd);
+  rmcp_log -> SetSensitiveDetector(recoil_mcp_sd);
 }
 
 

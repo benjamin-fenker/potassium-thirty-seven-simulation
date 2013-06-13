@@ -63,7 +63,6 @@ void K37PhysicsList::ConstructParticle() {
   K37Ar37Neutral:: Ar37NeutralDefinition();
   K37Ar37Minus:: Ar37MinusDefinition();
   K37Ar37PlusOne::Ar37PlusOneDefinition();
-  
   G4IonConstructor iConstructor;
   iConstructor.ConstructParticle();
 }

@@ -12,6 +12,10 @@
 extern G4bool fillEvGenData;
 
 void JTW_Event::MakeEvent() {
+  MakeEvent(1.0, 1.0);
+}
+
+void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
   // Set cuts on production for testing the EV Generator
   G4double minCosTheta = 0.0;
   G4double minElectronT = 0.0*electron.MaxT;  // MeV --> beta_min = 0.995
@@ -28,8 +32,8 @@ void JTW_Event::MakeEvent() {
           // For faster testing:
           // electron.T = 0.1*electron.MaxT;
           // electron.T -=  (electron.MaxT - minElectronT) * G4UniformRand();
-          electron.T = electron.MaxT*G4UniformRand(); // MeV
-          electron.E = electron.T + electron.Mass;   // MeV
+          electron.T = electron.MaxT*G4UniformRand();  // MeV
+          electron.E = electron.T + electron.Mass;     // MeV
           electron.PmagSquared = (electron.T+electron.Mass)*
             (electron.T+electron.Mass) -
             electron.Mass*electron.Mass;  // MeV/c with c = 1
@@ -133,9 +137,9 @@ void JTW_Event::MakeEvent() {
         *Zhi*(1.0
               + LittleA*(eDotn)/(electron.E*neutrino.E)
               - LittleC*(eDotn)/(3.0*electron.E*neutrino.E)
-              + LittleC*eDotJ*nDotJ/(electron.E*neutrino.E)
-              + BigA*eDotJ/electron.E
-              + BigB*nDotJ/neutrino.E);
+              + alignment*LittleC*eDotJ*nDotJ/(electron.E*neutrino.E)
+              + polarization*BigA*eDotJ/electron.E
+              + polarization*BigB*nDotJ/neutrino.E);
       if (Omega >= testOmega) {
         // G4cout << "Broke out (omega)! " << G4endl;
         break;
@@ -187,5 +191,6 @@ G4int JTW_Event::GetNumMins() {
 G4int JTW_Event::GetNumPlus() {
   return numPlus;
 }
+
 
 

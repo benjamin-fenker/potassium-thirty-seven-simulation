@@ -38,6 +38,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void setBetaVertex();
   void setDaughterVertex();
   void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
+
  private:
   G4double      distanceToTrap;
   // G4ParticleGun*      particleGun;

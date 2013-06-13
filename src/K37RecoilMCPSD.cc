@@ -17,7 +17,7 @@ void K37RecoilMCPSD::Initialize(G4HCofThisEvent* hit_collection_this_event) {
   rmcp_hit_collection_ =
       new K37RecoilMCPHitsCollection(SensitiveDetectorName,
                                        collectionName[0]);
-  hit_collection_this_event -> AddHitsCollection(4, rmcp_hit_collection_);
+  hit_collection_this_event -> AddHitsCollection(5, rmcp_hit_collection_);
 }
 
 G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {

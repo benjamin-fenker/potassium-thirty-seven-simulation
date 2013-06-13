@@ -289,6 +289,12 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   anMan -> FinishNtuple();
   anMan -> CreateNtupleDColumn("TDC_SCINT_TOP");
   anMan -> CreateNtupleDColumn("TDC_SCINT_BOTTOM");
+  anMan -> CreateNtupleDColumn("QDC_UpperPMT");
+  anMan -> CreateNtupleDColumn("QDC_LowerPMT");
+  anMan -> CreateNtupleDColumn("DL_X_Pos");
+  anMan -> CreateNtupleDColumn("DL_Z_Pos");
+  anMan -> CreateNtupleDColumn("TDC_ION_MCP");
+  anMan -> CreateNtupleDColumn("TDC_ELECTRON_MCP");
 
   // End making ntuples
 }

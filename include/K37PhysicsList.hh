@@ -25,6 +25,7 @@ class K37PhysicsList: public G4VUserPhysicsList {
   void ConstructEM();
   void AddStepMax();
   void ConstructDecay();
+
  private:
   G4Decay* theDecayProcess;
   G4StepLimiter* stepLimiter;

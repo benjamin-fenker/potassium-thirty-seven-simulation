@@ -128,14 +128,13 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
         theTrack -> GetTrackStatus() != fStopAndKill) {
       G4StepPoint * thePostPoint = theStep->GetPostStepPoint();
       G4String thePostPVname = thePostPoint->GetPhysicalVolume()->GetName();
-
       if (thePostPoint -> GetStepStatus() == fGeomBoundary &&
           thePostPVname == "SOED_phys") {
         AllTheInformation ->
-          setEnteringShakeOffElectronDetector(theTrack -> GetPosition());
+            setEnteringShakeOffElectronDetector(theTrack -> GetPosition());
         AllTheInformation ->
-          setEnteringShakeOffElectronDetectorTime(theTrack -> GetGlobalTime());
-        theTrack->SetTrackStatus(fKillTrackAndSecondaries);
+          setEnteringShakeOffElectronDetectorTime(theTrack ->
+                                                  GetGlobalTime());
       }
     }
 
