@@ -26,9 +26,10 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            K37DetectorConstruction* det,
                            K37AllPossibleEventInformation* APEI,
                            K37EventGenerator* evGen) :
-  detector(det), randomFlag("on"), EventInformation(APEI), v(), vertex(NULL),
-  EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
-  K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen) {
+    polarization_(1.0), alignment_(1.0), detector(det), randomFlag("on"),
+    EventInformation(APEI), v(), vertex(NULL), EventVertex(), K37Neutral(NULL),
+    K37Minus(NULL), decayTableAr37Minus(NULL), K37MinusDecayMode(NULL),
+    cloud(NULL), evGenerator(evGen) {
   gunMessenger = new K37PrimaryGeneratorMessenger(this);
   insideCollimator = detector->GetSubtraction();
   distanceToTrap =detector->GetDistanceToTrap();
@@ -46,7 +47,6 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
 
   ion = particleTable->GetIon(18, 37, 0);
-
   // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
   // evGenerator->MakeEvent();
   // G4IonTable* ionTable = particleTable-> GetIonTable();
@@ -66,7 +66,9 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
 
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   bool testingEVGenerator = false;
-  evGenerator->MakeEvent(-1.0, -1.0);
+
+  evGenerator -> MakeEvent(polarization_, alignment_);
+
   if (!testingEVGenerator) {
     cloud->makeEvent();
     EventVertex.set((cloud->xFinal())*mm, (cloud->yFinal())*mm,
@@ -125,7 +127,7 @@ void K37PrimaryGeneratorAction::setDaughterVertex() {
   G4ParticleDefinition *daughter = particleTable -> FindParticle("Ar37PlusOne");
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4PrimaryParticle* particle =
-    new G4PrimaryParticle(daughter, evGenerator->dMomentumX(),
+      new G4PrimaryParticle(daughter, evGenerator->dMomentumX(),
                           evGenerator->dMomentumY(), evGenerator->dMomentumZ());
   vertex->SetPrimary(particle);
 }
@@ -163,5 +165,23 @@ void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
     vertex = new G4PrimaryVertex(EventVertex, 0);  // 0 means occurs at t = 0
     vertex -> SetPrimary(particle);
     ev -> AddPrimaryVertex(vertex);
+  }
+}
+
+void K37PrimaryGeneratorAction::SetPolarization(G4double pol) {
+  if (fabs(pol) <= 1.0) {
+    polarization_ = pol;
+  } else {
+    G4cout << "WARNING: Polarization " << pol
+           << " not in allowed range.  No changes made." << G4endl;
+  }
+}
+
+void K37PrimaryGeneratorAction::SetAlignment(G4double ali) {
+  if (fabs(ali) <= 1.0) {
+    alignment_ = ali;
+  } else {
+    G4cout << "WARNING: Alignment " << ali
+           << " not in allowed range.  No changes made." << G4endl;
   }
 }

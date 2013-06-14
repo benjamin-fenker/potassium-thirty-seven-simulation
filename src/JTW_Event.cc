@@ -136,7 +136,7 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
         *pow((electron.MaxE - electron.E), 2.0)
         *Zhi*(1.0
               + LittleA*(eDotn)/(electron.E*neutrino.E)
-              - LittleC*(eDotn)/(3.0*electron.E*neutrino.E)
+              - alignment*LittleC*(eDotn)/(3.0*electron.E*neutrino.E)
               + alignment*LittleC*eDotJ*nDotJ/(electron.E*neutrino.E)
               + polarization*BigA*eDotJ/electron.E
               + polarization*BigB*nDotJ/neutrino.E);
@@ -175,6 +175,7 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
     anMan -> FillNtupleDColumn(ntup_theta_e_generated, cos(electron.Theta));
     anMan -> FillNtupleDColumn(ntup_omega, Omega);
     anMan -> FillNtupleDColumn(ntup_electron_kinetic_energy_gen, electron.T);
+    anMan -> FillNtupleDColumn(ntup_recoil_mu_generated, cos(daughter.Theta));
     // anMan -> AddNtupleRow();
   }
 }     // End makeEvent

@@ -295,7 +295,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   anMan -> CreateNtupleDColumn("DL_Z_Pos");
   anMan -> CreateNtupleDColumn("TDC_ION_MCP");
   anMan -> CreateNtupleDColumn("TDC_ELECTRON_MCP");
-
+  anMan -> CreateNtupleDColumn("recoil_mu_generated");
   // End making ntuples
 }
 

@@ -100,9 +100,10 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   VetoedEvent = false;
   primaryScatteredOffHoops = false;
 
-  upper_scintillator_threshold_ = 0.0 * keV;
-  lower_scintillator_threshold_ = 0.0 * keV;
-  electron_mcp_threshold_ = 0.0 * keV;
+  // Default values
+  upper_scintillator_threshold_ = 100.0 * keV;
+  lower_scintillator_threshold_ = 100.0 * keV;
+  electron_mcp_threshold_ = 2.0 * keV;
 
   //event_messenger_ = new K37EventMessenger(this);
   // vector< double > spot;
@@ -113,7 +114,7 @@ K37EventAction::~K37EventAction() {
 }
 
 void K37EventAction::BeginOfEventAction(const G4Event* ev) {
-  if (ev -> GetEventID() % 100000 == 0) {
+  if (ev -> GetEventID() % 1000 == 0) {
     G4cout << "Event " << ev -> GetEventID() << G4endl;
   }
   // spot.clear();
@@ -131,8 +132,6 @@ void K37EventAction::BeginOfEventAction(const G4Event* ev) {
     dedx2CollID = SDman->GetCollectionID(colNam="dsssdMinusZHC");
     recoil_mcp_collection_id = SDman -> GetCollectionID(colNam="rMCP_HC");
     electron_mcp_collection_id = SDman -> GetCollectionID(colNam="eMCP_HC");
-    G4cout << "rMCP Collection ID is: " << recoil_mcp_collection_id << G4endl;
-    G4cout << "eMCP Collection ID is: " << electron_mcp_collection_id << G4endl;
   }
 
   energyDedx = 0;
@@ -197,12 +196,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   vector<G4double> sd_energy_minsZ_X(40, 0.0), sd_energy_minsZ_Y(40, 0.0);
 
   // rMCP info
-  G4double recoil_mcp_x_pos;
-  G4double recoil_mcp_z_pos;
-  G4double recoil_mcp_time;
+  G4double recoil_mcp_x_pos = 0.0;
+  G4double recoil_mcp_z_pos = 0.0;
+  G4double recoil_mcp_time = 0.0;
 
   // eMCP info
-  G4double electron_mcp_time;
+  G4double electron_mcp_time = 0.0;
+  G4double electron_mcp_energy = 0.0;
 
   G4AnalysisManager* anMan = G4AnalysisManager::Instance();
 
@@ -360,16 +360,18 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   if (electron_mcp_hit_collection) {      // rMCP
     if (electron_mcp_hit_collection -> entries() > 0) {
+      int n_hit = electron_mcp_hit_collection -> entries();
       K37ElectronMCPHit *hit = (*electron_mcp_hit_collection)[0];
       electron_mcp_time = hit -> GetTime();
-    } else {
-      G4cout << "Got no hits in eMCP!" << G4endl;
-      electron_mcp_time = 0.0;
+      for (int i = 0; i < n_hit; i++) {
+        hit = (*electron_mcp_hit_collection)[i];
+        electron_mcp_energy += hit -> GetEnergy();
+      }
     }
   }
 
   if (EventPassesTrigger(energy_upper_scintillator, energy_lower_scintillator,
-                         -1.0)) {
+                         electron_mcp_energy)) {
     // G4cout << "Event passes my trigger with energy "
     //        << G4BestUnit(energy_upper_scintillator, "Energy") << " / "
     //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"

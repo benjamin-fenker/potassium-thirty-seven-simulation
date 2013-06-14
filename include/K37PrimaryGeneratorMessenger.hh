@@ -3,7 +3,9 @@
 #ifndef K37PrimaryGeneratorMessenger_h
 #define K37PrimaryGeneratorMessenger_h 1
 
+#include "G4UIcmdWithADouble.hh"
 #include "G4UImessenger.hh"
+
 #include "globals.hh"
 
 class K37PrimaryGeneratorAction;
@@ -23,6 +25,8 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   K37PrimaryGeneratorAction* Action;
   G4UIdirectory*          gunDir;
   G4UIcmdWithAString*     RndmCmd;
+  G4UIcmdWithADouble *set_pol_cmd_;
+  G4UIcmdWithADouble *set_ali_cmd_;
 };
 
 //----------------------------------

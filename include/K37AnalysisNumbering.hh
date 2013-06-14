@@ -46,4 +46,5 @@
 #define ntup_rmcp_z_pos 172
 #define ntup_rmcp_time 173
 #define ntup_emcp_time 174
+#define ntup_recoil_mu_generated 175
 #endif  // INCLUDE_K37ANALYSISNUMBERING_H_
