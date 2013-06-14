@@ -38,6 +38,10 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void setBetaVertex();
   void setDaughterVertex();
   void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
+  void SetPolarization(G4double pol);
+  G4double GetPolarization() {return polarization_;}
+  void SetAlignment(G4double ali);
+  G4double GetAlignment() {return alignment_;}
 
  private:
   G4double      distanceToTrap;
@@ -51,6 +55,9 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4ParticleDefinition* positron;
   G4ParticleDefinition* Ar37MinusParticle;
   G4ParticleDefinition* ion;
+
+  G4double polarization_;
+  G4double alignment_;
 
   G4String use_recoil_;
   K37DetectorConstruction* detector;

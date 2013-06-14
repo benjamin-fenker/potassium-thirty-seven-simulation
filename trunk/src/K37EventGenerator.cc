@@ -20,16 +20,17 @@ K37EventGenerator::K37EventGenerator()
   neutrino.Mass = 0.0;
 
   Zhi = 2.69001;
-  //  BigA = -0.573938;
-  BigA = -0.5;
+  BigA = -0.573938;
+  // BigA = -0.5;
   //  BigA = 0.0;
   // BigA = -1.0;
-  // BigB = -0.779145;
-  BigB = 0.0;
-  // LittleC = 0.205207;
-  LittleC = 0.0;
-  // LittleA = 0.657989;
-  LittleA = 0.0;
+  BigB = -0.779145;
+  // BigB = 0.0;
+  LittleC = 0.205207;
+  // LittleC = 0.20;
+  // LittleC = 0.0;
+  LittleA = 0.657989;
+  // LittleA = 0.0;
 
   // All in MeV/c^2
   QValue = -1.0 * (daughter.Mass - parent.Mass  + 2. * electron.Mass);
