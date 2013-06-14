@@ -5,6 +5,12 @@ project(K37)
 #ADD_DEFINITIONS(-g -O0 -Wall) for debug builds 
 
 #----------------------------------------------------------------------------
+# Find Root so that we can link the aggregator class to it
+INCLUDE(FindROOT.cmake)
+INCLUDE_DIRECTORIES (${ROOT_INCLUDE_DIR})
+LINK_DIRECTORIES(${ROOT_LIBRARY_DIR})
+
+#----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
 # to build a batch mode only executable
@@ -40,11 +46,16 @@ configure_file (
 	"${PROJECT_SOURCE_DIR}/K37Config.hh"
 	)
 
+configure_file (
+	"${PROJECT_SOURCE_DIR}/IOconfiguration.mac.in"
+	"${PROJECT_SOURCE_DIR}/IOconfiguration.mac"
+	)
+
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 
 add_executable(K37 K37.cc ${sources} ${headers})
-target_link_libraries(K37 ${Geant4_LIBRARIES})
+target_link_libraries(K37 ${Geant4_LIBRARIES} Core Rio Tree)
 
 #----------------------------------------------------------------------------
  # Copy all scripts to the build directory, i.e. the directory in which we
@@ -53,6 +64,7 @@ target_link_libraries(K37 ${Geant4_LIBRARIES})
 #
 set(K37_SCRIPTS
   vis.mac
+  IOconfiguration.mac
   )
 
 foreach(_script ${K37_SCRIPTS})
