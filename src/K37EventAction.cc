@@ -104,7 +104,7 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   lower_scintillator_threshold_ = 0.0 * keV;
   electron_mcp_threshold_ = 0.0 * keV;
 
-  event_messenger_ = new K37EventMessenger(this);
+  //event_messenger_ = new K37EventMessenger(this);
   // vector< double > spot;
 }
 
@@ -376,7 +376,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     //        << G4BestUnit(energy_lower_scintillator, "Energy") << " / "
     //        << G4BestUnit(energyDedx2, "Energy") << G4endl;
 
-    G4double trigTime = pow(10, 10);
+    G4double trigTime = pow(10.0, 10);
     if (time_upper_scintillator > 0.0) {  // Then its above threshold
       trigTime = min(trigTime, time_upper_scintillator/ns);
     }
