@@ -55,7 +55,7 @@ configure_file (
 # Add the executable, and link it to the Geant4 libraries
 
 add_executable(K37 K37.cc ${sources} ${headers})
-target_link_libraries(K37 ${Geant4_LIBRARIES} Core Rio Tree)
+target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
 
 #----------------------------------------------------------------------------
  # Copy all scripts to the build directory, i.e. the directory in which we

@@ -105,7 +105,7 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   lower_scintillator_threshold_ = 100.0 * keV;
   electron_mcp_threshold_ = 2.0 * keV;
 
-  //event_messenger_ = new K37EventMessenger(this);
+  event_messenger_ = new K37EventMessenger(this);
   // vector< double > spot;
 }
 
