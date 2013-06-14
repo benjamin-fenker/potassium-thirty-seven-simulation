@@ -11,14 +11,14 @@
 
 #include "G4THitsMap.hh"
 
-//#include "K37EventMessenger.hh"
+#include "K37EventMessenger.hh"
 #include "K37StripDetectorHit.hh"
 
 using std::vector;
 
 class K37AllPossibleEventInformation;
 class K37ContainerForStripInformation;
-//class K37EventMessenger;
+class K37EventMessenger;
 class K37HistogramManager;
 class K37ListOfVolumeNames;
 class K37RunAction;
@@ -163,7 +163,7 @@ class K37EventAction : public G4UserEventAction {
   double lower_scintillator_threshold_;
   double electron_mcp_threshold_;
 
-  //K37EventMessenger *event_messenger_;
+  K37EventMessenger *event_messenger_;
 };
 
 #endif

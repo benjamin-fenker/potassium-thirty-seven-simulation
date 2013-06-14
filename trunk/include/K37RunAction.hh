@@ -4,9 +4,13 @@
 #define K37RunAction_h 1
 
 #include "G4UserRunAction.hh"
-#include "K37RunMessenger.hh"
 #include "globals.hh"
 
+#include "Aggregator.hh"
+#include "Generic_Channel.hh"
+#include "K37RunMessenger.hh"
+
+using AGG::Aggregator;
 //----------------------------------
 
 class G4Run;
@@ -215,6 +219,7 @@ class K37RunAction : public G4UserRunAction {
 
   // Event generator testing 1/18/2013
   G4int numPlus, numMinus;
+  Aggregator *the_aggregator_;
 };
 
 //----------------------------------

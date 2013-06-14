@@ -23,6 +23,8 @@
 
 #include "K37Analysis.hh"
 
+using AGG::Aggregator;
+
 G4bool fillEvGenData = true;
 G4bool fillAllSDData = true;
 
@@ -91,6 +93,7 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
   outFileName = "K37test";  // The extension (.root) is added by the analysis
   // manager automatically
   runMessenger = new K37RunMessenger(this);
+  the_aggregator_ = 0;
 }
 
 //----------------------------------
@@ -297,6 +300,26 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   anMan -> CreateNtupleDColumn("TDC_ELECTRON_MCP");
   anMan -> CreateNtupleDColumn("recoil_mu_generated");
   // End making ntuples
+
+  // Analysis Version 3! Spencer's Aggregator---should be IDENTICAL to what we
+  // get from the analyzer.
+  the_aggregator_ = new Aggregator();
+  Generic_Channel *test_channel = new Generic_Channel("TestChannel", 1, "/D");
+  the_aggregator_ -> RegisterData(test_channel);
+  the_aggregator_ -> RegisterIOMethod("IOconfiguration.mac");
+  the_aggregator_ -> BeginRun();
+
+  test_channel -> InsertData(10.0);
+  the_aggregator_ -> EndEvent();
+
+  test_channel -> InsertData(15.0);
+  the_aggregator_ -> EndEvent();
+
+  test_channel -> InsertData(13.0);
+  the_aggregator_ -> EndEvent();
+  the_aggregator_ -> EndRun();
+  delete the_aggregator_;
+  delete test_channel;
 }
 
 void K37RunAction::EndOfRunAction(const G4Run* aRun) {
@@ -356,6 +379,7 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
   } else {
     G4cout << "WARNING...Not closing histograms after run!" << G4endl;
   }
+
   G4cout << "Last line of EORA" << G4endl;
 }
 

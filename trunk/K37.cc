@@ -63,22 +63,22 @@ int main(int argc, char** argv) {
    //-------------------------------------------------------------
    //This is a minimally working exapmple of how the aggregator 
    //works. The order of operations is important
-   AGG::Aggregator *theAggregator= new AGG::Aggregator();
-   Generic_Channel *testChan  = new Generic_Channel("theTest", 1, "/D");
-   theAggregator->RegisterData(testChan);
-   theAggregator->RegisterIOMethod("IOconfiguration.mac");
-   theAggregator->BeginRun();
-   testChan->InsertData(10.0);
-   theAggregator->EndEvent();
-   testChan->InsertData(11.0);
-   theAggregator->EndEvent();
-   testChan->InsertData(13.0);
-   theAggregator->EndEvent();
-   testChan->InsertData(15.0);
-   theAggregator->EndEvent();
-   theAggregator->EndRun();
-   delete theAggregator; theAggregator = 0;
-   delete testChan; testChan = 0;
+   // AGG::Aggregator *theAggregator= new AGG::Aggregator();
+   // Generic_Channel *testChan  = new Generic_Channel("theTest", 1, "/D");
+   // theAggregator->RegisterData(testChan);
+   // theAggregator->RegisterIOMethod("IOconfiguration.mac");
+   // theAggregator->BeginRun();
+   // testChan->InsertData(10.0);
+   // theAggregator->EndEvent();
+   // testChan->InsertData(11.0);
+   // theAggregator->EndEvent();
+   // testChan->InsertData(13.0);
+   // theAggregator->EndEvent();
+   // testChan->InsertData(15.0);
+   // theAggregator->EndEvent();
+   // theAggregator->EndRun();
+   // delete theAggregator; theAggregator = 0;
+   // delete testChan; testChan = 0;
    //-------------------------------------------------------------
 
    K37HistogramManager* histo = new K37HistogramManager();
