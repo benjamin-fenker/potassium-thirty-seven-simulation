@@ -83,6 +83,21 @@ K37RunMessenger::K37RunMessenger(K37RunAction* RA)
   setFileName -> SetParameterName("filename", true);
   setFileName -> SetDefaultValue("K37");
   setFileName -> AvailableForStates(G4State_Idle);
+
+  set_configuration_file_ =
+      new G4UIcmdWithAString("/K37/RunControls/setConfigurationFile", this);
+  set_configuration_file_ -> SetGuidance("Enter complete configuration file");
+  set_configuration_file_ -> SetParameterName("filename", true);
+  set_configuration_file_ -> SetDefaultValue("IOconfiguration.mac");
+  set_configuration_file_ -> AvailableForStates(G4State_Idle);
+
+  set_output_directory_ =
+      new G4UIcmdWithAString("/K37/RunControls/setOutputDirectory", this);
+  set_output_directory_ -> SetGuidance("Enter new output directory");
+  set_output_directory_ -> SetParameterName("path", true);
+  set_output_directory_ ->
+      SetDefaultValue("/home/bfenker/geant4_workdir/K37Build");
+  set_output_directory_ -> AvailableForStates(G4State_Idle);
 }
 
 //---------------------------------
@@ -125,7 +140,23 @@ void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   }
 
   if (command == setFileName) {
-    runAction -> setFileName(newValues);
+    // runAction -> setFileName(newValues);
+    FILE *io_file;
+    io_file = fopen(runAction -> GetConfigurationFileName(), "w+");
+    printf("root %s/%s.root", runAction -> GetOutputDirectory(),
+           newValues.c_str());
+    fprintf(io_file, "root %s/%s.root", runAction -> GetOutputDirectory(),
+            newValues.c_str());
+    fclose(io_file);
+  }
+
+  if (command == set_configuration_file_) {
+    //    char *value_char = newValues.c_str();
+    runAction -> SetConfigurationFileName(newValues.c_str());
+  }
+
+  if (command == set_output_directory_) {
+    runAction -> SetOutputDirectory(newValues.c_str());
   }
 }
 

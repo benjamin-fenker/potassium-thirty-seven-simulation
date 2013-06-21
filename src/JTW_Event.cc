@@ -177,6 +177,10 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
     anMan -> FillNtupleDColumn(ntup_electron_kinetic_energy_gen, electron.T);
     anMan -> FillNtupleDColumn(ntup_recoil_mu_generated, cos(daughter.Theta));
     // anMan -> AddNtupleRow();
+
+    (*active_channels_)["T_GEN_ELE"] -> InsertData(electron.T);
+    (*active_channels_)["MU_GEN_ELE"] -> InsertData(cos(electron.Theta));
+    (*active_channels_)["MU_GEN_RECOIL"] -> InsertData(cos(daughter.Theta));
   }
 }     // End makeEvent
 

@@ -3,7 +3,18 @@
 #ifndef K37EventGenerator_H
 #define K37EventGenerator_H 1
 
+#include <map>
+#include <string>
+
 #include "globals.hh"
+
+#include "Aggregator.hh"
+#include "K37_Data.hh"
+
+using AGG::Aggregator;
+using K37_ABC::K37_Data;
+using std::map;
+using std::string;
 
 class K37FermiFunction;
 struct particle {
@@ -33,6 +44,8 @@ class K37EventGenerator {
   G4double Omega, testOmega, Zhi, BigA, BigB, LittleC, LittleA;
   K37FermiFunction* FF;
   G4double v_over_c_running;    // Will keep a running tally of v/c coming out
+  Aggregator *the_aggregator_;
+  map<string, K37_Data*> *active_channels_;
   // of event generator for testing purposes
 
  public:
@@ -47,49 +60,24 @@ class K37EventGenerator {
   /*virtual int area (void) =0;*/
   /*void printarea (void)*/
   /*{ cout << this->area() << endl; }*/
-  G4double eMomentumX() {
-    return electron.X;
-  };
-  G4double eMomentumY() {
-    return electron.Y;
-  };
-  G4double eMomentumZ() {
-    return electron.Z;
-  };
-  G4double eMomentumTheta() {
-    return electron.Theta;
-  };
-  G4double eMomentumPhi() {
-    return electron.Phi;
-  };
-  G4double eMomentumPmag() {
-    return electron.Pmag;
-  };
-  G4double eKineticEnergy() {
-    return electron.T;
-  };
-
-  G4double dMomentumX() {
-    return daughter.X;
-  };
-  G4double dMomentumY() {
-    return daughter.Y;
-  };
-  G4double dMomentumZ() {
-    return daughter.Z;
-  };
-  G4double dMomentumTheta() {
-    return daughter.Theta;
-  };
-  G4double dMomentumPhi() {
-    return daughter.Phi;
-  };
-  G4double dMomentumPmag() {
-    return daughter.Pmag;
-  };
-  G4double dKineticEnergy() {
-    return daughter.T;
-  };
+  G4double eMomentumX() {return electron.X;}
+  G4double eMomentumY() {return electron.Y;}
+  G4double eMomentumZ() {return electron.Z;}
+  G4double eMomentumTheta() {return electron.Theta;}
+  G4double eMomentumPhi() {return electron.Phi;}
+  G4double eMomentumPmag() {return electron.Pmag;}
+  G4double eKineticEnergy() {return electron.T;}
+  G4double dMomentumX() {return daughter.X;}
+  G4double dMomentumY() {return daughter.Y;}
+  G4double dMomentumZ() {return daughter.Z;}
+  G4double dMomentumTheta() {return daughter.Theta;}
+  G4double dMomentumPhi() {return daughter.Phi;}
+  G4double dMomentumPmag() {return daughter.Pmag;}
+  G4double dKineticEnergy() {return daughter.T;}
+  void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
+  void SetActiveChannels(map<string, K37_Data*> *active_channels) {
+    active_channels_ = active_channels;
+  }
 };
 
 #endif

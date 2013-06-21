@@ -106,6 +106,7 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   electron_mcp_threshold_ = 2.0 * keV;
 
   event_messenger_ = new K37EventMessenger(this);
+  the_aggregator_ = 0;
   // vector< double > spot;
 }
 
@@ -117,6 +118,7 @@ void K37EventAction::BeginOfEventAction(const G4Event* ev) {
   if (ev -> GetEventID() % 1000 == 0) {
     G4cout << "Event " << ev -> GetEventID() << G4endl;
   }
+
   // spot.clear();
   if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
     sizeOfListOfEnteredVolumes = listOfEnteredVolumes->checkSizeOfList();
@@ -407,15 +409,35 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     anMan -> FillNtupleDColumn(ntup_rmcp_time, recoil_mcp_time/ns);
     anMan -> FillNtupleDColumn(ntup_emcp_time, electron_mcp_time/ns);
 
+    (*active_channels_)["QDC_UpperPMT"] ->
+        InsertData(energy_upper_scintillator/keV);
+    (*active_channels_)["QDC_LowerPMT"] ->
+        InsertData(energy_lower_scintillator/keV);
+    (*active_channels_)["DL_X_Pos"] -> InsertData(recoil_mcp_x_pos/mm);
+    (*active_channels_)["DL_Z_Pos"] -> InsertData(recoil_mcp_z_pos/mm);
+    (*active_channels_)["TDC_SCINT_TOP"] ->
+        InsertData(time_upper_scintillator/ns);
+    (*active_channels_)["TDC_SCINT_BOTTOM"] ->
+        InsertData(time_lower_scintillator/ns);
+    (*active_channels_)["TDC_ION_MCP"] -> InsertData(recoil_mcp_time/ns);
+    (*active_channels_)["TDC_ELECTRON_MCP"] -> InsertData(electron_mcp_time/ns);
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
     if (fillAllSDData) {
+      // All (G4) way
       fillSDNtuples(sd_energy_plusZ_X, ntup_SD_plusZ_X_start);
       fillSDNtuples(sd_energy_plusZ_Y, ntup_SD_plusZ_Y_start);
       fillSDNtuples(sd_energy_minsZ_X, ntup_SD_minsZ_X_start);
       fillSDNtuples(sd_energy_minsZ_Y, ntup_SD_minsZ_Y_start);
+
+      // New (Aggregator) way
+      fillSDNtuples(sd_energy_minsZ_X, "STRIP_LX_");
+      fillSDNtuples(sd_energy_minsZ_Y, "STRIP_LY_");
+      fillSDNtuples(sd_energy_plusZ_X, "STRIP_UX_");
+      fillSDNtuples(sd_energy_plusZ_Y, "STRIP_UY_");
     }
+
     if (isThereEnergyDedx == true) {
       // stripHandler->PrintMaps();
       stripHandler->PassThePlusZDetectors();
@@ -497,6 +519,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // Add a new row here to add a new row for only accpeted events where
     // either there was energy in the plus or minus z detector, but not both!
     anMan -> AddNtupleRow();
+    the_aggregator_ -> EndEvent();
   }
   // PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;
@@ -524,6 +547,19 @@ void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,
                              energy_strip[i]/keV);
     if (energy_strip[i] > 0 && debug) {
       G4cout << "Strip " << i << " with " << energy_strip[i]/keV << G4endl;
+    }
+  }
+}
+
+void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,
+                                   G4String name) {
+  G4bool debug = false;
+  char full_name[200];
+  for (G4int i = 0; i < 40; i++) {
+    snprintf(full_name, sizeof(full_name), "%s%02d", name.c_str(), i);
+    (*active_channels_)[full_name] -> InsertData(energy_strip[i]/keV);
+    if (energy_strip[i] > 0 && debug) {
+      G4cout << full_name << " with " << energy_strip[i]/keV << G4endl;
     }
   }
 }

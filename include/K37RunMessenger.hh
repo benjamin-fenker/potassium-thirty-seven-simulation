@@ -31,6 +31,8 @@ class K37RunMessenger: public G4UImessenger {
   G4UIcmdWithAnInteger* SaveFilesCommand;
   G4UIcmdWithAString* printEnergyLossTable;
   G4UIcmdWithAString* setFileName;
+  G4UIcmdWithAString* set_configuration_file_;
+  G4UIcmdWithAString* set_output_directory_;
   G4UIcmdWithABool* printAnnihilation;
   G4UIcmdWithABool* printTheVolumeNames;
   G4UIcmdWithABool* setFillEvGenData;
