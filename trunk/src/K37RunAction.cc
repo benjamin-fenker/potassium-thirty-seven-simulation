@@ -24,6 +24,7 @@
 #include "K37Analysis.hh"
 
 using AGG::Aggregator;
+using std::string;
 
 G4bool fillEvGenData = true;
 G4bool fillAllSDData = true;
@@ -90,9 +91,43 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
 
   acceptedPrimaryScatteredOffHoops = 0;
 
-  outFileName = "K37test";  // The extension (.root) is added by the analysis
+  snprintf(configuration_filename_, sizeof(configuration_filename_),
+           "IOconfiguration.mac");
+  snprintf(output_directory_, sizeof(output_directory_),
+           "/home/bfenker/geant4_workdir/K37Build");
+
+  outFileName = "old_analysis_manager";
   // manager automatically
   runMessenger = new K37RunMessenger(this);
+
+  // Detectors
+  qdc_upper_pmt_ = new Generic_Channel("QDC_UpperPMT", 1, "/D");
+  qdc_lower_pmt_ = new Generic_Channel("QDC_LowerPMT", 2, "/D");
+  dl_x_pos_      = new Generic_Channel("DL_X_Pos"    , 3, "/D");
+  dl_z_pos_      = new Generic_Channel("DL_Z_Pos"    , 4, "/D");
+  char name[200];
+  for (G4int i = 0; i < 40; i++) {
+    snprintf(name, sizeof(name), "STRIP_UX_%02d", i);
+    strip_detector_upper_x_[i] = new Generic_Channel(name, i+5, "/D");
+    snprintf(name, sizeof(name), "STRIP_UY_%02d", i);
+    strip_detector_upper_y_[i] = new Generic_Channel(name, i+45, "/D");
+    snprintf(name, sizeof(name), "STRIP_LX_%02d", i);
+    strip_detector_lower_x_[i] = new Generic_Channel(name, i+85, "/D");
+    snprintf(name, sizeof(name), "STRIP_LY_%02d", i);
+    strip_detector_lower_y_[i] = new Generic_Channel(name, i+125, "/D");
+  }
+
+  // TDCs
+  tdc_scint_top_    = new TDC_Channel("TDC_SCINT_TOP"   , 201, "/v", false);
+  tdc_scint_bottom_ = new TDC_Channel("TDC_SCINT_BOTTOM", 202, "/v", false);
+  tdc_ion_mcp_      = new TDC_Channel("TDC_ION_MCP"     , 203, "/v", false);
+  tdc_electron_mcp_ = new TDC_Channel("TDC_ELECTRON_MCP", 203, "/v", false);
+
+  // Event generator
+  electron_kinetic_energy_generated_ = new Generic_Channel("T_GEN_ELE", 301,
+                                                           "/D");
+  electron_mu_generated_ = new Generic_Channel("MU_GEN_ELE", 302, "/D");
+  recoil_mu_generated_   = new Generic_Channel("MU_GEN_RECOIL", 302, "/D");
   the_aggregator_ = 0;
 }
 
@@ -100,6 +135,23 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
 
 K37RunAction::~K37RunAction() {
   delete runMessenger;
+  delete qdc_upper_pmt_;
+  delete qdc_lower_pmt_;
+  delete dl_x_pos_;
+  delete dl_z_pos_;
+  for (G4int i = 0; i < 40; i++) {
+    delete strip_detector_upper_x_[i];
+    delete strip_detector_upper_y_[i];
+    delete strip_detector_lower_x_[i];
+    delete strip_detector_lower_y_[i];
+  }
+  delete tdc_scint_top_;
+  delete tdc_scint_bottom_;
+  delete tdc_ion_mcp_;
+  delete tdc_electron_mcp_;
+  delete electron_kinetic_energy_generated_;
+  delete electron_mu_generated_;
+  delete recoil_mu_generated_;
 }
 
 //----------------------------------
@@ -225,7 +277,12 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // Open an output file
   //
   // G4String fileName = "K37";
-  G4cout << "Opening file: " << outFileName << G4endl;
+  FILE *io_file;
+  char data_type[80], out_file[80];
+  io_file = fopen(GetConfigurationFileName(), "r");
+  fscanf(io_file, "%s %s", data_type, out_file);
+
+  G4cout << "Opening file: " << out_file << G4endl;
   anMan->OpenFile(outFileName);
   // anMan->SetFirstHistoId(1);
   // anMan->SetFirstNtupleId(1);
@@ -303,23 +360,38 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   // Analysis Version 3! Spencer's Aggregator---should be IDENTICAL to what we
   // get from the analyzer.
-  the_aggregator_ = new Aggregator();
-  Generic_Channel *test_channel = new Generic_Channel("TestChannel", 1, "/D");
-  the_aggregator_ -> RegisterData(test_channel);
-  the_aggregator_ -> RegisterIOMethod("IOconfiguration.mac");
+  // the_aggregator_ = new Aggregator();
+
+  RegisterChannel(qdc_upper_pmt_);
+  RegisterChannel(qdc_lower_pmt_);
+  RegisterChannel(dl_x_pos_);
+  RegisterChannel(dl_z_pos_);
+  for (G4int i = 0; i < 40; i++) {
+    RegisterChannel(strip_detector_upper_x_[i]);
+    RegisterChannel(strip_detector_upper_y_[i]);
+    RegisterChannel(strip_detector_lower_x_[i]);
+    RegisterChannel(strip_detector_lower_y_[i]);
+  }
+  RegisterChannel(tdc_scint_top_);
+  RegisterChannel(tdc_scint_bottom_);
+  RegisterChannel(tdc_ion_mcp_);
+  RegisterChannel(tdc_electron_mcp_);
+  RegisterChannel(electron_kinetic_energy_generated_);
+  RegisterChannel(electron_mu_generated_);
+  RegisterChannel(recoil_mu_generated_);
+
+  the_aggregator_ -> RegisterIOMethod(configuration_filename_);
+  // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();
 
-  test_channel -> InsertData(10.0);
-  the_aggregator_ -> EndEvent();
+  // test_channel_ -> InsertData(10.0);
+  // the_aggregator_ -> EndEvent();
 
-  test_channel -> InsertData(15.0);
-  the_aggregator_ -> EndEvent();
+  // test_channel_ -> InsertData(15.0);
+  // the_aggregator_ -> EndEvent();
 
-  test_channel -> InsertData(13.0);
-  the_aggregator_ -> EndEvent();
-  the_aggregator_ -> EndRun();
-  delete the_aggregator_;
-  delete test_channel;
+  // test_channel_ -> InsertData(13.0);
+  // the_aggregator_ -> EndEvent();
 }
 
 void K37RunAction::EndOfRunAction(const G4Run* aRun) {
@@ -368,17 +440,15 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
   G4AnalysisManager *anMan = G4AnalysisManager::Instance();
   // save histograms
   //
-  if (true) {
-    G4cout << "Closing histograms........." << G4endl;
-    anMan->Write();
-    anMan->CloseFile();
-    G4cout << "Closed histograms." << G4endl;
-    G4cout << "Total v/c N+ = " << plusZHits_vc << G4endl;
-    G4cout << "Total v/c N- = " << minusZHits_vc << G4endl;
-    delete G4AnalysisManager::Instance();
-  } else {
-    G4cout << "WARNING...Not closing histograms after run!" << G4endl;
-  }
+  G4cout << "Closing histograms........." << G4endl;
+  anMan->Write();
+  anMan->CloseFile();
+  G4cout << "Closed histograms." << G4endl;
+  G4cout << "Total v/c N+ = " << plusZHits_vc << G4endl;
+  G4cout << "Total v/c N- = " << minusZHits_vc << G4endl;
+  delete G4AnalysisManager::Instance();
+
+  the_aggregator_ -> EndRun();
 
   G4cout << "Last line of EORA" << G4endl;
 }
@@ -512,6 +582,10 @@ void K37RunAction::PrintResultsToScreen() {
   // G4cout << "-------------------------------" << G4endl;
 }
 
+void K37RunAction::RegisterChannel(K37_Data* channel) {
+  (*active_channels_)[channel->GetName()] = channel;
+  the_aggregator_ -> RegisterData(channel);
+}
 
 void K37RunAction::PrintResultsToRunstat() {
   std::ofstream runstat;

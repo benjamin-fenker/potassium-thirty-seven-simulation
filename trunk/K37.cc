@@ -17,6 +17,7 @@
 #include "K37EventGenerator.hh"
 #include "Holstein_Event.hh"
 #include "JTW_Event.hh"
+#include "K37_Data.hh"
 #include "K37FermiFunction.hh"
 #include "K37ListOfVolumeNames.hh"
 #include "K37DetectorConstruction.hh"
@@ -43,6 +44,7 @@
 #include "G4UIExecutive.hh"
 #endif
 
+using K37_ABC::K37_Data;
 using std::ofstream;
 
 int main(int argc, char** argv) {
@@ -60,13 +62,10 @@ int main(int argc, char** argv) {
    K37AllPossibleEventInformation* APEI =
       new K37AllPossibleEventInformation("EventInformation.txt");
 
-   //-------------------------------------------------------------
-   //This is a minimally working exapmple of how the aggregator 
-   //works. The order of operations is important
-   // AGG::Aggregator *theAggregator= new AGG::Aggregator();
+   AGG::Aggregator *the_aggregator= new AGG::Aggregator();
    // Generic_Channel *testChan  = new Generic_Channel("theTest", 1, "/D");
    // theAggregator->RegisterData(testChan);
-   // theAggregator->RegisterIOMethod("IOconfiguration.mac");
+   // the_aggregator -> RegisterIOMethod("IOconfiguration.mac");
    // theAggregator->BeginRun();
    // testChan->InsertData(10.0);
    // theAggregator->EndEvent();
@@ -77,7 +76,7 @@ int main(int argc, char** argv) {
    // testChan->InsertData(15.0);
    // theAggregator->EndEvent();
    // theAggregator->EndRun();
-   // delete theAggregator; theAggregator = 0;
+
    // delete testChan; testChan = 0;
    //-------------------------------------------------------------
 
@@ -96,6 +95,7 @@ int main(int argc, char** argv) {
    runstat << "Random seed: " << myseed << G4endl;
    runstat << "-----------------------" << G4endl;
    runstat.close();
+   map<string, K37_Data*> active_channels;
 
    G4VSteppingVerbose* verbosity = new K37SteppingVerbose;
    G4VSteppingVerbose::SetInstance(verbosity);
@@ -116,6 +116,8 @@ int main(int argc, char** argv) {
 
    // User Action classes
    K37EventGenerator * evGen = new JTW_Event();
+   evGen -> SetAggregator(the_aggregator);
+   evGen -> SetActiveChannels(&active_channels);
 
    K37PrimaryGeneratorAction* gen_action;
    runManager->SetUserAction(gen_action = new K37PrimaryGeneratorAction(
@@ -126,16 +128,20 @@ int main(int argc, char** argv) {
    K37ListOfVolumeNames *volumesTheBetaEntered =
       new K37ListOfVolumeNames("volumeNames.txt", 1000);
 
-   K37RunAction* run_action;
-   runManager->SetUserAction(run_action = new K37RunAction(detector,
-            gen_action,
-            volumesTheBetaEntered,
-            annihilation, APEI,
-            histo));
 
-   K37EventAction* event_action;
-   runManager->SetUserAction(event_action =
-         new K37EventAction(run_action, volumesTheBetaEntered, APEI, histo));
+   K37RunAction* run_action = new K37RunAction(detector, gen_action,
+                                               volumesTheBetaEntered,
+                                               annihilation, APEI, histo);
+   run_action -> SetActiveChannels(&active_channels);
+   run_action -> SetAggregator(the_aggregator);
+   runManager -> SetUserAction(run_action);
+
+   K37EventAction* event_action = new K37EventAction(run_action,
+                                                     volumesTheBetaEntered,
+                                                     APEI, histo);
+   event_action -> SetAggregator(the_aggregator);
+   event_action -> SetActiveChannels(&active_channels);
+   runManager   -> SetUserAction(event_action);
 
    K37TrackingAction* tracking_action;
    runManager->SetUserAction(tracking_action= new K37TrackingAction());
@@ -267,6 +273,8 @@ if (histo)       {
 }
 // if(visManager)        {delete visManager;}
 // delete betaGenerator;
+
+delete the_aggregator;
 return 0;
 }
 

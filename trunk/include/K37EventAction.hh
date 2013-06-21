@@ -3,18 +3,25 @@
 #ifndef K37EventAction_h
 #define K37EventAction_h 1
 
+#include <map>
+#include <string>
 #include <vector>
 
-#include "G4UserEventAction.hh"
-#include "G4ThreeVector.hh"
 #include "globals.hh"
-
 #include "G4THitsMap.hh"
+#include "G4ThreeVector.hh"
+#include "G4UserEventAction.hh"
 
+#include "Aggregator.hh"
+#include "Generic_Channel.hh"
 #include "K37EventMessenger.hh"
 #include "K37StripDetectorHit.hh"
 
+using std::map;
+using std::string;
 using std::vector;
+using AGG::Aggregator;
+using K37_ABC::K37_Data;
 
 class K37AllPossibleEventInformation;
 class K37ContainerForStripInformation;
@@ -45,6 +52,10 @@ class K37EventAction : public G4UserEventAction {
   void SetLowerScintillatorThreshold(double t)
   {lower_scintillator_threshold_ = t;}
   void SetElectronMCPthreshold(double t) {electron_mcp_threshold_ = t;}
+  void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
+  void SetActiveChannels(map<string, K37_Data*> *active_channels) {
+    active_channels_ = active_channels;
+  }
 
  private:
   // G4THitsMap<G4double>* evtMap;
@@ -53,6 +64,7 @@ class K37EventAction : public G4UserEventAction {
   // When using this function, always pass it the x-start
   // for the SD you wnat to fill!!!
   void fillSDNtuples(vector<G4double> EDep_strip, G4int ntuple_number_start);
+  void fillSDNtuples(vector<G4double> energy_strip, G4String name);
   // *******************************
   vector<G4double>GetEDepVector(K37StripDetectorHitsCollection *collection,
                                 G4int coordinate);
@@ -164,6 +176,8 @@ class K37EventAction : public G4UserEventAction {
   double electron_mcp_threshold_;
 
   K37EventMessenger *event_messenger_;
+  Aggregator *the_aggregator_;
+  map<string, K37_Data*> *active_channels_;
 };
 
 #endif
