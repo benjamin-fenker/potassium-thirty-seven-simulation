@@ -22,7 +22,7 @@ class K37_Data {
   // stored into the class with the InsertData function. I realized later that
   // overloading this function is the best way to deal with multiple types
   virtual void InsertData(const uint32_t &) = 0;
-
+  virtual void InsertDataL(const uint64_t &data_) = 0;
   // All of the coulumns that are returning double can be given a default
   // value to signal if they are not filed the only exception is the
   // TTTL column that will return the time because this coulum returns a

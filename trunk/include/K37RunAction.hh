@@ -183,16 +183,18 @@ class K37RunAction : public G4UserRunAction {
   G4int numPlus, numMinus;
   Aggregator *the_aggregator_;
   Generic_Channel *qdc_upper_pmt_, *qdc_lower_pmt_;
-  Generic_Channel *dl_x_pos_, *dl_z_pos_;
+  TDC_Channel *dl_x_pos_, *dl_z_pos_;
   Generic_Channel *strip_detector_upper_x_[40];
   Generic_Channel *strip_detector_upper_y_[40];
   Generic_Channel *strip_detector_lower_x_[40];
   Generic_Channel *strip_detector_lower_y_[40];
   TDC_Channel *tdc_scint_top_, *tdc_scint_bottom_;
   TDC_Channel *tdc_ion_mcp_, *tdc_electron_mcp_;
-  Generic_Channel *electron_kinetic_energy_generated_;
-  Generic_Channel *electron_mu_generated_;
-  Generic_Channel *recoil_mu_generated_;
+  TDC_Channel *tdc_photo_diode_;
+  TDC_Channel *tdc_long_electron_, *tdc_nimio32_trigger_, *tdc_tdc_stop_;
+  Generic_Channel *electron_kinetic_energy_generated_, *electron_mu_generated_;
+  Generic_Channel *recoil_mu_generated_,  *run_action_, *recoil_mcp_particle_;
+  Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_;
 
   map<string, K37_Data*> *active_channels_;
 };

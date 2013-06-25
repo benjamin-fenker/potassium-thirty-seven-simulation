@@ -42,10 +42,11 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4double GetPolarization() {return polarization_;}
   void SetAlignment(G4double ali);
   G4double GetAlignment() {return alignment_;}
+  void SetRecoilCharge(G4int charge);
 
  private:
   G4double      distanceToTrap;
-  // G4ParticleGun*      particleGun;
+
   G4SingleParticleSource*       particleGun;
   G4double      rho;
   G4double      phi;
@@ -54,10 +55,10 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4ParticleDefinition* electron;
   G4ParticleDefinition* positron;
   G4ParticleDefinition* Ar37MinusParticle;
-  G4ParticleDefinition* ion;
 
   G4double polarization_;
   G4double alignment_;
+  G4double recoil_charge_;               // Also determines number of SOE
 
   G4String use_recoil_;
   K37DetectorConstruction* detector;

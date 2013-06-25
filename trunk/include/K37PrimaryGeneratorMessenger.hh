@@ -4,13 +4,13 @@
 #define K37PrimaryGeneratorMessenger_h 1
 
 #include "G4UIcmdWithADouble.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithAnInteger.hh"
+#include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
-
 #include "globals.hh"
 
-class K37PrimaryGeneratorAction;
-class G4UIdirectory;
-class G4UIcmdWithAString;
+#include "K37PrimaryGeneratorAction.hh"
 
 //----------------------------------
 
@@ -22,11 +22,12 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   void SetNewValue(G4UIcommand*, G4String);
 
  private:
-  K37PrimaryGeneratorAction* Action;
+  K37PrimaryGeneratorAction* action_;
   G4UIdirectory*          gunDir;
   G4UIcmdWithAString*     RndmCmd;
   G4UIcmdWithADouble *set_pol_cmd_;
   G4UIcmdWithADouble *set_ali_cmd_;
+  G4UIcmdWithAnInteger *set_recoil_charge_cmd_;
 };
 
 //----------------------------------

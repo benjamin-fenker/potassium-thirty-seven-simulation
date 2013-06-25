@@ -49,6 +49,9 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
   if (particleType == K37Ar37PlusOne::Ar37PlusOneDefinition()) {
     classification = fUrgent;
   }
+  if (particleType -> GetParticleType() == "nucleus") {
+    classification = fUrgent;
+  }
   return classification;
 }
 

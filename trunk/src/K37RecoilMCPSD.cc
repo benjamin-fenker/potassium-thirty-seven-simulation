@@ -1,10 +1,14 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
-#include "K37RecoilMCPSD.hh"
-#include "K37RecoilMCPHit.hh"
-#include "G4Step.hh"
 #include "G4HCofThisEvent.hh"
+#include "G4Step.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4TouchableHistory.hh"
+#include "G4UnitsTable.hh"
+
+#include "K37RecoilMCPHit.hh"
+#include "K37RecoilMCPSD.hh"
+
 
 K37RecoilMCPSD::K37RecoilMCPSD(G4String name)
     :G4VSensitiveDetector(name) {
@@ -21,6 +25,7 @@ void K37RecoilMCPSD::Initialize(G4HCofThisEvent* hit_collection_this_event) {
 }
 
 G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
+  G4bool debug = false;
   K37RecoilMCPHit *new_hit = new K37RecoilMCPHit();
   G4Track *track = step -> GetTrack();
 
@@ -30,6 +35,28 @@ G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
   // what I'll go with
   new_hit -> SetXPos(step -> GetPreStepPoint() -> GetPosition().x());
   new_hit -> SetZPos(step -> GetPreStepPoint() -> GetPosition().z());
+  new_hit ->
+      SetParticlePDG(track -> GetParticleDefinition() -> GetPDGEncoding());
+
   rmcp_hit_collection_ -> insert(new_hit);
+  if (debug) {
+    G4cout << "Particle name: "
+           << track -> GetParticleDefinition() -> GetParticleName() << G4endl
+           << "PDG Encoding: "
+           << track -> GetParticleDefinition() -> GetPDGEncoding() << G4endl
+           << "Prestep y-position: "
+           << step -> GetPreStepPoint() -> GetPosition().y()/mm << " mm"
+           << G4endl << "Poststep y-position: "
+           << step -> GetPostStepPoint() -> GetPosition().y()/mm << " mm"
+           << G4endl << "Global time: "
+           << step -> GetPreStepPoint() -> GetGlobalTime()/ns << " ns"
+           << G4endl << "Local time: "
+           << step -> GetPreStepPoint() -> GetLocalTime()/ns << " ns"
+           << G4endl << "Proper time: "
+           << step -> GetPreStepPoint() -> GetProperTime()/ns << " ns"
+           << G4endl;
+    // G4int j;
+    // G4cin >> j;
+  }
   return true;
 }
