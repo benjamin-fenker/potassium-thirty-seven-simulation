@@ -103,8 +103,8 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
   // Detectors
   qdc_upper_pmt_ = new Generic_Channel("QDC_UpperPMT", 1, "/D");
   qdc_lower_pmt_ = new Generic_Channel("QDC_LowerPMT", 2, "/D");
-  dl_x_pos_      = new Generic_Channel("DL_X_Pos"    , 3, "/D");
-  dl_z_pos_      = new Generic_Channel("DL_Z_Pos"    , 4, "/D");
+  dl_x_pos_      = new TDC_Channel("DL_X_Pos"    , 3, "/v", false);
+  dl_z_pos_      = new TDC_Channel("DL_Z_Pos"    , 4, "/v", false);
   char name[200];
   for (G4int i = 0; i < 40; i++) {
     snprintf(name, sizeof(name), "STRIP_UX_%02d", i);
@@ -118,16 +118,28 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
   }
 
   // TDCs
-  tdc_scint_top_    = new TDC_Channel("TDC_SCINT_TOP"   , 201, "/v", false);
-  tdc_scint_bottom_ = new TDC_Channel("TDC_SCINT_BOTTOM", 202, "/v", false);
-  tdc_ion_mcp_      = new TDC_Channel("TDC_ION_MCP"     , 203, "/v", false);
-  tdc_electron_mcp_ = new TDC_Channel("TDC_ELECTRON_MCP", 203, "/v", false);
+  tdc_scint_top_     = new TDC_Channel("TDC_SCINT_TOP"    , 201, "/v", false);
+  tdc_scint_bottom_  = new TDC_Channel("TDC_SCINT_BOTTOM" , 202, "/v", false);
+  tdc_ion_mcp_       = new TDC_Channel("TDC_ION_MCP"      , 203, "/v", false);
+  tdc_electron_mcp_  = new TDC_Channel("TDC_ELECTRON_MCP" , 203, "/v", false);
+  tdc_photo_diode_   = new TDC_Channel("TDC_PHOTO_DIODE"  , 204, "/v", false);
+  tdc_long_electron_ = new TDC_Channel("TDC_LONG_ELECTRON", 205, "/v", false);
+  tdc_nimio32_trigger_ = new TDC_Channel("TDC_NIMIO32_TRIGGER", 205, "/v",
+                                         false);
+  tdc_tdc_stop_= new TDC_Channel("TDC_TDC_STOP", 205, "/v", false);
 
-  // Event generator
+  // Event generator and other Geant-only data
   electron_kinetic_energy_generated_ = new Generic_Channel("T_GEN_ELE", 301,
                                                            "/D");
   electron_mu_generated_ = new Generic_Channel("MU_GEN_ELE", 302, "/D");
   recoil_mu_generated_   = new Generic_Channel("MU_GEN_RECOIL", 302, "/D");
+  recoil_mcp_particle_   = new Generic_Channel("ION_MCP_PARTICLE_PDG",
+                                               303, "/D");
+
+  // Information to match analyzer (not really simulated)
+  run_action_       = new Generic_Channel("Run_Number"      , 401, "/D");
+  tnim_op_beam_     = new Generic_Channel("TNIM_OP_Beam"    , 402, "/l");
+  ttlbit_sigmaplus_ = new Generic_Channel("TTLBit_SigmaPlus", 403, "/D");
   the_aggregator_ = 0;
 }
 
@@ -149,9 +161,17 @@ K37RunAction::~K37RunAction() {
   delete tdc_scint_bottom_;
   delete tdc_ion_mcp_;
   delete tdc_electron_mcp_;
+  delete tdc_photo_diode_;
+  delete tdc_long_electron_;
+  delete tdc_nimio32_trigger_;
+  delete tdc_tdc_stop_;
   delete electron_kinetic_energy_generated_;
   delete electron_mu_generated_;
   delete recoil_mu_generated_;
+  delete run_action_;
+  delete recoil_mcp_particle_;
+  delete tnim_op_beam_;
+  delete ttlbit_sigmaplus_;
 }
 
 //----------------------------------
@@ -376,10 +396,17 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(tdc_scint_bottom_);
   RegisterChannel(tdc_ion_mcp_);
   RegisterChannel(tdc_electron_mcp_);
+  RegisterChannel(tdc_photo_diode_);
   RegisterChannel(electron_kinetic_energy_generated_);
   RegisterChannel(electron_mu_generated_);
   RegisterChannel(recoil_mu_generated_);
-
+  RegisterChannel(run_action_);
+  RegisterChannel(tdc_long_electron_);
+  RegisterChannel(tdc_nimio32_trigger_);
+  RegisterChannel(tdc_tdc_stop_);
+  RegisterChannel(recoil_mcp_particle_);
+  RegisterChannel(tnim_op_beam_);
+  RegisterChannel(ttlbit_sigmaplus_);
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();

@@ -22,8 +22,8 @@ K37SteppingAction::K37SteppingAction(K37EventAction* event,
                                      K37ListOfVolumeNames* list,
                                      K37AnnihilationPosition* anhilP,
                                      K37AllPossibleEventInformation* APEI)
-  : eventAction(event), listOfEnteredVolumes(list),
-    annihilationPosition(anhilP), AllTheInformation(APEI) {
+    : eventAction(event), listOfEnteredVolumes(list),
+      annihilationPosition(anhilP), AllTheInformation(APEI) {
 }
 
 K37SteppingAction::~K37SteppingAction() {}
@@ -33,62 +33,7 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
   const G4ParticleDefinition* theDefinition = theTrack->GetParticleDefinition();
   G4String theParticleName = theDefinition->GetParticleName();
 
-  // if(theParticleName=="Ar37[0.0]" )
-  // {
-  // G4cout<<"IT WORKS LIKE A CHARM"<<G4endl;
-  // }
-  /*
-    if(theTrack -> GetParentID() == 0 &&
-    theTrack->GetTrackStatus() != fStopAndKill &&
-    (theTrack->GetPosition().x())/mm > 100) {
-    ofstream zpos;
-    zpos.open ("alive.txt", ofstream::out | ofstream::app);
-    zpos.setf( std::ios::fixed, std::ios::floatfield );
-    zpos<< (theStep->GetPostStepPoint()->GetPosition().x())/mm << G4endl;
-    zpos.close();
-    }
-  */
 
-  /*
-    if (theTrack->GetParentID()==0 && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() == "annihil")
-    {
-    ofstream annihilate;
-    annihilate.open ("annihilate.txt", ofstream::out | ofstream::app);
-    annihilate.setf( std::ios::fixed, std::ios::floatfield );
-    annihilate<< (theStep->GetPostStepPoint()->GetPosition().x())/mm << "\t"<< (theStep->GetPostStepPoint()->GetPosition().y())/mm << "\t"<< (theStep->GetPostStepPoint()->GetPosition().z())/mm << G4endl;
-    annihilate.close();
-    }
-  */
-
-  if (annihilationPosition -> getShouldAnnihilationBeRecorded()) {
-    if (theTrack -> GetParentID() ==0 &&
-        theStep -> GetPostStepPoint() -> GetProcessDefinedStep() ->
-        GetProcessName() == "annihil") {
-      annihilationPosition->setPosition(theStep -> GetPostStepPoint() ->
-                                        GetPosition().x(),
-                                        theStep -> GetPostStepPoint() ->
-                                        GetPosition().y(),
-                                        theStep -> GetPostStepPoint() ->
-                                        GetPosition().z());
-    }
-  }
-
-  // if(theTrack->GetParentID()==0 && theTrack->GetTrackStatus()!=fStopAndKill)
-  // {
-
-  // G4StepPoint * thePrePoint = theStep->GetPreStepPoint();
-  // G4VPhysicalVolume * thePrePV = thePrePoint->GetPhysicalVolume();
-  // G4String thePrePVname = thePrePV->GetName();
-  // G4cout<< thePrePVname << G4endl;
-
-
-
-  // G4StepPoint * thePrePoint = theStep->GetPreStepPoint();
-
-  // G4VPhysicalVolume * thePostPV = thePostPoint->GetPhysicalVolume();
-  // G4String thePostPVname = thePostPV->GetName();
-  // G4cout<< thePostPVname << G4endl;
-  // }
   if (listOfEnteredVolumes -> getShouldVolumeNamesBeRecorded()) {
     if (theParticleName == "e+" &&
         theTrack -> GetTrackStatus() != fStopAndKill) {
@@ -99,27 +44,12 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
           thePostPVname != "world_phys") {
         // G4cout<< " Theata: "<< theTrack->GetPosition().theta()<<G4endl;
         listOfEnteredVolumes ->
-          setEnteredVolumeName(thePostPVname,
-                               (theTrack -> GetPosition().theta()),
-                               (theTrack ->
-                                GetVertexMomentumDirection().theta()));
+            setEnteredVolumeName(thePostPVname,
+                                 (theTrack -> GetPosition().theta()),
+                                 (theTrack ->
+                                  GetVertexMomentumDirection().theta()));
         // G4cout<<"sent stuff to listOfEnteredVolumes"<< G4endl;
       }
-
-      /*
-        if (thePostPoint->GetStepStatus() == fGeomBoundary && (thePostPVname == "dedx_plusZ_phys" || thePostPVname == "dedx_minusZ_phys"))
-        {
-
-
-        G4ThreeVector entry = theTrack->GetPosition();
-        G4ThreeVector start = theTrack->GetVertexMomentumDirection();
-
-        //G4cout<< " Strp: "<< start.theta()<<G4endl;
-
-        eventAction->setEnteringDedx(entry);
-        eventAction->setStartingDirection(start);
-        }
-      */
     }
   }
 
@@ -133,8 +63,8 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
         AllTheInformation ->
             setEnteringShakeOffElectronDetector(theTrack -> GetPosition());
         AllTheInformation ->
-          setEnteringShakeOffElectronDetectorTime(theTrack ->
-                                                  GetGlobalTime());
+            setEnteringShakeOffElectronDetectorTime(theTrack ->
+                                                    GetGlobalTime());
       }
     }
 
@@ -161,28 +91,11 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
       G4StepPoint * thePostPoint = theStep->GetPostStepPoint();
       G4String thePostPVname = thePostPoint->GetPhysicalVolume()->GetName();
 
-      /*if(thePostPoint->GetStepStatus() == fGeomBoundary && thePostPVname != "world_phys")
-        {
-
-        //G4cout<< " Theata: "<< theTrack->GetPosition().theta()<<G4endl;
-        listOfEnteredVolumes->setEnteredVolumeName(thePostPVname, (theTrack->GetPosition().theta()),(theTrack->GetVertexMomentumDirection().theta()));
-        //G4cout<<"sent stuff to listOfEnteredVolumes"<< G4endl;
-        }
-      */
-
       if (thePostPoint -> GetStepStatus() == fGeomBoundary &&
           (thePostPVname == "dedx_plusZ_phys" ||
            thePostPVname == "dedx_minusZ_phys")) {
         AllTheInformation ->
-          setEnteringStripDetector(0, theTrack -> GetPosition());
-        // if(!AllTheInformation->getIsTheVertexSet())
-        // {
-        // AllTheInformation->setVertexPosition(theTrack->GetVertexPosition());
-        // AllTheInformation -> setOriginalTheta((theTrack ->
-        //                                        GetVertexMomentumDirection()).
-        //                                       theta());
-        // AllTheInformation->setIsTheVertexSetToTrue();
-        // }
+            setEnteringStripDetector(0, theTrack -> GetPosition());
       }
 
       if (thePostPoint -> GetStepStatus() == fGeomBoundary &&

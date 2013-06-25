@@ -54,17 +54,17 @@ void K37ScintillatorSD::Initialize(G4HCofThisEvent* HCE) {
 
 G4bool K37ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
   K37ScintillatorHit* newHit = new K37ScintillatorHit();
-  G4Track * theTrack = aStep->GetTrack();
+  G4Track * theTrack = aStep -> GetTrack();
 
-  if (theTrack->GetParentID() != 0) {
-    newHit->SetPrimary(false);
+  if (theTrack -> GetParentID() != 0) {
+    newHit -> SetPrimary(false);
   } else {
-    newHit->SetPrimary(true);
+    newHit -> SetPrimary(true);
   }
 
   // theTrack->SetTrackStatus(fStopAndKill);
 
-  G4double edep = aStep->GetTotalEnergyDeposit();
+  G4double edep = aStep -> GetTotalEnergyDeposit();
   // if(edep==0.) return false;
 
 
@@ -76,13 +76,12 @@ G4bool K37ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
 
   if (aStep -> GetTrack() -> GetParentID() == 0 &&
       aStep -> GetPreStepPoint() -> GetStepStatus() == fGeomBoundary) {
-    newHit->SetBound(2.);
+    newHit -> SetBound(2.);
   } else {
-    newHit->SetBound(1.);
+    newHit -> SetBound(1.);
   }
 
-  fullenergy1Collection->insert(newHit);
-
+  fullenergy1Collection -> insert(newHit);
   return true;
 }
 

@@ -10,17 +10,20 @@
 #include "K37CloudSize.hh"
 #include "K37EventGenerator.hh"
 
+
+#include "globals.hh"
+#include "G4DecayTable.hh"
+#include "G4DynamicParticle.hh"
 #include "G4Event.hh"
-#include "G4SingleParticleSource.hh"
-#include "G4ParticleTable.hh"
 #include "G4IonTable.hh"
 #include "G4ParticleDefinition.hh"
-#include "G4DecayTable.hh"
+#include "G4ParticleTable.hh"
 #include "G4PhaseSpaceDecayChannel.hh"
+#include "G4SingleParticleSource.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
-#include "globals.hh"
 #include "Randomize.hh"
+
 
 K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            K37DetectorConstruction* det,
@@ -42,11 +45,12 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   particleGun = new G4SingleParticleSource();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
+  // ion = particleTable->GetIon(18, 37, 0);
   positron = particleTable->FindParticle(particleName="e+");
   electron = particleTable->FindParticle(particleName="e-");
   Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
+  recoil_charge_ = 1.0;
 
-  ion = particleTable->GetIon(18, 37, 0);
   // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
   // evGenerator->MakeEvent();
   // G4IonTable* ionTable = particleTable-> GetIonTable();
@@ -69,10 +73,14 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
 
   evGenerator -> MakeEvent(polarization_, alignment_);
 
+  //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  //  ion = particleTable->FindIon(18, 37, 0);
+
   if (!testingEVGenerator) {
-    cloud->makeEvent();
-    EventVertex.set((cloud->xFinal())*mm, (cloud->yFinal())*mm,
-                    (cloud->zFinal())*mm);
+    // cloud->makeEvent();
+    // EventVertex.set((cloud->xFinal())*mm, (cloud->yFinal())*mm,
+    //                 (cloud->zFinal())*mm);
+    EventVertex.set(0*mm, 0*mm, 0*mm);
     EventInformation->
       setMetaStableTimeOfDeath(CLHEP::RandExponential::shoot(260));
 
@@ -94,7 +102,7 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
                                           evGenerator->dMomentumY(),
                                           evGenerator->dMomentumZ()));
-      SetSOelectronVertices(anEvent, 2);
+      SetSOelectronVertices(anEvent, recoil_charge_ + 1);
     } else {
       vertex = new G4PrimaryVertex(EventVertex, 0);
       G4PrimaryParticle* particle =
@@ -118,17 +126,40 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
   G4PrimaryParticle* particle =
     new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
                           evGenerator->eMomentumY(), evGenerator->eMomentumZ());
-  // G4PrimaryParticle* particle = new G4PrimaryParticle(positron,0,0,0.01 );
   vertex->SetPrimary(particle);
 }
 
 void K37PrimaryGeneratorAction::setDaughterVertex() {
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition *daughter = particleTable -> FindParticle("Ar37PlusOne");
+  // G4ThreeVector momentum(evGenerator -> dMomentumX(),
+  //                        evGenerator -> dMomentumY(),
+  //                        evGenerator -> dMomentumZ());
+  G4bool debug = false;
+  G4ThreeVector momentum(0, 0, 0);
   vertex = new G4PrimaryVertex(EventVertex, 0);
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition *ion = particleTable -> GetIon(18, 37, 0);  // 37Ar
   G4PrimaryParticle* particle =
-      new G4PrimaryParticle(daughter, evGenerator->dMomentumX(),
-                          evGenerator->dMomentumY(), evGenerator->dMomentumZ());
+      new G4PrimaryParticle(ion, evGenerator->dMomentumX(),
+                            evGenerator->dMomentumY(),
+                            evGenerator->dMomentumZ());
+  // Simulate any charge state >= +1
+  particle -> SetCharge(recoil_charge_ * eplus);
+  if (debug) {
+    G4cout << "Ion mass: " << ion -> GetPDGMass()/c_squared/kg << " kg"
+           << G4endl;
+    G4cout << "Ion velocity: " << G4endl << "v0_x = "
+           << (particle -> GetPx()/(particle -> GetMass())*c_light)/(mm/ns)
+           << " mm/ns" << G4endl << "v0_y = "
+           << (particle -> GetPy()/(particle -> GetMass())*c_light)/(mm/ns)
+           << " mm/ns" << G4endl << "v0_z = "
+           << (particle -> GetPz()/(particle -> GetMass())*c_light)/(mm/ns)
+           << " mm/ns" << G4endl;
+    G4cout << "Ion momentum: "
+           << particle -> GetTotalMomentum()/(c_light*kg*m/s) << " kg*m/s"
+           << G4endl;
+    G4cout << "Ion kinetic energy: " << particle -> GetKineticEnergy()/joule
+           << " J " << G4endl;
+  }
   vertex->SetPrimary(particle);
 }
 
@@ -183,5 +214,14 @@ void K37PrimaryGeneratorAction::SetAlignment(G4double ali) {
   } else {
     G4cout << "WARNING: Alignment " << ali
            << " not in allowed range.  No changes made." << G4endl;
+  }
+}
+
+void K37PrimaryGeneratorAction::SetRecoilCharge(G4int charge) {
+  if (charge < 0) {
+    G4cout << "Negative ions not supported as primary particles. "
+           << " No change...Recoil charge = " << recoil_charge_ << G4endl;
+  } else {                            // Positive ions action
+    recoil_charge_ = charge;
   }
 }

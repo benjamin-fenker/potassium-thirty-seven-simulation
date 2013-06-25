@@ -6,19 +6,6 @@
 #include <iomanip>
 #include <cmath>
 
-#include "K37EventAction.hh"
-
-#include "K37HistogramManager.hh"
-#include "K37ScintillatorHit.hh"
-#include "K37MirrorHit.hh"
-#include "K37RunAction.hh"
-#include "K37ListOfVolumeNames.hh"
-#include "K37AllPossibleEventInformation.hh"
-#include "K37ContainerForStripInformation.hh"
-#include "K37AnalysisNumbering.hh"
-#include "K37RecoilMCPHit.hh"
-#include "K37ElectronMCPHit.hh"
-
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4HCofThisEvent.hh"
@@ -32,7 +19,19 @@
 #include "G4ios.hh"
 #include "G4UnitsTable.hh"
 
+#include "K37AllPossibleEventInformation.hh"
 #include "K37Analysis.hh"
+#include "K37AnalysisNumbering.hh"
+#include "K37Config.hh"
+#include "K37ContainerForStripInformation.hh"
+#include "K37ElectronMCPHit.hh"
+#include "K37EventAction.hh"
+#include "K37HistogramManager.hh"
+#include "K37ListOfVolumeNames.hh"
+#include "K37MirrorHit.hh"
+#include "K37RecoilMCPHit.hh"
+#include "K37RunAction.hh"
+#include "K37ScintillatorHit.hh"
 
 using std::min;
 using std::pow;
@@ -45,7 +44,8 @@ extern G4bool fillAllSDData;
 K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
                                K37AllPossibleEventInformation* APEI,
                                K37HistogramManager * his) :
-  runAct(run), listOfEnteredVolumes(list), stripHandler(0),
+    v1190_factor_ns(0.09765625), runAct(run), listOfEnteredVolumes(list),
+    stripHandler(0),
   EventInformation(APEI), histograms(his) {
   stripHandler = new K37ContainerForStripInformation(EventInformation);
 
@@ -201,6 +201,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   G4double recoil_mcp_x_pos = 0.0;
   G4double recoil_mcp_z_pos = 0.0;
   G4double recoil_mcp_time = 0.0;
+  G4int recoil_pdg = 0;
 
   // eMCP info
   G4double electron_mcp_time = 0.0;
@@ -345,6 +346,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       recoil_mcp_x_pos = hit -> GetXPos();
       recoil_mcp_z_pos = hit -> GetZPos();
       recoil_mcp_time  = hit -> GetTime();
+      recoil_pdg       = hit -> GetParticlePDG();
       // G4cout << "Recoil MCP hit at x = "
       //        << G4BestUnit(recoil_mcp_x_pos, "Length") << " and y = "
       //        << G4BestUnit(recoil_mcp_z_pos, "Length") << G4endl;
@@ -416,11 +418,15 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     (*active_channels_)["DL_X_Pos"] -> InsertData(recoil_mcp_x_pos/mm);
     (*active_channels_)["DL_Z_Pos"] -> InsertData(recoil_mcp_z_pos/mm);
     (*active_channels_)["TDC_SCINT_TOP"] ->
-        InsertData(time_upper_scintillator/ns);
+        InsertData(time_upper_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_SCINT_BOTTOM"] ->
-        InsertData(time_lower_scintillator/ns);
-    (*active_channels_)["TDC_ION_MCP"] -> InsertData(recoil_mcp_time/ns);
-    (*active_channels_)["TDC_ELECTRON_MCP"] -> InsertData(electron_mcp_time/ns);
+        InsertData(time_lower_scintillator/ns/v1190_factor_ns);
+    (*active_channels_)["TDC_ION_MCP"] ->
+        InsertData(recoil_mcp_time/ns/v1190_factor_ns);
+    (*active_channels_)["TDC_ELECTRON_MCP"] ->
+        InsertData(electron_mcp_time/ns/v1190_factor_ns);
+    (*active_channels_)["ION_MCP_PARTICLE_PDG"] ->
+        InsertData((G4double)recoil_pdg);
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
@@ -519,6 +525,33 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // Add a new row here to add a new row for only accpeted events where
     // either there was energy in the plus or minus z detector, but not both!
     anMan -> AddNtupleRow();
+    // Fill Run_Number with negative version number to indicate simulated
+    (*active_channels_)["Run_Number"] -> InsertData(-1.0*K37_VERSION);
+
+    G4double polarization = primary_generator_ -> GetPolarization();
+    // 1000000 ns = 1000 us is within the optical pumping on time
+    // 10 ns is outside the optical pumping on time
+    uint64_t  op_time;
+    if (fabs(polarization) > 0) {  // Polarized
+      op_time = 1000000;   // Will resolove to polarized as if it were real data
+    } else {               // Not polarized
+      op_time = 10;        // Will show up as unpolarized just like real data
+    }
+    (*active_channels_)["TNIM_OP_Beam"] -> InsertDataL(op_time);
+
+    // To match the analyzer TTLBit_Sigmaplus should be one for s+ and 0 for s-
+    // Unpolarized light should be vetoed by  TNIM_OP_Beam, but I will give it
+    // an error code of -10.
+    G4double op_bit;
+    if (polarization > 0) {
+      op_bit = 1.0;
+    } else if (polarization < 0) {
+      op_bit = 0.0;
+    } else {
+      op_bit = -10.0;
+    }
+    (*active_channels_)["TTLBit_SigmaPlus"] -> InsertData(op_bit);
+
     the_aggregator_ -> EndEvent();
   }
   // PrintEvent(evt);

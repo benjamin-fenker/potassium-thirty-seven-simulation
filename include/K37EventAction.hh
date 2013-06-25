@@ -15,6 +15,7 @@
 #include "Aggregator.hh"
 #include "Generic_Channel.hh"
 #include "K37EventMessenger.hh"
+#include "K37PrimaryGeneratorAction.hh"
 #include "K37StripDetectorHit.hh"
 
 using std::map;
@@ -56,8 +57,17 @@ class K37EventAction : public G4UserEventAction {
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
   }
+  void SetPrimaryGenerator(K37PrimaryGeneratorAction *primary_generator) {
+    primary_generator_ = primary_generator;
+  }
 
  private:
+  // V1190 TDC Clock beats every 97.65625 ns; output from analyzer is in
+  // number of ticks.  See manual pg 13 for details.  I want to output the
+  // number of ticks to the ntuple to match the analyzer.  To convert from ns
+  // to number of ticks, divide by this number.
+  const G4double v1190_factor_ns;
+
   // G4THitsMap<G4double>* evtMap;
 
   // ******VERY IMPORTANT**********
@@ -178,6 +188,9 @@ class K37EventAction : public G4UserEventAction {
   K37EventMessenger *event_messenger_;
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
+
+  G4double svn_version_number;
+  K37PrimaryGeneratorAction *primary_generator_;
 };
 
 #endif

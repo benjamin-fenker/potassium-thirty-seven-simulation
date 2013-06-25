@@ -74,6 +74,8 @@ K37DetectorConstruction::K37DetectorConstruction()
     this-> DefineMaterials();
     detectorMessenger = new K37DetectorMessenger(this);
     InvisibilityCloak = new G4VisAttributes(false);
+    changeZtoX = new CLHEP::HepRotation();
+    changeZtoX->rotateX(90.*deg);
     // ******SET CONSTRUCTION FLAGS HERE**************************************
     makeScintillators = true;     // Must be true!
     makeStripDetectors = true;    // Must be true!
@@ -335,11 +337,6 @@ void K37DetectorConstruction::ConstructChamber() {
 
   G4Tubs* CFTMCPS_sol = new G4Tubs("CFTMCPS_sol", 0.0, (298.45/2.0)*mm,
                                    (560.0/2.)*mm, 0.0*deg, 360.0*deg);
-
-  //      changeZtoX = new G4RotationMatrix();
-  changeZtoX = new CLHEP::HepRotation();
-  changeZtoX->rotateX(90.*deg);
-
   G4ThreeVector noChange(0, 0, 0);
 
   G4SubtractionSolid* ChamberCut2_sol =
@@ -1123,7 +1120,8 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
   G4double rmcp_dz   = 10./2.*mm;
   G4double rmcp_start_phi = 0.    *deg;
   G4double rmcp_d_phi = 360.  *deg;
-  G4double rmcp_z_pos = 102.0 * mm;
+  G4double rmcp_z_pos = (102.0 * mm) + rmcp_dz;
+  // Extrudes symetrically about this point
 
   G4Tubs * rmcp_sol = new G4Tubs("rmcp_sol", rmcp_rmin, rmcp_rmax,  rmcp_dz,
                                  rmcp_start_phi, rmcp_d_phi);

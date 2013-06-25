@@ -35,7 +35,7 @@ K37ElectricFieldSetup::K37ElectricFieldSetup()
   fElFieldValue = G4ThreeVector(0.0, 350.0*volt/cm, 0.0);
   fEMfield = new G4UniformElectricField(fElFieldValue);
 
-  G4cout << "Making field!" << G4endl;
+  //  G4cout << "Making field!" << G4endl;
   fFieldMessenger = new K37FieldMessenger(this);
   fEquation = new G4EqMagElectricField(fEMfield);
   fMinStep     = 0.010*mm;  // minimal step of 10 microns

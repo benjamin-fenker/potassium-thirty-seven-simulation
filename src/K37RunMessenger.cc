@@ -143,8 +143,8 @@ void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
     // runAction -> setFileName(newValues);
     FILE *io_file;
     io_file = fopen(runAction -> GetConfigurationFileName(), "w+");
-    printf("root %s/%s.root", runAction -> GetOutputDirectory(),
-           newValues.c_str());
+    // printf("root %s/%s.root", runAction -> GetOutputDirectory(),
+    //        newValues.c_str());
     fprintf(io_file, "root %s/%s.root", runAction -> GetOutputDirectory(),
             newValues.c_str());
     fclose(io_file);

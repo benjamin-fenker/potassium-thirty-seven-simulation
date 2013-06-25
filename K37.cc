@@ -141,6 +141,7 @@ int main(int argc, char** argv) {
                                                      APEI, histo);
    event_action -> SetAggregator(the_aggregator);
    event_action -> SetActiveChannels(&active_channels);
+   event_action -> SetPrimaryGenerator(gen_action);
    runManager   -> SetUserAction(event_action);
 
    K37TrackingAction* tracking_action;

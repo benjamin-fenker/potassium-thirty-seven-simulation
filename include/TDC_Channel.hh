@@ -51,6 +51,8 @@ class TDC_Channel:public K37_ABC::K37_Data {
   void InsertData(const uint32_t &data_ ) {
     intData = data_;
   };
+
+  void InsertDataL(const uint64_t &data_) {intData = data_;}
   uint64_t* GetReferenceI() {
     return &longData;
   };
