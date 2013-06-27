@@ -35,6 +35,52 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   set_recoil_charge_cmd_ -> SetGuidance("Available charge states: +1 -> +3");
   set_recoil_charge_cmd_ -> SetParameterName("Charge state", true);
   set_recoil_charge_cmd_ -> SetDefaultValue(1);
+
+  set_cloud_temperature_v_ =
+      new G4UIcmdWith3VectorAndUnit("/K37/gun/setTemperatureV", this);
+  set_cloud_temperature_v_ -> SetGuidance("Enter temperature for the atom");
+  set_cloud_temperature_v_ -> SetGuidance("as a vector");
+  set_cloud_temperature_v_ -> SetParameterName("T_x", "T_y", "T_z", true);
+  set_cloud_temperature_v_ -> SetDefaultValue(G4ThreeVector(0.0, 0.0, 0.0));
+
+
+  set_cloud_temperature_v_ -> SetUnitCategory("Temperature");
+
+  set_cloud_temperature_d_ =
+      new G4UIcmdWithADoubleAndUnit("/K37/gun/setTemperatureD", this);
+  set_cloud_temperature_d_ -> SetGuidance("Enter temperature for the atoms.");
+  set_cloud_temperature_d_ -> SetGuidance("Note that this will be applied to");
+  set_cloud_temperature_d_ -> SetGuidance(" every direction!");
+  set_cloud_temperature_d_ -> SetParameterName("Temperature", true);
+  set_cloud_temperature_d_ -> SetDefaultValue(0.0);
+  set_cloud_temperature_d_ -> SetUnitCategory("Temperature");
+
+  set_initial_cloud_size_v_ =
+      new G4UIcmdWith3VectorAndUnit("/K37/gun/setCloudSizeV", this);
+  set_initial_cloud_size_v_ -> SetGuidance("Enter cloud size (sigma) at the");
+  set_initial_cloud_size_v_ -> SetGuidance(" start of the optical pumping");
+  set_initial_cloud_size_v_ -> SetGuidance(" cycle.");
+  set_initial_cloud_size_v_ -> SetParameterName("wx", "wy", "wz", true);
+  set_initial_cloud_size_v_ -> SetDefaultValue(G4ThreeVector(0.0, 0.0, 0.0));
+  set_initial_cloud_size_v_ -> SetUnitCategory("Length");
+
+  set_initial_cloud_size_d_ =
+      new G4UIcmdWithADoubleAndUnit("/K37/gun/setCloudSizeD", this);
+  set_initial_cloud_size_d_ -> SetGuidance("Enter spherical cloud size");
+  set_initial_cloud_size_d_ -> SetGuidance(" (sigma) at the start of the");
+  set_initial_cloud_size_d_ -> SetGuidance(" optical pumping cycle.");
+  set_initial_cloud_size_d_ -> SetParameterName("width (sigma)", true);
+  set_initial_cloud_size_d_ -> SetDefaultValue(0.0);
+  set_initial_cloud_size_d_ -> SetUnitCategory("Length");
+
+  set_cloud_center_ =
+      new G4UIcmdWith3VectorAndUnit("/K37/gun/setCloudCenter", this);
+  set_cloud_center_ -> SetGuidance("Enter the coordinates of the center of ");
+  set_cloud_center_ -> SetGuidance("the cloud at the start of the optical ");
+  set_cloud_center_ -> SetGuidance("pumping cycle.");
+  set_cloud_center_ -> SetParameterName("x", "y", "z", true);
+  set_cloud_center_ -> SetDefaultValue(G4ThreeVector(0.0, 0.0, 0.0));
+  set_cloud_center_ -> SetUnitCategory("Length");
 }
 
 // ----------------------------------
@@ -60,6 +106,28 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
   if (command == set_recoil_charge_cmd_) {
     action_ ->
         SetRecoilCharge(set_recoil_charge_cmd_ -> GetNewIntValue(newValue));
+  }
+  if (command == set_cloud_temperature_v_) {
+    action_ -> GetCloudSize() -> SetTemperature(set_cloud_temperature_v_ ->
+                                                GetNew3VectorValue(newValue));
+  }
+  if (command == set_cloud_temperature_d_) {
+    action_ -> GetCloudSize() -> SetTemperature(set_cloud_temperature_d_ ->
+                                                GetNewDoubleValue(newValue));
+  }
+  if (command == set_initial_cloud_size_v_) {
+    action_ ->
+        GetCloudSize() ->  SetInitialCloudSize(set_initial_cloud_size_v_ ->
+                                               GetNew3VectorValue(newValue));
+  }
+  if (command == set_initial_cloud_size_d_) {
+    action_ -> GetCloudSize() ->
+        SetInitialCloudSize(set_initial_cloud_size_d_ ->
+                            GetNewDoubleValue(newValue));
+  }
+  if (command == set_cloud_center_) {
+    action_ -> GetCloudSize() ->
+        SetCloudCenter(set_cloud_center_ -> GetNew3VectorValue(newValue));
   }
 }
 
