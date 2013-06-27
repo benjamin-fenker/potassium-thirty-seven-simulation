@@ -43,6 +43,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetAlignment(G4double ali);
   G4double GetAlignment() {return alignment_;}
   void SetRecoilCharge(G4int charge);
+  K37CloudSize* GetCloudSize() {return cloud;}
 
  private:
   G4double      distanceToTrap;

@@ -41,7 +41,14 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
 
   // G4int n_particle = 1;
   // particleGun = new G4ParticleGun(n_particle);
-  cloud = new K37CloudSize(0.1, 1);
+
+  //                     temp , size
+
+  cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),
+                           G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
+                                         0.0014*kelvin),
+                           G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm));
+
   particleGun = new G4SingleParticleSource();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
@@ -77,10 +84,13 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   //  ion = particleTable->FindIon(18, 37, 0);
 
   if (!testingEVGenerator) {
-    // cloud->makeEvent();
-    // EventVertex.set((cloud->xFinal())*mm, (cloud->yFinal())*mm,
-    //                 (cloud->zFinal())*mm);
-    EventVertex.set(0*mm, 0*mm, 0*mm);
+    cloud -> makeEvent();
+    EventVertex = cloud -> GetFinalPosition();
+
+    // EventVertex.set(0*mm, 0*mm, 0*mm);
+    // G4cout << "Starting from x = " << cloud -> xFinal()/mm << G4endl
+    //        << "\t y = "  << cloud -> yFinal()/mm << G4endl << "\t z = "
+    //        << cloud -> zFinal()/mm << G4endl;
     EventInformation->
       setMetaStableTimeOfDeath(CLHEP::RandExponential::shoot(260));
 

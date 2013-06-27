@@ -3,6 +3,9 @@
 #ifndef K37CloudSize_h
 #define K37CloudSize_h 1
 
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleTable.hh"
+#include "G4ThreeVector.hh"
 #include "globals.hh"
 
 class K37CloudSize {
@@ -14,38 +17,30 @@ class K37CloudSize {
   /// \since version 1.0
   ///
  public:
-  K37CloudSize(G4double, G4double);
+  K37CloudSize(G4ThreeVector cloud_center, G4ThreeVector temperature,
+               G4ThreeVector  initial_size);
   ~K37CloudSize();
   void makeEvent();
-  G4double xFinal() {
-    return endX;
-  };
-  G4double yFinal() {
-    return endY;
-  };
-  G4double zFinal() {
-    return endZ;
-  };
+  G4ThreeVector GetFinalPosition() {return final_position_;}
+  void SetCloudCenter(G4ThreeVector center) {cloud_center_ = center;}
+  void SetTemperature(G4ThreeVector temp);
+  void SetTemperature(G4double temp);
+  void SetInitialCloudSize(G4ThreeVector size);
+  void SetInitialCloudSize(G4double size);
 
  private:
-  G4double cloudTemperature;  // K
-  G4double cloudSizeStart;    // sigma in mm
-  G4double sigma;
-  G4double boltzmannConstant;  // MeV_per_K
-  G4double massOfAr37;  // MeV_per_c^2
-  G4double speedOfLight;  // mm_per_us
-  G4double startX;  // mm
-  G4double startY;  // mm
-  G4double startZ;  // mm
-  G4double endX;  // mm
-  G4double endY;  // mm
-  G4double endZ;  // mm
-  G4double velocityX;  // mm_per_s
-  G4double velocityY;  // mm_per_s
-  G4double velocityZ;  // mm_per_s
-  G4double decayTime;  // us
-  G4double cycleTime;  // us
-  G4double distanceTraveled;  // mm
+  G4ThreeVector cloud_center_;
+  G4ThreeVector initial_cloud_size_;
+  G4ThreeVector velocity_sigma_;
+  G4ThreeVector final_position_;
+
+  G4double cycleTime;
+  G4double expansion_before_polarized_;
+
+  void SetupSigma(G4ThreeVector temperature);
+  G4double CalcSigma(G4double temperature);
+  void SetFinalPosition(G4ThreeVector initial_position, G4ThreeVector velocity,
+                        G4double time);
 };
 
 #endif
