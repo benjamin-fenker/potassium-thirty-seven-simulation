@@ -16,7 +16,6 @@ class Aggregator {
   void BeginRun();
   void EndEvent();
   void EndRun();
-
  private:
   // to make Aggregator non-copyable
   Aggregator(const Aggregator &);

@@ -18,12 +18,9 @@
 #include "K37AnnihilationPosition.hh"
 #include "K37AllPossibleEventInformation.hh"
 
-K37SteppingAction::K37SteppingAction(K37EventAction* event,
-                                     K37ListOfVolumeNames* list,
-                                     K37AnnihilationPosition* anhilP,
+K37SteppingAction::K37SteppingAction(K37ListOfVolumeNames* list,
                                      K37AllPossibleEventInformation* APEI)
-    : eventAction(event), listOfEnteredVolumes(list),
-      annihilationPosition(anhilP), AllTheInformation(APEI) {
+    : listOfEnteredVolumes(list), AllTheInformation(APEI) {
 }
 
 K37SteppingAction::~K37SteppingAction() {}

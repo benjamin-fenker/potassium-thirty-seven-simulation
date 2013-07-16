@@ -90,11 +90,11 @@ int main(int argc, char** argv) {
    G4long myseed = seconds;
    CLHEP::HepRandom::setTheSeed(myseed);
 
-   ofstream runstat;
-   runstat.open("runstat.txt", ofstream::out | ofstream::trunc);
-   runstat << "Random seed: " << myseed << G4endl;
-   runstat << "-----------------------" << G4endl;
-   runstat.close();
+   // ofstream runstat;
+   // runstat.open("runstat.txt", ofstream::out | ofstream::trunc);
+   // runstat << "Random seed: " << myseed << G4endl;
+   // runstat << "-----------------------" << G4endl;
+   // runstat.close();
    map<string, K37_Data*> active_channels;
 
    G4VSteppingVerbose* verbosity = new K37SteppingVerbose;
@@ -119,18 +119,18 @@ int main(int argc, char** argv) {
    evGen -> SetAggregator(the_aggregator);
    evGen -> SetActiveChannels(&active_channels);
 
-   K37PrimaryGeneratorAction* gen_action;
-   runManager->SetUserAction(gen_action = new K37PrimaryGeneratorAction(
-            detector,
-            APEI,
-            evGen));
+   K37PrimaryGeneratorAction* gen_action =
+       new K37PrimaryGeneratorAction(detector, APEI, evGen);
+   gen_action -> SetAggregator(the_aggregator);
+   gen_action -> SetActiveChannels(&active_channels);
+   runManager -> SetUserAction(gen_action);
+
 
    K37ListOfVolumeNames *volumesTheBetaEntered =
       new K37ListOfVolumeNames("volumeNames.txt", 1000);
 
 
-   K37RunAction* run_action = new K37RunAction(detector, gen_action,
-                                               volumesTheBetaEntered,
+   K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered,
                                                annihilation, APEI, histo);
    run_action -> SetActiveChannels(&active_channels);
    run_action -> SetAggregator(the_aggregator);
@@ -147,11 +147,9 @@ int main(int argc, char** argv) {
    K37TrackingAction* tracking_action;
    runManager->SetUserAction(tracking_action= new K37TrackingAction());
 
-   K37SteppingAction* stepping_action;
-   runManager->SetUserAction(stepping_action =
-         new K37SteppingAction(event_action,
-            volumesTheBetaEntered,
-            annihilation, APEI));
+   K37SteppingAction* stepping_action = new K37SteppingAction(volumesTheBetaEntered,
+							      APEI);
+   runManager->SetUserAction(stepping_action);
 
    // get the pointer to the User Interface manager
    runManager->SetUserAction(new K37StackingAction);

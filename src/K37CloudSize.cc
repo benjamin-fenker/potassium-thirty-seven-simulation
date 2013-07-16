@@ -20,6 +20,7 @@ K37CloudSize::~K37CloudSize() {
 
 void K37CloudSize::makeEvent() {
   // Position of the decaying particle at the instant the cloud starts expanding
+
   G4ThreeVector initial_position =
       G4ThreeVector(G4RandGauss::shoot(cloud_center_.x(),
                                        initial_cloud_size_.x()),

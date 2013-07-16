@@ -20,7 +20,6 @@ class K37AllPossibleEventInformation {
 
   void printEventInformation();
   void clearEventInformation();
-  void touchFile();
   void deleteFile();
   G4bool getShouldEventInformationBeRecorded() {
     return shouldEventInformationBeRecorded;

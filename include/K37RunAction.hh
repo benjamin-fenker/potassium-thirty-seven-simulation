@@ -34,8 +34,7 @@ class K37HistogramManager;
 
 class K37RunAction : public G4UserRunAction {
  public:
-  K37RunAction(K37DetectorConstruction*, K37PrimaryGeneratorAction*,
-               K37ListOfVolumeNames*, K37AnnihilationPosition*,
+  K37RunAction(K37ListOfVolumeNames*, K37AnnihilationPosition*,
                K37AllPossibleEventInformation*, K37HistogramManager*);
   ~K37RunAction();
   void BeginOfRunAction(const G4Run*);
@@ -161,8 +160,8 @@ class K37RunAction : public G4UserRunAction {
   G4int    vetoed;
   G4int    nonVetoed;
 
-  K37DetectorConstruction* detector;
-  K37PrimaryGeneratorAction* kinematic;
+  //  K37DetectorConstruction* detector;
+  //  K37PrimaryGeneratorAction* kinematic;
   K37ListOfVolumeNames* listOfEnteredVolumes;
   K37RunMessenger* runMessenger;
 
@@ -180,7 +179,7 @@ class K37RunAction : public G4UserRunAction {
   char output_directory_[200];
 
   // Event generator testing 1/18/2013
-  G4int numPlus, numMinus;
+  //  G4int numPlus, numMinus;
   Aggregator *the_aggregator_;
   Generic_Channel *qdc_upper_pmt_, *qdc_lower_pmt_;
   TDC_Channel *dl_x_pos_, *dl_z_pos_;
@@ -194,7 +193,7 @@ class K37RunAction : public G4UserRunAction {
   TDC_Channel *tdc_long_electron_, *tdc_nimio32_trigger_, *tdc_tdc_stop_;
   Generic_Channel *electron_kinetic_energy_generated_, *electron_mu_generated_;
   Generic_Channel *recoil_mu_generated_,  *run_action_, *recoil_mcp_particle_;
-  Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_;
+  Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_, *recoil_charge_state_;
 
   map<string, K37_Data*> *active_channels_;
 };

@@ -5,8 +5,10 @@
 
 #include <CLHEP/Vector/Rotation.h>
 
-#include "G4VUserDetectorConstruction.hh"
+#include "G4Box.hh"
 #include "G4SDManager.hh"
+#include "G4Tubs.hh"
+#include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 
 class G4VPhysicalVolume;
@@ -24,26 +26,13 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   K37DetectorConstruction();
   ~K37DetectorConstruction();
 
- public:
   G4VPhysicalVolume* Construct();
-  const G4VPhysicalVolume* GetphysiWorld() {
-    return world_phys;
-  };
-  G4Material*  GetMirrorMaterial() {
-    return MirrorMaterial;
-  };
-  G4double GetDistanceToTrap() {
-    return 10.0;
-  }
-  G4double GetDeDxRadius() {
-    return 10.0;
-  }
-  G4double GetSubtraction() {
-    return 10.0;
-  }
-  void SetWFEDM_MirrorCut(G4bool value) {
-    shouldTheMirrorBeWFEDMCut = value;
-  }
+  const G4VPhysicalVolume* GetPhysicalWorld() {return world_phys_;}
+  G4Material*  GetMirrorMaterial() {return MirrorMaterial;}
+  G4double GetDistanceToTrap() {return 10.0;}
+  G4double GetDeDxRadius() {return 10.0;}
+  G4double GetSubtraction() {return 10.0;}
+  void SetWFEDM_MirrorCut(G4bool value) {shouldTheMirrorBeWFEDMCut = value;}
 
   void UpdateGeometry();
   void SetMirrorMaterial(G4String);
@@ -61,11 +50,25 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructCoils();        // Not a sensitive detector
   void DefineMaterials();
 
-  G4VPhysicalVolume* world_phys;    // pointer to the physical World
+  G4Material* world_material_;          // default is vacuum
+  G4double world_size_;                 // default is 2.0 x 2.0 x 2.0 m
+
+  G4Box *world_box_;                  // pointer to the solid world
+  G4LogicalVolume *world_log_;        // pointer to the logical world
+  G4VPhysicalVolume *world_phys_;      // pointer to the physical World
+
+  G4Tubs *scintillator_tubs_;        // pointer to the solid scintillator
+
+  G4LogicalVolume *upper_scintillator_log_;     // pointer to the logical scinti
+  G4VPhysicalVolume *upper_scintillator_phys_;  // pointer to the physical scint
+
+  G4LogicalVolume *lower_scintillator_log_;     // pointer to the logical scinti
+  G4VPhysicalVolume *lower_scintillator_phys_;  // pointer to the physical scint
+
   K37DetectorMessenger* detectorMessenger;  // pointer to the Messenger
   G4LogicalVolume * mirror_log;
   G4Material* MirrorMaterial;
-  G4Material* WorldMaterial;
+
   G4Material* FullEnergyDetectorMaterial;
   G4Material* DeDxDetectorMaterial;
   G4Material* SiliconDetectorFrameMaterial;
@@ -99,7 +102,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   CLHEP::HepRotation* MirrorCutRotation;
   CLHEP::HepRotation* MMRotation;
   CLHEP::HepRotation* hoopRotation;
-  G4LogicalVolume * world_log;
+
   G4VisAttributes * scint_logVisAttributes_plusZ;
   G4VisAttributes * scint_logVisAttributes_minusZ;
   G4VisAttributes * dedx_logVisAttributes;
@@ -116,7 +119,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VisAttributes * hoop7_logVisAttributes;
   G4VisAttributes * SOED_logVisAttributes;
   G4VisAttributes * coils_logVisAttributes;
-  G4VisAttributes * InvisibilityCloak;
+
   G4VisAttributes * rmcp_logVisAttributes_;
   // Bools to turn off or on various aspects of the apparatus to simulate their
   // individual effects

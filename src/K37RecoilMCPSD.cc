@@ -37,7 +37,8 @@ G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
   new_hit -> SetZPos(step -> GetPreStepPoint() -> GetPosition().z());
   new_hit ->
       SetParticlePDG(track -> GetParticleDefinition() -> GetPDGEncoding());
-
+  new_hit ->
+      SetParticleCharge(track -> GetParticleDefinition() -> GetPDGCharge());
   rmcp_hit_collection_ -> insert(new_hit);
   if (debug) {
     G4cout << "Particle name: "

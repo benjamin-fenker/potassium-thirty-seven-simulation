@@ -12,10 +12,11 @@
 extern G4bool fillEvGenData;
 
 void JTW_Event::MakeEvent() {
-  MakeEvent(1.0, 1.0);
+  MakeEvent(1.0, 1.0, 1.0);
 }
 
-void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
+void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
+                          G4double recoil_charge) {
   // Set cuts on production for testing the EV Generator
   G4double minCosTheta = 0.0;
   G4double minElectronT = 0.0*electron.MaxT;  // MeV --> beta_min = 0.995
@@ -160,7 +161,6 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
   // G4cout << "Used in calculation: " << eDotJ/electron.E << G4endl;
 
   // Fill up histogram to check that event generator makes sense
-  G4AnalysisManager *anMan = G4AnalysisManager::Instance();
   running_denom += fabs(v_over_c*cos(electron.Theta));
   if (cos(electron.Theta) > 0.0) {
     numPlus++;
@@ -168,19 +168,10 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment) {
     numMins++;
   }
   if (fillEvGenData) {
-    anMan -> FillH1(hist_e_angle_to_pol_generated, cos(electron.Theta));
-    anMan -> FillH1(hist_e_energy_generated, electron.E);
-    anMan -> FillH1(hist_v_over_c_generated, v_over_c);
-    anMan -> FillNtupleDColumn(ntup_v_over_c_generated, v_over_c);
-    anMan -> FillNtupleDColumn(ntup_theta_e_generated, cos(electron.Theta));
-    anMan -> FillNtupleDColumn(ntup_omega, Omega);
-    anMan -> FillNtupleDColumn(ntup_electron_kinetic_energy_gen, electron.T);
-    anMan -> FillNtupleDColumn(ntup_recoil_mu_generated, cos(daughter.Theta));
-    // anMan -> AddNtupleRow();
-
     (*active_channels_)["T_GEN_ELE"] -> InsertData(electron.T);
     (*active_channels_)["MU_GEN_ELE"] -> InsertData(cos(electron.Theta));
     (*active_channels_)["MU_GEN_RECOIL"] -> InsertData(cos(daughter.Theta));
+    (*active_channels_)["ION_CHARGE"] -> InsertData(recoil_charge);
   }
 }     // End makeEvent
 

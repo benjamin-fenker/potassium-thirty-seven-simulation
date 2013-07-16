@@ -32,14 +32,12 @@ G4bool fillAllSDData = true;
 
 //----------------------------------
 
-K37RunAction::K37RunAction(K37DetectorConstruction* det,
-                           K37PrimaryGeneratorAction* kin,
-                           K37ListOfVolumeNames* list,
+K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
                            K37AnnihilationPosition* anhilP,
                            K37AllPossibleEventInformation* APEI,
                            K37HistogramManager * his) :
-  detector(det), kinematic(kin), listOfEnteredVolumes(list), runMessenger(0),
-  annihilationPosition(anhilP), AllEventInformation(APEI), histograms(his) {
+  listOfEnteredVolumes(list), runMessenger(0), annihilationPosition(anhilP),
+  AllEventInformation(APEI), histograms(his) {
   recordAnnihilationPosition = false;
   // recordAnnihilationPosition = true;
   recordVolumeNames = false;
@@ -135,6 +133,7 @@ K37RunAction::K37RunAction(K37DetectorConstruction* det,
   recoil_mu_generated_   = new Generic_Channel("MU_GEN_RECOIL", 302, "/D");
   recoil_mcp_particle_   = new Generic_Channel("ION_MCP_PARTICLE_PDG",
                                                303, "/D");
+  recoil_charge_state_   = new Generic_Channel("ION_CHARGE", 304, "/D");
 
   // Information to match analyzer (not really simulated)
   run_action_       = new Generic_Channel("Run_Number"      , 401, "/D");
@@ -172,6 +171,7 @@ K37RunAction::~K37RunAction() {
   delete recoil_mcp_particle_;
   delete tnim_op_beam_;
   delete ttlbit_sigmaplus_;
+  delete recoil_charge_state_;
 }
 
 //----------------------------------
@@ -181,7 +181,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   NbofEvents = 0;
   if (recordVolumeNames == true) {
-    listOfEnteredVolumes->touchFile();
     listOfEnteredVolumes->clearList();
     listOfEnteredVolumes->setShouldVolumeNamesBeRecorded();
   } else {
@@ -196,7 +195,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
     annihilationPosition->deleteFile();
   }
   if (recordEventInformation== true) {
-    AllEventInformation->touchFile();
     AllEventInformation->clearEventInformation();
     AllEventInformation->setShouldEventInformationBeRecorded();
   } else {
@@ -272,15 +270,15 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // runstat.open ("runstat.txt", std::ofstream::out | std::ofstream::trunc);
   // runstat.close();
 
-  std::ofstream detectorADA;
-  detectorADA.open("detectorADA.txt",
-                   std::ofstream::out | std::ofstream::trunc);
-  detectorADA.close();
+  // std::ofstream detectorADA;
+  // detectorADA.open("detectorADA.txt",
+  //                  std::ofstream::out | std::ofstream::trunc);
+  // detectorADA.close();
 
-  std::ofstream detectorODA;
-  detectorODA.open("detectorODA.txt",
-                   std::ofstream::out | std::ofstream::trunc);
-  detectorODA.close();
+  // std::ofstream detectorODA;
+  // detectorODA.open("detectorODA.txt",
+  //                  std::ofstream::out | std::ofstream::trunc);
+  // detectorODA.close();
 
 
   // std::ofstream theta;
@@ -292,7 +290,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // Create analysis manager
   // The choice of analysis technology is done via selectin of a namespace
   // in K37Analysis.hh
-  G4AnalysisManager *anMan = G4AnalysisManager::Instance();
 
   // Open an output file
   //
@@ -303,81 +300,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   fscanf(io_file, "%s %s", data_type, out_file);
 
   G4cout << "Opening file: " << out_file << G4endl;
-  anMan->OpenFile(outFileName);
-  // anMan->SetFirstHistoId(1);
-  // anMan->SetFirstNtupleId(1);
-  // Creating histograms
-  //
-  anMan->CreateH1("ADA Detector Scintillator", "ADA Detector Scintillator",
-                  200, 0., 10000);
-  anMan->CreateH1("ADA Detector Strip Detector", "ADA Detector Strip Detector",
-                  1000, 0., 10000);
-  anMan->CreateH1("ODA Detector Scintillator", "ODA Detector Scintillator",
-                  200, 0., 10000);
-  anMan->CreateH1("ODA Detector Strip Detector", "ODA Detector Strip Detector",
-                  1000, 0., 10000);
-  //  Histogram to get the cos(theta_e) from event generator
-  anMan->CreateH1("Electron_angle_to_pol_generated",
-                  "Electron_angle_to_pol_generated",
-                  100, -1.1, 1.1);
-  anMan->CreateH1("Electron energy (event generator)",
-                  "Electron energy(event generator", 1000, 0.0, 10.0);
-  anMan->CreateH1("v_over_c", "v_over_c", 100, 0.0, 1.0);
-
-  // The order with which the ntuple columns are created MUST stay the same.
-  // They are accessed simply by a number that is incremented each time one is
-  // created.  These numbers are stored in K37AnalysisNumbering.  Add to the
-  // end, but DO NOT add to the beginning and DO NOT add to the middle and DO
-  // NOT rearrange these (without rearrning the numbering).  If you must
-  // rearrange things, make sure to update the numbering!
-
-  // One ntuple per accepted event will contain all the information of the event
-  // By "all," I mean what we will get from the detectors.  Energy deposited.
-  // Some of these also give information straight out of the event generator.
-  anMan->CreateNtuple("ntuple", "Event data");
-  anMan -> CreateNtupleDColumn("T_e_generated");
-  anMan->CreateNtupleDColumn("v_over_c_generated");
-  anMan->CreateNtupleDColumn("theta_e_generated");
-  anMan -> CreateNtupleDColumn("omega");
-  anMan->CreateNtupleIColumn("detector_hit");
-  anMan->CreateNtupleDColumn("v_over_c");
-  char ntupName[15];
-  // Each strip detector reads energy left in each of its 80 channels
-  // 2-dimensions * 40 strips/dimension * 2 detectors = 160 columns
-  for (G4int i = 1; i <= 40; i++) {
-    //    snprintf(ntupName, sizeof(ntupName), "SDplusZX%02d", i);
-    snprintf(ntupName, sizeof(ntupName), "STRIP_UX_%02d", i);
-    anMan->CreateNtupleDColumn(ntupName);
-  }
-  for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "STRIP_UY_%02d", i);
-    anMan->CreateNtupleDColumn(ntupName);
-  }
-  for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "STRIP_LX_%02d", i);
-    anMan->CreateNtupleDColumn(ntupName);
-  }
-  for (G4int i = 1; i <= 40; i++) {
-    snprintf(ntupName, sizeof(ntupName), "STRIP_LY_%02d", i);
-    anMan->CreateNtupleDColumn(ntupName);
-  }
-  // First level of accepted events:  energy in +z(-z) scintillator and strip
-  // detector and no energy in the -z(+z) detector.  Neglects low-energy
-  // back-scattered eventsxo.
-  anMan -> CreateNtupleIColumn("accepted");
-  anMan -> CreateNtupleDColumn("T_e_generated");
-  anMan -> FinishNtuple();
-  anMan -> CreateNtupleDColumn("TDC_SCINT_TOP");
-  anMan -> CreateNtupleDColumn("TDC_SCINT_BOTTOM");
-  anMan -> CreateNtupleDColumn("QDC_UpperPMT");
-  anMan -> CreateNtupleDColumn("QDC_LowerPMT");
-  anMan -> CreateNtupleDColumn("DL_X_Pos");
-  anMan -> CreateNtupleDColumn("DL_Z_Pos");
-  anMan -> CreateNtupleDColumn("TDC_ION_MCP");
-  anMan -> CreateNtupleDColumn("TDC_ELECTRON_MCP");
-  anMan -> CreateNtupleDColumn("recoil_mu_generated");
-  // End making ntuples
-
   // Analysis Version 3! Spencer's Aggregator---should be IDENTICAL to what we
   // get from the analyzer.
   // the_aggregator_ = new Aggregator();
@@ -407,6 +329,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(recoil_mcp_particle_);
   RegisterChannel(tnim_op_beam_);
   RegisterChannel(ttlbit_sigmaplus_);
+  RegisterChannel(recoil_charge_state_);
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();
@@ -464,16 +387,6 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
   // G4ParticleDefinition* particle = kinematic -> GetParticleGun() ->
   //   GetParticleDefinition();
 
-  G4AnalysisManager *anMan = G4AnalysisManager::Instance();
-  // save histograms
-  //
-  G4cout << "Closing histograms........." << G4endl;
-  anMan->Write();
-  anMan->CloseFile();
-  G4cout << "Closed histograms." << G4endl;
-  G4cout << "Total v/c N+ = " << plusZHits_vc << G4endl;
-  G4cout << "Total v/c N- = " << minusZHits_vc << G4endl;
-  delete G4AnalysisManager::Instance();
 
   the_aggregator_ -> EndRun();
 
@@ -615,15 +528,15 @@ void K37RunAction::RegisterChannel(K37_Data* channel) {
 }
 
 void K37RunAction::PrintResultsToRunstat() {
-  std::ofstream runstat;
-  runstat.open("runstat.txt", std::ofstream::out | std::ofstream::app);
-  runstat << "--------------------------------------------------------"
-          << G4endl;
-  runstat << "  # Events ___________: " << NbofEvents  << G4endl;
-  runstat << "  # Accepted _________: " << accepted << G4endl;
-  runstat << "--------------------------------------------------------"
-          << G4endl;
-  runstat.close();
+  // std::ofstream runstat;
+  // runstat.open("runstat.txt", std::ofstream::out | std::ofstream::app);
+  // runstat << "--------------------------------------------------------"
+  //         << G4endl;
+  // runstat << "  # Events ___________: " << NbofEvents  << G4endl;
+  // runstat << "  # Accepted _________: " << accepted << G4endl;
+  // runstat << "--------------------------------------------------------"
+  //         << G4endl;
+  // runstat.close();
 
 
   // runstat << "  # ABSoffHoop _______: " << acceptedPrimaryScatteredOffHoops

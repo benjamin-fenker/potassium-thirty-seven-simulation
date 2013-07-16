@@ -84,8 +84,8 @@ class K37EventAction : public G4UserEventAction {
                           double lower_scintillator_energy,
                           double electron_mcp_energy);
 
-  G4THitsMap<G4double>* energyBTdedxMap;
-  G4THitsMap<G4double>* energyBTscintillatorMap;
+  //  G4THitsMap<G4double>* energyBTdedxMap;
+  //  G4THitsMap<G4double>* energyBTscintillatorMap;
   // G4THitsMap<G4double>* energyMirror2Map;
   // G4THitsMap<G4double>* energyBeryllium2Map;
   // G4THitsMap<G4double>* energyDedx2Map;
@@ -101,19 +101,19 @@ class K37EventAction : public G4UserEventAction {
   G4int fullenergy2CollID;
   G4int dedx1CollID;
   G4int dedx2CollID;
-  G4int mirrorCollID;
+  //  G4int mirrorCollID;
   G4int recoil_mcp_collection_id;
   G4int electron_mcp_collection_id;
-  G4int BTdedxID;
-  G4int BTscintillatorID;
+  //  G4int BTdedxID;
+  //  G4int BTscintillatorID;
 
-  G4int Mirror2ID;
-  G4int Beryllium2ID;
-  G4int Dedx2ID;
-  G4int SiLi2ID;
-  G4int MountID;
-  G4int BerylliumID;
-  G4int FaceID;
+  //  G4int Mirror2ID;
+  //  G4int Beryllium2ID;
+  //  G4int Dedx2ID;
+  //  G4int SiLi2ID;
+  //  G4int MountID;
+  //  G4int BerylliumID;
+  //  G4int FaceID;
 
   G4double energyDedx;
   G4double energyDedx_Primaries;
@@ -122,18 +122,18 @@ class K37EventAction : public G4UserEventAction {
   G4double energyDedx2_Primaries;
   G4double energyDedx2_Secondaries;
 
-  G4double energyBTdedx;
-  G4double energyBTscintillator;
+  //  G4double energyBTdedx;
+  //  G4double energyBTscintillator;
 
-  G4double energyMirror2;
-  G4double energyBeryllium2;
+  //  G4double energyMirror2;
+  //  G4double energyBeryllium2;
   // G4double energyDedx2;
-  G4double energyMount;
-  G4double energyBeryllium;
-  G4double energyFace;
+  // G4double energyMount;
+  //  G4double energyBeryllium;
+  //  G4double energyFace;
 
-  G4double energyfront;
-  G4double energyback;
+  //  G4double energyfront;
+  //  G4double energyback;
 
   G4int accepted;
   G4int interesting;
@@ -164,20 +164,20 @@ class K37EventAction : public G4UserEventAction {
   G4double Z;
   G4double Radius;
 
-  G4double theta;
-  G4double thetaFromStart;
-  G4double difference;
-  G4double cosDifference;
-  G4double thetafromfunction;
-  G4double cosfromfunction_old;
-  G4double cosfromfunction_new;
-  G4double cosfromthetaFromStart;
+  //  G4double theta;
+  //  G4double thetaFromStart;
+  //  G4double difference;
+  //  G4double cosDifference;
+  //  G4double thetafromfunction;
+  //  G4double cosfromfunction_old;
+  //  G4double cosfromfunction_new;
+  //  G4double cosfromthetaFromStart;
 
   vector< G4ThreeVector > spot;
   vector< G4ThreeVector > start;
 
   unsigned int sizeOfListOfEnteredVolumes;
-  int differenceInListSizeFromStartToEnd;
+  //  int differenceInListSizeFromStartToEnd;
   K37AllPossibleEventInformation* EventInformation;
   K37HistogramManager * histograms;
 
@@ -189,7 +189,7 @@ class K37EventAction : public G4UserEventAction {
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
 
-  G4double svn_version_number;
+  //  G4double svn_version_number;
   K37PrimaryGeneratorAction *primary_generator_;
 };
 

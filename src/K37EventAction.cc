@@ -207,8 +207,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   G4double electron_mcp_time = 0.0;
   G4double electron_mcp_energy = 0.0;
 
-  G4AnalysisManager* anMan = G4AnalysisManager::Instance();
-
   if (fullenergy1CollID < 0 || dedx1CollID < 0) return;
 
   G4HCofThisEvent * hit_collection = evt->GetHCofThisEvent();
@@ -396,20 +394,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     runAct->SetAccepted();
 
 
-    anMan->FillNtupleIColumn(ntup_accepted, 1);
     EventInformation->setThisIsAnAccepterEvent();
-    anMan -> FillNtupleDColumn(ntup_tdc_scint_top,
-                               time_upper_scintillator/ns);
-    anMan -> FillNtupleDColumn(ntup_tdc_scint_bottom,
-                               time_lower_scintillator/ns);
-    anMan -> FillNtupleDColumn(ntup_qdc_scint_top,
-                               energy_upper_scintillator/keV);
-    anMan -> FillNtupleDColumn(ntup_qdc_scint_bottom,
-                               energy_lower_scintillator/keV);
-    anMan -> FillNtupleDColumn(ntup_rmcp_x_pos, recoil_mcp_x_pos/mm);
-    anMan -> FillNtupleDColumn(ntup_rmcp_z_pos, recoil_mcp_z_pos/mm);
-    anMan -> FillNtupleDColumn(ntup_rmcp_time, recoil_mcp_time/ns);
-    anMan -> FillNtupleDColumn(ntup_emcp_time, electron_mcp_time/ns);
 
     (*active_channels_)["QDC_UpperPMT"] ->
         InsertData(energy_upper_scintillator/keV);
@@ -431,12 +416,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
     if (fillAllSDData) {
-      // All (G4) way
-      fillSDNtuples(sd_energy_plusZ_X, ntup_SD_plusZ_X_start);
-      fillSDNtuples(sd_energy_plusZ_Y, ntup_SD_plusZ_Y_start);
-      fillSDNtuples(sd_energy_minsZ_X, ntup_SD_minsZ_X_start);
-      fillSDNtuples(sd_energy_minsZ_Y, ntup_SD_minsZ_Y_start);
-
       // New (Aggregator) way
       fillSDNtuples(sd_energy_minsZ_X, "STRIP_LX_");
       fillSDNtuples(sd_energy_minsZ_Y, "STRIP_LY_");
@@ -448,29 +427,21 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       // stripHandler->PrintMaps();
       stripHandler->PassThePlusZDetectors();
 
-      ofstream detectorADA;
-      detectorADA.open("detectorADA.txt", ofstream::out | ofstream::app);
-      detectorADA.setf(std::ios::fixed, std::ios::floatfield);
-      detectorADA << setw(15) << left << energyDedx/keV << setw(15) << left
-                  << energy_upper_scintillator/keV << G4endl;
-      detectorADA.close();
+      // ofstream detectorADA;
+      // detectorADA.open("detectorADA.txt", ofstream::out | ofstream::app);
+      // detectorADA.setf(std::ios::fixed, std::ios::floatfield);
+      // detectorADA << setw(15) << left << energyDedx/keV << setw(15) << left
+      //             << energy_upper_scintillator/keV << G4endl;
+      // detectorADA.close();
 
-      histograms->FillNtuple(1, 0, energy_upper_scintillator);
-      histograms->FillNtuple(0, 0, energyDedx);
-      histograms->AddRowNtuple(1);
-      histograms->AddRowNtuple(0);
+      // histograms->FillNtuple(1, 0, energy_upper_scintillator);
+      // histograms->FillNtuple(0, 0, energyDedx);
+      // histograms->AddRowNtuple(1);
+      // histograms->AddRowNtuple(0);
 
-      //  fill histograms
-      anMan->FillH1(hist_ADA_Scintillator, energy_upper_scintillator/keV);
-      anMan->FillH1(hist_ADA_StripDetector, energyDedx/keV);
 
       runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
                                                     energy_upper_scintillator));
-      // Int-column 1 corresponds to plus or minus Z
-      anMan -> FillNtupleIColumn(ntup_sign_z_hit, 1);
-      anMan -> FillNtupleDColumn(ntup_v_over_c,
-                               GetRelativisticFactor(emass,
-                                                 energy_upper_scintillator));
 
       EventInformation ->
           setTotalEnergyInScintillator(energy_upper_scintillator);
@@ -487,29 +458,21 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (isThereEnergyDedx2 == true) {
       stripHandler->PassTheMinusZDetectors();
 
-      ofstream detectorODA;
-      detectorODA.open("detectorODA.txt", ofstream::out | ofstream::app);
-      detectorODA.setf(std::ios::fixed, std::ios::floatfield);
-      detectorODA << setw(15)<< left << energyDedx2/keV << setw(15) << left
-                  << energy_lower_scintillator/keV << G4endl;
-      detectorODA.close();
+      // ofstream detectorODA;
+      // detectorODA.open("detectorODA.txt", ofstream::out | ofstream::app);
+      // detectorODA.setf(std::ios::fixed, std::ios::floatfield);
+      // detectorODA << setw(15)<< left << energyDedx2/keV << setw(15) << left
+      //             << energy_lower_scintillator/keV << G4endl;
+      // detectorODA.close();
 
-      histograms->FillNtuple(3, 0, energy_lower_scintillator);
-      histograms->FillNtuple(2, 0, energyDedx2);
-      histograms->AddRowNtuple(3);
-      histograms->AddRowNtuple(2);
+      // histograms->FillNtuple(3, 0, energy_lower_scintillator);
+      // histograms->FillNtuple(2, 0, energyDedx2);
+      // histograms->AddRowNtuple(3);
+      // histograms->AddRowNtuple(2);
 
-      //  Fill histograms
-      anMan -> FillH1(hist_ODA_Scintillator, energy_lower_scintillator/keV);
-      anMan -> FillH1(hist_ODA_StripDetector, energyDedx2/keV);
       runAct ->
           incrementMinusZ_vc(GetRelativisticFactor(emass,
                                                    energy_lower_scintillator));
-      anMan -> FillNtupleIColumn(ntup_sign_z_hit, -1);
-      anMan -> FillNtupleDColumn(ntup_v_over_c,
-                               GetRelativisticFactor(emass,
-                                                 energy_lower_scintillator));
-      // Done filling histograms
       EventInformation ->
           setTotalEnergyInScintillator(energy_lower_scintillator);
       EventInformation -> setTotalEnergyInStripDetector(energyDedx2);
@@ -524,7 +487,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
     // Add a new row here to add a new row for only accpeted events where
     // either there was energy in the plus or minus z detector, but not both!
-    anMan -> AddNtupleRow();
     // Fill Run_Number with negative version number to indicate simulated
     (*active_channels_)["Run_Number"] -> InsertData(-1.0*K37_VERSION);
 
@@ -558,7 +520,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   //  G4cout << "------------------------------" << G4endl;
   // Add a new row here to add a new row for EVERY EVENT, even events that were
   // not "accepted."
-  // anMan -> AddNtupleRow();
 }  // End of event action
 //----------------
 void K37EventAction::setEnteringDedx(G4ThreeVector enteringPosition) {
@@ -567,21 +528,6 @@ void K37EventAction::setEnteringDedx(G4ThreeVector enteringPosition) {
 
 void K37EventAction::setStartingDirection(G4ThreeVector startingPosition) {
   start.push_back(startingPosition);
-}
-
-void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,
-                                   G4int ntuple_number_start) {
-  // After filling up the total energy hit-by-hit, write out the event
-  // total energy for each strip.
-  bool debug = false;
-  G4AnalysisManager *anMan = G4AnalysisManager::Instance();
-  for (G4int i = 0; i < 40; i++) {
-    anMan->FillNtupleDColumn(ntuple_number_start + i,
-                             energy_strip[i]/keV);
-    if (energy_strip[i] > 0 && debug) {
-      G4cout << "Strip " << i << " with " << energy_strip[i]/keV << G4endl;
-    }
-  }
 }
 
 void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,

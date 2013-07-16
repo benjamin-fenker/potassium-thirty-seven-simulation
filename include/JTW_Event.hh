@@ -6,7 +6,8 @@ class JTW_Event: public K37EventGenerator {
  public:
   /*int area (){ return (width * height / 2); };*/
   void MakeEvent();
-  void MakeEvent(G4double polarization, G4double alignment);
+  void MakeEvent(G4double polarization, G4double alignment,
+                 G4double recoil_charge);
   void ResetGeneratedCounters();
   G4int GetNumMins();
   G4int GetNumPlus();
