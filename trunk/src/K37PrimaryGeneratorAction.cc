@@ -29,10 +29,10 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            K37DetectorConstruction* det,
                            K37AllPossibleEventInformation* APEI,
                            K37EventGenerator* evGen) :
-    polarization_(1.0), alignment_(1.0), detector(det), randomFlag("on"),
-    EventInformation(APEI), v(), vertex(NULL), EventVertex(), K37Neutral(NULL),
-    K37Minus(NULL), decayTableAr37Minus(NULL), K37MinusDecayMode(NULL),
-    cloud(NULL), evGenerator(evGen) {
+    polarization_(1.0), alignment_(1.0), charge_state_ratio_(8, 1.0/8.0),
+    detector(det), randomFlag("on"), EventInformation(APEI), v(), vertex(NULL),
+    EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
+    K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen) {
   gunMessenger = new K37PrimaryGeneratorMessenger(this);
   insideCollimator = detector->GetSubtraction();
   distanceToTrap =detector->GetDistanceToTrap();
@@ -43,6 +43,16 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   // particleGun = new G4ParticleGun(n_particle);
 
   //                     temp , size
+
+  charge_state_ratio_[0] = 1.0;
+  charge_state_ratio_[1] = 0.69699;
+  charge_state_ratio_[2] = 0.19483;
+  charge_state_ratio_[3] = 0.08173;
+  charge_state_ratio_[4] = 0.01953;
+  charge_state_ratio_[5] = 0.00581;
+  charge_state_ratio_[6] = 0.00110;
+  charge_state_ratio_[7] = 0.0;
+  NormalizeChargeStateRatio();
 
   cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),
                            G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
@@ -76,9 +86,17 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
 }
 
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+  G4double recoil_charge_this_event;
+  if (recoil_charge_ == -2) {
+    recoil_charge_this_event = GetChargeStateThisEvent();
+  } else {
+    recoil_charge_this_event = recoil_charge_ * eplus;
+  }
+  (*active_channels_)["ION_CHARGE"] ->  InsertData(recoil_charge_this_event);
+
   bool testingEVGenerator = false;
 
-  evGenerator -> MakeEvent(polarization_, alignment_);
+  evGenerator -> MakeEvent(polarization_, alignment_, recoil_charge_this_event);
 
   //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   //  ion = particleTable->FindIon(18, 37, 0);
@@ -106,13 +124,13 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
       this->setBetaVertex();
       anEvent->AddPrimaryVertex(vertex);
 
-      this->setDaughterVertex();
+      this->setDaughterVertex(recoil_charge_this_event);
       anEvent->AddPrimaryVertex(vertex);
       EventInformation->
         setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
                                           evGenerator->dMomentumY(),
                                           evGenerator->dMomentumZ()));
-      SetSOelectronVertices(anEvent, recoil_charge_ + 1);
+      SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
     } else {
       vertex = new G4PrimaryVertex(EventVertex, 0);
       G4PrimaryParticle* particle =
@@ -139,7 +157,7 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
   vertex->SetPrimary(particle);
 }
 
-void K37PrimaryGeneratorAction::setDaughterVertex() {
+void K37PrimaryGeneratorAction::setDaughterVertex(G4double recoil_charge) {
   // G4ThreeVector momentum(evGenerator -> dMomentumX(),
   //                        evGenerator -> dMomentumY(),
   //                        evGenerator -> dMomentumZ());
@@ -153,7 +171,7 @@ void K37PrimaryGeneratorAction::setDaughterVertex() {
                             evGenerator->dMomentumY(),
                             evGenerator->dMomentumZ());
   // Simulate any charge state >= +1
-  particle -> SetCharge(recoil_charge_ * eplus);
+  particle -> SetCharge(recoil_charge * eplus);
   if (debug) {
     G4cout << "Ion mass: " << ion -> GetPDGMass()/c_squared/kg << " kg"
            << G4endl;
@@ -228,10 +246,46 @@ void K37PrimaryGeneratorAction::SetAlignment(G4double ali) {
 }
 
 void K37PrimaryGeneratorAction::SetRecoilCharge(G4int charge) {
-  if (charge < 0) {
+  if (charge < 0 && charge != -2) {
     G4cout << "Negative ions not supported as primary particles. "
            << " No change...Recoil charge = " << recoil_charge_ << G4endl;
+  } else if (charge == -2) {
+    G4cout << "Randomizing charge state based on compiled distribution"
+           << G4endl;
+    recoil_charge_ = charge;
   } else {                            // Positive ions action
     recoil_charge_ = charge;
   }
+}
+
+void K37PrimaryGeneratorAction::NormalizeChargeStateRatio() {
+  G4double sum = 0.0;
+  for (unsigned int i = 0; i < charge_state_ratio_.size(); i++) {
+    sum += charge_state_ratio_[i];
+  }
+  for (unsigned int i = 0; i < charge_state_ratio_.size(); i++) {
+    charge_state_ratio_[i] = charge_state_ratio_[i] / sum;
+    // G4cout << "CS " << i << " has ratio "
+    //        << charge_state_ratio_[i] << G4endl;
+  }
+}
+
+G4double K37PrimaryGeneratorAction::GetChargeStateThisEvent() {
+  G4double charge_state = -2.0, sum = 0.0;
+  unsigned c = 0;
+  G4double guess = CLHEP::RandFlat::shoot(0.0, 1.0);
+
+  while (charge_state < 0 && c < charge_state_ratio_.size()) {
+    sum += charge_state_ratio_[c];
+    // G4cout << "Comparing to " << sum << "...";
+    if (guess < sum) {
+      charge_state = c * eplus;
+      // G4cout << " passed!";
+    }
+    c++;
+    // G4cout << G4endl;
+  }
+  // G4cout << "Random is " << guess << " --> charge state is +" << charge_state
+  //        << "\n" << G4endl;
+  return charge_state;
 }

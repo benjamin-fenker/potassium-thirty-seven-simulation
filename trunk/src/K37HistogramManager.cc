@@ -9,8 +9,7 @@
 
 //-----------------------------------------
 
-K37HistogramManager::K37HistogramManager()
-  :af(0), tree(0), factoryOn(false) {
+K37HistogramManager::K37HistogramManager() {
 #ifdef G4ANALYSIS_USE
   // Creating the analysis factory
   af = AIDA_createAnalysisFactory();

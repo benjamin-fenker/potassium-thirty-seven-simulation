@@ -19,6 +19,7 @@
 
 // Project Specific
 #include "K37_Data.hh"
+//#include "K37RunData.hh"
 #include "Aggregator.hh"
 
 using std::cerr;
@@ -61,6 +62,7 @@ class Aggregator::ImplementAGG {
   bool writeToROOT;
   TTree *theNTuple;
   TDirectory *theDirectory;
+  void WriteRunData();
 };
 
 Aggregator::ImplementAGG::ImplementAGG()
@@ -213,6 +215,8 @@ void Aggregator::ImplementAGG::InsertChannel(const std::string &uniqueName_,
 }
 
 void Aggregator::ImplementAGG::EndRun() {
+  WriteRunData();
+
   if (writeToROOT == true) {
     rootFile -> cd();
     theNTuple -> Write(0, TObject::kOverwrite);
@@ -270,6 +274,14 @@ void Aggregator::ImplementAGG::PrintROOT() {
   theNTuple->Fill();
 }
 
+void Aggregator::ImplementAGG::WriteRunData() {
+  // K37RunData *data = new K37RunData();
+  // cout << "Polarization: " << data -> GetPolarization() << endl;
+  cout << "Writing my new thingy!!!" << endl;
+  // rootFile -> cd();
+  // data -> Write();
+}
+
 Aggregator::Aggregator()
     :mAGG(new ImplementAGG()) {
 }
@@ -298,5 +310,6 @@ void Aggregator::EndEvent() {
 void Aggregator::RegisterIOMethod(const std::string &fileName_) {
   mAGG->InitilzeIO(fileName_);
 }
+
 }
 

@@ -3,10 +3,16 @@
 #ifndef K37PrimaryGeneratorAction_h
 #define K37PrimaryGeneratorAction_h 1
 
+#include <map>
+#include <string>
+#include <vector>
+
+#include "Aggregator.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
-#include "globals.hh"
 #include "G4ParticleGun.hh"
+#include "K37_Data.hh"
 #include "Randomize.hh"
+#include "globals.hh"
 
 class G4VPrimaryGenerator;
 class G4Event;
@@ -20,6 +26,12 @@ class G4DecayTable;
 class G4PhaseSpaceDecayChannel;
 class K37CloudSize;
 class K37EventGenerator;
+
+using AGG::Aggregator;
+using K37_ABC::K37_Data;
+using std::map;
+using std::string;
+using std::vector;
 
 class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
@@ -36,7 +48,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void setRandomFlag(G4String val) {randomFlag = val;}
   void SetRecoil(G4String val) {use_recoil_ = val;}
   void setBetaVertex();
-  void setDaughterVertex();
+  void setDaughterVertex(G4double recoil_charge);
   void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
   void SetPolarization(G4double pol);
   G4double GetPolarization() {return polarization_;}
@@ -44,14 +56,18 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4double GetAlignment() {return alignment_;}
   void SetRecoilCharge(G4int charge);
   K37CloudSize* GetCloudSize() {return cloud;}
+  void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
+  void SetActiveChannels(map<string, K37_Data*> *active_channels) {
+    active_channels_ = active_channels;
+  }
 
  private:
   G4double      distanceToTrap;
 
   G4SingleParticleSource*       particleGun;
   G4double      rho;
-  G4double      phi;
-  G4double      theta;
+  //  G4double      phi;
+  //  G4double      theta;
   G4double      insideCollimator;
   G4ParticleDefinition* electron;
   G4ParticleDefinition* positron;
@@ -60,6 +76,8 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4double polarization_;
   G4double alignment_;
   G4double recoil_charge_;               // Also determines number of SOE
+  // Ratios of recoil charge distribution...
+  vector<G4double> charge_state_ratio_;      // Ar0 -> Ar+7
 
   G4String use_recoil_;
   K37DetectorConstruction* detector;
@@ -78,6 +96,12 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4PhaseSpaceDecayChannel *K37MinusDecayMode;
   K37CloudSize *cloud;
   K37EventGenerator *evGenerator;
+
+  void NormalizeChargeStateRatio();
+  G4double GetChargeStateThisEvent();
+
+  Aggregator *the_aggregator_;
+  map<string, K37_Data*> *active_channels_;
 };
 
 #endif

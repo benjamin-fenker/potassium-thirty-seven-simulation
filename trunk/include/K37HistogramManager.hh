@@ -31,14 +31,14 @@ class K37HistogramManager {
   G4String                 fileName[2];
   G4String                 fileType;
   G4String                 fileOption;
-  AIDA::IAnalysisFactory*  af;
-  AIDA::ITree*             tree;
+  //  AIDA::IAnalysisFactory*  af;
+  //  AIDA::ITree*             tree;
   AIDA::ITuple*        ntupl0;      // StripDetectorPlusZ
   AIDA::ITuple*            ntupl1;  // ScintillatorPlusZ
   AIDA::ITuple*            ntupl2;  // StripDetectorMinusZ
   AIDA::ITuple*            ntupl3;  // ScintillatorMinusZ
 
-  G4bool                   factoryOn;
+  //  G4bool                   factoryOn;
 };
 
 //-----------------------------------------

@@ -1,4 +1,4 @@
-// Authors: Spencer Behling and Benjamin Fenerk 2013
+// Authors: Spencer Behling and Benjamin Fenker 2013
 
 #ifndef K37_Data_h
 #define K37_Data_h 1

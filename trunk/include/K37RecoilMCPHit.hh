@@ -13,6 +13,7 @@ class K37RecoilMCPHit : public G4VHit {
   G4double x_pos_;
   G4double z_pos_;
   G4int particle_pdg_;
+  G4int particle_charge_;
  public:
   K37RecoilMCPHit();
   ~K37RecoilMCPHit();
@@ -21,11 +22,13 @@ class K37RecoilMCPHit : public G4VHit {
   void SetXPos(G4double x_pos) {x_pos_ = x_pos;}
   void SetZPos(G4double z_pos) {z_pos_ = z_pos;}
   void SetParticlePDG(G4int pdg) {particle_pdg_ = pdg;}
+  void SetParticleCharge(G4int charge) {particle_charge_ = charge;}
   G4double GetEnergy() {return energy_;}
   G4double GetTime() {return time_;}
   G4double GetXPos() {return x_pos_;}
   G4double GetZPos() {return z_pos_;}
   G4int GetParticlePDG() {return particle_pdg_;}
+  G4int GetParticleCharge() {return particle_charge_;}
 };
 
 typedef G4THitsCollection<K37RecoilMCPHit> K37RecoilMCPHitsCollection;
