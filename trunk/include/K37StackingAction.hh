@@ -7,6 +7,7 @@
 #include "globals.hh"
 #include "K37ScintillatorHit.hh"
 #include "K37StripDetectorHit.hh"
+#include "G4ParticleDefinition.hh"
 
 class G4Track;
 
@@ -29,6 +30,12 @@ class K37StackingAction : public G4UserStackingAction {
   G4VHitsCollection* GetCollection(G4String colName);
 
   G4bool GetPointersToHitCollections();
+  G4ParticleDefinition *electron;
+  G4ParticleDefinition *positron;
+  G4ParticleDefinition *gamma;
+  G4ParticleDefinition *ArMinus;
+  G4ParticleDefinition *ArNeutral;
+  G4ParticleDefinition *ArPlus;
 };
 
 #endif
