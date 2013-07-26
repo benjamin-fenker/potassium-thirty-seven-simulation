@@ -17,7 +17,13 @@
 
 K37StackingAction::K37StackingAction()
   : scintillatorPlusZHits(0), scintillatorMinusZHits(0),
-    stripDetectorPlusZHits(0), stripDetectorMinusZHits(0)
+    stripDetectorPlusZHits(0), stripDetectorMinusZHits(0),
+    electron(G4Electron::ElectronDefinition()),
+    positron(G4Positron::PositronDefinition()),
+    gamma(G4Gamma::GammaDefinition()),
+    ArMinus(K37Ar37Minus::Ar37MinusDefinition()),
+    ArNeutral(K37Ar37Neutral::Ar37NeutralDefinition()),
+    ArPlus(K37Ar37PlusOne::Ar37PlusOneDefinition())
 {}
 
 //-----------------------------------------------
@@ -35,18 +41,18 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
 
   G4ParticleDefinition * particleType = aTrack->GetDefinition();
 
-  if ((particleType == G4Electron::ElectronDefinition()) ||
-      (particleType == G4Positron::PositronDefinition()) ||
-      (particleType == G4Gamma::GammaDefinition())) {
+  if ((particleType == electron) ||
+      (particleType == positron) ||
+      (particleType == gamma)) {
     classification = fUrgent;
   }
-  if (particleType == K37Ar37Minus::Ar37MinusDefinition()) {
+  if (particleType == ArMinus) {
     classification = fUrgent;
   }
-  if (particleType == K37Ar37Neutral::Ar37NeutralDefinition()) {
+  if (particleType == ArNeutral) {
     classification = fUrgent;
   }
-  if (particleType == K37Ar37PlusOne::Ar37PlusOneDefinition()) {
+  if (particleType == ArPlus) {
     classification = fUrgent;
   }
   if (particleType -> GetParticleType() == "nucleus") {

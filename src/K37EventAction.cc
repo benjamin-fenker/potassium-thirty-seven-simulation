@@ -62,6 +62,9 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   electron_mcp_collection_id = -1;
   // BTdedxID= -1;
   // BTscintillatorID= -1;
+
+  theElectron = G4Electron::ElectronDefinition();
+  emass = theElectron -> GetPDGMass();
   energyDedx = 0;
   energyDedx_Primaries = 0;
   energyDedx_Secondaries = 0;
@@ -108,6 +111,7 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   event_messenger_ = new K37EventMessenger(this);
   the_aggregator_ = 0;
   // vector< double > spot;
+
 }
 
 K37EventAction::~K37EventAction() {
@@ -257,7 +261,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       }
     }
     if (energy_upper_scintillator>0) {
-      time_upper_scintillator = hit -> GetTime();
       isThereEnergySili = true;
       if (energy_upper_scintillator_primaries == 0) {
         EventInformation->setGammaFiredScintillatorPlusZToTrue();
@@ -281,7 +284,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       }
     }
     if (energy_lower_scintillator>0) {
-      time_lower_scintillator = hit -> GetEdep();
       isThereEnergySili2 = true;
       if (energy_lower_scintillator_primaries == 0) {
         EventInformation->setGammaFiredScintillatorMinusZToTrue();
@@ -381,16 +383,14 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     //        << G4BestUnit(energy_lower_scintillator, "Energy") << " / "
     //        << G4BestUnit(energyDedx2, "Energy") << G4endl;
 
-    G4double trigTime = pow(10.0, 10);
-    if (time_upper_scintillator > 0.0) {  // Then its above threshold
-      trigTime = min(trigTime, time_upper_scintillator/ns);
-    }
-    if (time_lower_scintillator > 0.0) {  // Then its above threhsold
-      trigTime = min(trigTime, time_lower_scintillator/ns);
-    }
+    //G4double trigTime = pow(10.0, 10);
+    //if (time_upper_scintillator > 0.0) {  // Then its above threshold
+      //trigTime = min(trigTime, time_upper_scintillator/ns);
+    //}
+    //if (time_lower_scintillator > 0.0) {  // Then its above threhsold
+      //trigTime = min(trigTime, time_lower_scintillator/ns);
+    //}
 
-    G4Electron *theElectron = G4Electron::ElectronDefinition();
-    G4double emass = theElectron -> GetPDGMass();
     accepted++;
     runAct->SetAccepted();
 

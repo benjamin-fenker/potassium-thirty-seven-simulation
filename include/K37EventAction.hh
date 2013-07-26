@@ -11,6 +11,7 @@
 #include "G4THitsMap.hh"
 #include "G4ThreeVector.hh"
 #include "G4UserEventAction.hh"
+#include "G4Electron.hh"
 
 #include "Aggregator.hh"
 #include "Generic_Channel.hh"
@@ -115,6 +116,8 @@ class K37EventAction : public G4UserEventAction {
   //  G4int BerylliumID;
   //  G4int FaceID;
 
+  G4Electron *theElectron;
+  G4double emass;
   G4double energyDedx;
   G4double energyDedx_Primaries;
   G4double energyDedx_Secondaries;
