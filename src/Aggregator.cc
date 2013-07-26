@@ -130,7 +130,7 @@ void Aggregator::ImplementAGG::OpenOutputChannel(const std::string &method_,
       theNTuple = 0;
     }
 
-    rootFile = new TFile(fileName_.c_str(), "RECREATE");
+    rootFile = new TFile(fileName_.c_str(), "RECREATE", "", 0);
     theNTuple = new TTree("ntuple", "TheTuple");
     std::string columnName;
     std::string typeBit;
@@ -277,7 +277,7 @@ void Aggregator::ImplementAGG::PrintROOT() {
 void Aggregator::ImplementAGG::WriteRunData() {
   // K37RunData *data = new K37RunData();
   // cout << "Polarization: " << data -> GetPolarization() << endl;
-  cout << "Writing my new thingy!!!" << endl;
+  //  cout << "Writing my new thingy!!!" << endl;
   // rootFile -> cd();
   // data -> Write();
 }

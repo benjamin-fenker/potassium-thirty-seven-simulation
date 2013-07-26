@@ -28,6 +28,9 @@ K37EventMessenger::K37EventMessenger(K37EventAction *event_action)
 
 K37EventMessenger::~K37EventMessenger() {
   delete event_directory_;
+  delete set_upper_scintillator_threshold_cmd_;
+  delete set_lower_scintillator_threshold_cmd_;
+  delete set_electron_mcp_threshold_cmd_;
 }
 
 void K37EventMessenger::SetNewValue(G4UIcommand *command, G4String new_values) {
