@@ -106,9 +106,11 @@ K37RunMessenger::~K37RunMessenger() {
   delete RunDirectory;
   delete SaveFilesCommand;
   delete printEnergyLossTable;
+  delete setFileName;
+  delete set_configuration_file_;
+  delete set_output_directory_;
   delete printAnnihilation;
   delete printTheVolumeNames;
-  delete setFileName;
   delete setFillEvGenData;
   delete setFillAllSDData;
 }

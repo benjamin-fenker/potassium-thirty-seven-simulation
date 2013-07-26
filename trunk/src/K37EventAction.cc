@@ -112,6 +112,7 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
 
 K37EventAction::~K37EventAction() {
   delete stripHandler;
+  delete event_messenger_;
 }
 
 void K37EventAction::BeginOfEventAction(const G4Event* ev) {

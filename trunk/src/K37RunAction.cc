@@ -389,7 +389,6 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
 
 
   the_aggregator_ -> EndRun();
-
   G4cout << "Last line of EORA" << G4endl;
 }
 

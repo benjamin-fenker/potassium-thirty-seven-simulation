@@ -88,6 +88,14 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
 K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
   delete RndmCmd;
   delete gunDir;
+  delete set_pol_cmd_;
+  delete set_ali_cmd_;
+  delete set_recoil_charge_cmd_;
+  delete set_cloud_temperature_v_;
+  delete set_cloud_temperature_d_;
+  delete set_initial_cloud_size_v_;
+  delete set_initial_cloud_size_d_;
+  delete set_cloud_center_;
 }
 
 // ----------------------------------

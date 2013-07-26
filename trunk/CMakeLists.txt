@@ -2,7 +2,7 @@
 # Setup the project
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(K37)
-#ADD_DEFINITIONS(-g -O0 -Wall) for debug builds 
+ADD_DEFINITIONS(-g -O0 -Wall) #for debug builds 
 
 #----------------------------------------------------------------------------
 # Find Root so that we can link the aggregator class to it

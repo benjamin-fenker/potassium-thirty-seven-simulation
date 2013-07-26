@@ -74,6 +74,7 @@ K37FieldMessenger::~K37FieldMessenger() {
   delete fieldDir;
   delete UpdateCmd;
   delete changeFieldCmd;
+  delete print_field_cmd;
 }
 
 //------------------------------------------------
