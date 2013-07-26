@@ -103,6 +103,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   CLHEP::HepRotation* MMRotation;
   CLHEP::HepRotation* hoopRotation;
 
+  G4VisAttributes * world_logVisAttributes;
   G4VisAttributes * scint_logVisAttributes_plusZ;
   G4VisAttributes * scint_logVisAttributes_minusZ;
   G4VisAttributes * dedx_logVisAttributes;
