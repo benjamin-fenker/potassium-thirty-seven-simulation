@@ -105,13 +105,13 @@ K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
   dl_z_pos_      = new TDC_Channel("DL_Z_Pos"    , 4, "/v", false);
   char name[200];
   for (G4int i = 0; i < 40; i++) {
-    snprintf(name, sizeof(name), "STRIP_UX_%02d", i);
+    snprintf(name, sizeof(name), "STRIP_UX_%02d", i+1);
     strip_detector_upper_x_[i] = new Generic_Channel(name, i+5, "/D");
-    snprintf(name, sizeof(name), "STRIP_UY_%02d", i);
+    snprintf(name, sizeof(name), "STRIP_UY_%02d", i+1);
     strip_detector_upper_y_[i] = new Generic_Channel(name, i+45, "/D");
-    snprintf(name, sizeof(name), "STRIP_LX_%02d", i);
+    snprintf(name, sizeof(name), "STRIP_LX_%02d", i+1);
     strip_detector_lower_x_[i] = new Generic_Channel(name, i+85, "/D");
-    snprintf(name, sizeof(name), "STRIP_LY_%02d", i);
+    snprintf(name, sizeof(name), "STRIP_LY_%02d", i+1);
     strip_detector_lower_y_[i] = new Generic_Channel(name, i+125, "/D");
   }
 
@@ -139,6 +139,8 @@ K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
   run_action_       = new Generic_Channel("Run_Number"      , 401, "/D");
   tnim_op_beam_     = new Generic_Channel("TNIM_OP_Beam"    , 402, "/l");
   ttlbit_sigmaplus_ = new Generic_Channel("TTLBit_SigmaPlus", 403, "/D");
+  ttlbit_op_beam_   = new Generic_Channel("TTLBit_OPBeam"   , 404, "/D");
+
   the_aggregator_ = 0;
 }
 
@@ -172,6 +174,7 @@ K37RunAction::~K37RunAction() {
   delete tnim_op_beam_;
   delete ttlbit_sigmaplus_;
   delete recoil_charge_state_;
+  delete ttlbit_op_beam_;
 }
 
 //----------------------------------
@@ -330,6 +333,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(tnim_op_beam_);
   RegisterChannel(ttlbit_sigmaplus_);
   RegisterChannel(recoil_charge_state_);
+  RegisterChannel(ttlbit_op_beam_);
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();

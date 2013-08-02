@@ -58,7 +58,6 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
                                          0.0014*kelvin),
                            G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm));
-
   particleGun = new G4SingleParticleSource();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;

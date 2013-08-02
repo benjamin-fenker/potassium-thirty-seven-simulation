@@ -3,7 +3,10 @@
 #ifndef Aggregator_h
 #define Aggregator_h 1
 
+#include <TFile.h>
+
 #include <string>
+
 #include "K37_Data.hh"
 
 namespace AGG {
@@ -16,6 +19,7 @@ class Aggregator {
   void BeginRun();
   void EndEvent();
   void EndRun();
+  TFile *GetRootFile();
  private:
   // to make Aggregator non-copyable
   Aggregator(const Aggregator &);

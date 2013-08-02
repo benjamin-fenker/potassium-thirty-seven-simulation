@@ -111,7 +111,6 @@ K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
   event_messenger_ = new K37EventMessenger(this);
   the_aggregator_ = 0;
   // vector< double > spot;
-
 }
 
 K37EventAction::~K37EventAction() {
@@ -383,13 +382,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     //        << G4BestUnit(energy_lower_scintillator, "Energy") << " / "
     //        << G4BestUnit(energyDedx2, "Energy") << G4endl;
 
-    //G4double trigTime = pow(10.0, 10);
-    //if (time_upper_scintillator > 0.0) {  // Then its above threshold
-      //trigTime = min(trigTime, time_upper_scintillator/ns);
-    //}
-    //if (time_lower_scintillator > 0.0) {  // Then its above threhsold
-      //trigTime = min(trigTime, time_lower_scintillator/ns);
-    //}
+    // G4double trigTime = pow(10.0, 10);
+    // if (time_upper_scintillator > 0.0) {  // Then its above threshold
+      // trigTime = min(trigTime, time_upper_scintillator/ns);
+    // }
+    // if (time_lower_scintillator > 0.0) {  // Then its above threhsold
+      // trigTime = min(trigTime, time_lower_scintillator/ns);
+    // }
 
     accepted++;
     runAct->SetAccepted();
@@ -495,13 +494,16 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // 1000000 ns = 1000 us is within the optical pumping on time
     // 10 ns is outside the optical pumping on time
     uint64_t  op_time;
+    G4double op_bit_onoff;
     if (fabs(polarization) > 0) {  // Polarized
       op_time = 1000000;   // Will resolove to polarized as if it were real data
+      op_bit_onoff = 1.0;
     } else {               // Not polarized
       op_time = 10;        // Will show up as unpolarized just like real data
+      op_bit_onoff = 0.0;
     }
     (*active_channels_)["TNIM_OP_Beam"] -> InsertDataL(op_time);
-
+    (*active_channels_)["TTLBit_OPBeam"] -> InsertData(op_bit_onoff);
     // To match the analyzer TTLBit_Sigmaplus should be one for s+ and 0 for s-
     // Unpolarized light should be vetoed by  TNIM_OP_Beam, but I will give it
     // an error code of -10.
@@ -536,7 +538,7 @@ void K37EventAction::fillSDNtuples(vector<G4double> energy_strip,
   G4bool debug = false;
   char full_name[200];
   for (G4int i = 0; i < 40; i++) {
-    snprintf(full_name, sizeof(full_name), "%s%02d", name.c_str(), i);
+    snprintf(full_name, sizeof(full_name), "%s%02d", name.c_str(), i+1);
     (*active_channels_)[full_name] -> InsertData(energy_strip[i]/keV);
     if (energy_strip[i] > 0 && debug) {
       G4cout << full_name << " with " << energy_strip[i]/keV << G4endl;

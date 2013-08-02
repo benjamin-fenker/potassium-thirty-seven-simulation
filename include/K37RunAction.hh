@@ -9,7 +9,7 @@
 
 #include "G4UserRunAction.hh"
 
-#include "Aggregator.hh"
+#include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
 #include "globals.hh"
 #include "K37_Data.hh"
@@ -94,7 +94,7 @@ class K37RunAction : public G4UserRunAction {
   };
   G4bool GetRecordVolumeNames() {return recordVolumeNames;}
   void setFileName(G4String newName) {outFileName = newName;}
-  void SetAggregator(Aggregator *the_aggregator) {
+  void SetAggregator(GeantAggregator *the_aggregator) {
     the_aggregator_ = the_aggregator;
   }
   void SetConfigurationFileName(const char *filename) {
@@ -180,7 +180,7 @@ class K37RunAction : public G4UserRunAction {
 
   // Event generator testing 1/18/2013
   //  G4int numPlus, numMinus;
-  Aggregator *the_aggregator_;
+  GeantAggregator *the_aggregator_;
   Generic_Channel *qdc_upper_pmt_, *qdc_lower_pmt_;
   TDC_Channel *dl_x_pos_, *dl_z_pos_;
   Generic_Channel *strip_detector_upper_x_[40];
@@ -194,7 +194,7 @@ class K37RunAction : public G4UserRunAction {
   Generic_Channel *electron_kinetic_energy_generated_, *electron_mu_generated_;
   Generic_Channel *recoil_mu_generated_,  *run_action_, *recoil_mcp_particle_;
   Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_, *recoil_charge_state_;
-
+  Generic_Channel *ttlbit_op_beam_;
   map<string, K37_Data*> *active_channels_;
 };
 
