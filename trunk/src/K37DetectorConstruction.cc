@@ -164,10 +164,10 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     world_phys_ = new G4PVPlacement(0, G4ThreeVector(), world_log_,
                                     "world_phys", 0, false, 0);
 
-    //G4VisAttributes(false) means invisible. It is better than using the 
-    //convience function G4VisAttributes::Invisble becuse it produces 
-    //a non const pointer that can later be delete avoiding a memory 
-    //leak.
+    // G4VisAttributes(false) means invisible. It is better than using the
+    // convience function G4VisAttributes::Invisble becuse it produces
+    // a non const pointer that can later be delete avoiding a memory
+    // leak.
     world_logVisAttributes = new G4VisAttributes(false);
     world_log_ -> SetVisAttributes(world_logVisAttributes);
 
@@ -561,14 +561,14 @@ void K37DetectorConstruction::ConstructChamber() {
   new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), chamber_log,
                     "chamber_phys", world_log_, false, 0);
 
-  //chamber_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
+  // chamber_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
   // chamber_logVisAttributes-> SetForceSolid(true);
-  //chamber_logVisAttributes-> SetForceWireframe(true);
+  // chamber_logVisAttributes-> SetForceWireframe(true);
 
-  //G4VisAttributes(false) means invisible. It is better than using the 
-  //convience function G4VisAttributes::Invisble becuse it produces 
-  //a non const pointer that can later be delete avoiding a memory 
-  //leak.
+  // G4VisAttributes(false) means invisible. It is better than using the
+  // convience function G4VisAttributes::Invisble becuse it produces
+  // a non const pointer that can later be delete avoiding a memory
+  // leak.
   chamber_logVisAttributes = new G4VisAttributes(false);
   chamber_log -> SetVisAttributes(chamber_logVisAttributes);
 
@@ -748,7 +748,7 @@ void K37DetectorConstruction::ConstructHoops() {
   G4Tubs * hoop_sol = new G4Tubs("hoop_sol", hoop_rmin, hoop_rmax,
                                  hoop_dz, hoop_Sphi, hoop_Dphi);
 
-  //G4RotationMatrix* hoopRotation = new G4RotationMatrix();
+  // G4RotationMatrix* hoopRotation = new G4RotationMatrix();
   hoopRotation = new G4RotationMatrix();
   hoopRotation->rotateX(90.*deg);
 
@@ -1063,7 +1063,7 @@ void K37DetectorConstruction::ConstructHoops() {
     new G4LogicalVolume(cut_hoop_1_withHolesAndBeams_sol, HoopMaterial,
                         "hoop_1_log", 0, 0, 0);
   // ------------------------------  vis and placment of hoops
-  //cut_ESP_logVisAttributes = new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
+  // cut_ESP_logVisAttributes = new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
   // G4VisAttributes* cut_ESP_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
   cut_ESP_logVisAttributes-> SetForceSolid(true);
@@ -1079,8 +1079,8 @@ void K37DetectorConstruction::ConstructHoops() {
   hoop_1_log -> SetVisAttributes(cut_ESP_logVisAttributes);  // 1
 
   // G4RotationMatrix* hoopRotation = new G4RotationMatrix();
-  //hoopRotation = new CLHEP::HepRotation();
-  //hoopRotation->rotateX(90.*deg);
+  // hoopRotation = new CLHEP::HepRotation();
+  // hoopRotation->rotateX(90.*deg);
 
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., 57.5*mm, 0.),
                     hoop_3through6_box_log, "hoop_3through6_phys_3",

@@ -1,7 +1,6 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
 // ROOT headers
-#include <TFile.h>
 #include <TTree.h>
 #include <TDirectory.h>
 #include <TROOT.h>
@@ -57,6 +56,7 @@ class Aggregator::ImplementAGG {
   std::map<std::string, K37_ABC::K37_Data * >::iterator it_data;
   std::ofstream outputFile;
   TFile *rootFile;
+  TFile* GetRootFile() {return rootFile;}
   bool textFileOpen;
   bool writeToScreen;
   bool writeToROOT;
@@ -276,7 +276,7 @@ void Aggregator::ImplementAGG::PrintROOT() {
 
 void Aggregator::ImplementAGG::WriteRunData() {
   // K37RunData *data = new K37RunData();
-  // cout << "Polarization: " << data -> GetPolarization() << endl;
+  //  cout << "Polarization: " << data -> GetPolarization() << endl;
   //  cout << "Writing my new thingy!!!" << endl;
   // rootFile -> cd();
   // data -> Write();
@@ -309,6 +309,10 @@ void Aggregator::EndEvent() {
 
 void Aggregator::RegisterIOMethod(const std::string &fileName_) {
   mAGG->InitilzeIO(fileName_);
+}
+  
+TFile* Aggregator::GetRootFile() {
+  return mAGG -> GetRootFile();
 }
 
 }

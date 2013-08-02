@@ -34,6 +34,7 @@
 #include "K37StackingAction.hh"
 #include "K37Config.hh"
 #include "Aggregator.hh"
+#include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
 
 #ifdef G4VIS_USE
@@ -48,233 +49,235 @@ using K37_ABC::K37_Data;
 using std::ofstream;
 
 int main(int argc, char** argv) {
-   // G4cout << "=================================" << G4endl;
-   // G4cout << "This is K37 revesion " << K37_VERSION << G4endl;
-   // G4cout << "=================================" << G4endl;
-   // G4bool shouldwe = 0;
-   // G4bool nowewont = 0;
-   // G4bool yeswewill = 0;
-   // G4cin>> shouldwe>> nowewont>> yeswewill;
+  // G4cout << "=================================" << G4endl;
+  // G4cout << "This is K37 revesion " << K37_VERSION << G4endl;
+  // G4cout << "=================================" << G4endl;
+  // G4bool shouldwe = 0;
+  // G4bool nowewont = 0;
+  // G4bool yeswewill = 0;
+  // G4cin>> shouldwe>> nowewont>> yeswewill;
 
-   K37AnnihilationPosition* annihilation =
+  K37AnnihilationPosition* annihilation =
       new K37AnnihilationPosition("annihilate.txt", 1000);
 
-   K37AllPossibleEventInformation* APEI =
+  K37AllPossibleEventInformation* APEI =
       new K37AllPossibleEventInformation("EventInformation.txt");
 
-   AGG::Aggregator *the_aggregator= new AGG::Aggregator();
-   // Generic_Channel *testChan  = new Generic_Channel("theTest", 1, "/D");
-   // theAggregator->RegisterData(testChan);
-   // the_aggregator -> RegisterIOMethod("IOconfiguration.mac");
-   // theAggregator->BeginRun();
-   // testChan->InsertData(10.0);
-   // theAggregator->EndEvent();
-   // testChan->InsertData(11.0);
-   // theAggregator->EndEvent();
-   // testChan->InsertData(13.0);
-   // theAggregator->EndEvent();
-   // testChan->InsertData(15.0);
-   // theAggregator->EndEvent();
-   // theAggregator->EndRun();
+  //   AGG::Aggregator *the_aggregator= new AGG::Aggregator();
+  GeantAggregator *the_aggregator = new GeantAggregator();
+  // Generic_Channel *testChan  = new Generic_Channel("theTest", 1, "/D");
+  // theAggregator->RegisterData(testChan);
+  // the_aggregator -> RegisterIOMethod("IOconfiguration.mac");
+  // theAggregator->BeginRun();
+  // testChan->InsertData(10.0);
+  // theAggregator->EndEvent();
+  // testChan->InsertData(11.0);
+  // theAggregator->EndEvent();
+  // testChan->InsertData(13.0);
+  // theAggregator->EndEvent();
+  // testChan->InsertData(15.0);
+  // theAggregator->EndEvent();
+  // theAggregator->EndRun();
 
-   // delete testChan; testChan = 0;
-   //-------------------------------------------------------------
+  // delete testChan; testChan = 0;
+  //-------------------------------------------------------------
 
-   K37HistogramManager* histo = new K37HistogramManager();
+  K37HistogramManager* histo = new K37HistogramManager();
 
-   CLHEP::Ranlux64Engine randomEngine;
-   CLHEP::HepRandom::setTheEngine(&randomEngine);
+  CLHEP::Ranlux64Engine randomEngine;
+  CLHEP::HepRandom::setTheEngine(&randomEngine);
 
-   time_t seconds;
-   seconds = time(NULL);
-   G4long myseed = seconds;
-   CLHEP::HepRandom::setTheSeed(myseed);
+  time_t seconds;
+  seconds = time(NULL);
+  G4long myseed = seconds;
+  CLHEP::HepRandom::setTheSeed(myseed);
 
-   // ofstream runstat;
-   // runstat.open("runstat.txt", ofstream::out | ofstream::trunc);
-   // runstat << "Random seed: " << myseed << G4endl;
-   // runstat << "-----------------------" << G4endl;
-   // runstat.close();
-   map<string, K37_Data*> active_channels;
+  // ofstream runstat;
+  // runstat.open("runstat.txt", ofstream::out | ofstream::trunc);
+  // runstat << "Random seed: " << myseed << G4endl;
+  // runstat << "-----------------------" << G4endl;
+  // runstat.close();
+  map<string, K37_Data*> active_channels;
 
-   G4VSteppingVerbose* verbosity = new K37SteppingVerbose;
-   G4VSteppingVerbose::SetInstance(verbosity);
+  G4VSteppingVerbose* verbosity = new K37SteppingVerbose;
+  G4VSteppingVerbose::SetInstance(verbosity);
 
-   // Run manager
-   G4RunManager* runManager = new G4RunManager();
+  // Run manager
+  G4RunManager* runManager = new G4RunManager();
 
-   // User Initialization classes (mandatory)
-   K37ElectricFieldSetup* field = new K37ElectricFieldSetup();
+  // User Initialization classes (mandatory)
+  K37ElectricFieldSetup* field = new K37ElectricFieldSetup();
+  the_aggregator -> SetElectricFieldSetup(field);
 
-   K37DetectorConstruction* detector;
-   runManager->SetUserInitialization(detector = new K37DetectorConstruction());
+  K37DetectorConstruction* detector;
+  runManager->SetUserInitialization(detector = new K37DetectorConstruction());
 
-   G4VUserPhysicsList* physics = new K37PhysicsList();
-   runManager->SetUserInitialization(physics);
+  G4VUserPhysicsList* physics = new K37PhysicsList();
+  runManager->SetUserInitialization(physics);
 
-   runManager->Initialize();
+  runManager->Initialize();
 
-   // User Action classes
-   K37EventGenerator * evGen = new JTW_Event();
-   evGen -> SetAggregator(the_aggregator);
-   evGen -> SetActiveChannels(&active_channels);
+  // User Action classes
+  K37EventGenerator * evGen = new JTW_Event();
+  evGen -> SetAggregator(the_aggregator);
+  evGen -> SetActiveChannels(&active_channels);
 
-   K37PrimaryGeneratorAction* gen_action =
-       new K37PrimaryGeneratorAction(detector, APEI, evGen);
-   gen_action -> SetAggregator(the_aggregator);
-   gen_action -> SetActiveChannels(&active_channels);
-   runManager -> SetUserAction(gen_action);
+  K37PrimaryGeneratorAction* gen_action =
+      new K37PrimaryGeneratorAction(detector, APEI, evGen);
+  gen_action -> SetAggregator(the_aggregator);
+  gen_action -> SetActiveChannels(&active_channels);
+  runManager -> SetUserAction(gen_action);
+  the_aggregator -> SetPrimaryGeneratorAction(gen_action);
 
-
-   K37ListOfVolumeNames *volumesTheBetaEntered =
+  K37ListOfVolumeNames *volumesTheBetaEntered =
       new K37ListOfVolumeNames("volumeNames.txt", 1000);
 
 
-   K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered,
-                                               annihilation, APEI, histo);
-   run_action -> SetActiveChannels(&active_channels);
-   run_action -> SetAggregator(the_aggregator);
-   runManager -> SetUserAction(run_action);
+  K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered,
+                                              annihilation, APEI, histo);
+  run_action -> SetActiveChannels(&active_channels);
+  run_action -> SetAggregator(the_aggregator);
+  runManager -> SetUserAction(run_action);
 
-   K37EventAction* event_action = new K37EventAction(run_action,
-                                                     volumesTheBetaEntered,
-                                                     APEI, histo);
-   event_action -> SetAggregator(the_aggregator);
-   event_action -> SetActiveChannels(&active_channels);
-   event_action -> SetPrimaryGenerator(gen_action);
-   runManager   -> SetUserAction(event_action);
+  K37EventAction* event_action = new K37EventAction(run_action,
+                                                    volumesTheBetaEntered,
+                                                    APEI, histo);
+  event_action -> SetAggregator(the_aggregator);
+  event_action -> SetActiveChannels(&active_channels);
+  event_action -> SetPrimaryGenerator(gen_action);
+  runManager   -> SetUserAction(event_action);
 
-   K37TrackingAction* tracking_action;
-   runManager->SetUserAction(tracking_action= new K37TrackingAction());
+  K37TrackingAction* tracking_action;
+  runManager->SetUserAction(tracking_action= new K37TrackingAction());
 
-   K37SteppingAction* stepping_action = new K37SteppingAction(volumesTheBetaEntered,
-							      APEI);
-   runManager->SetUserAction(stepping_action);
+  K37SteppingAction* stepping_action =
+      new K37SteppingAction(volumesTheBetaEntered, APEI);
+  runManager->SetUserAction(stepping_action);
 
-   // get the pointer to the User Interface manager
-   runManager->SetUserAction(new K37StackingAction);
+  // get the pointer to the User Interface manager
+  runManager->SetUserAction(new K37StackingAction);
 
-   G4int result = static_cast<G4int>(system("rm -rf detectors.root"));
-   if (result != 0) G4cout << "Could not remove detectors.root." << G4endl;
+  G4int result = static_cast<G4int>(system("rm -rf detectors.root"));
+  if (result != 0) G4cout << "Could not remove detectors.root." << G4endl;
 
 #ifdef G4VIS_USE
-   G4VisManager* visManager = new G4VisExecutive();
-   visManager->Initialize();
-   G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID();
-   model->SetDefault("cyan");
-   model->Set("gamma", "green");
-   model->Set("e+", "blue");
-   model->Set("Ar37Minus", G4Colour(0.8, 0.1, 0.8));
-   model->Set("Ar37Neutral", "cyan");
-   model->Set("e-", "red");
-   visManager->RegisterModel(model);
-   visManager->SelectTrajectoryModel(model->Name());
+  G4VisManager* visManager = new G4VisExecutive();
+  visManager->Initialize();
+  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID();
+  model->SetDefault("cyan");
+  model->Set("gamma", "green");
+  model->Set("e+", "blue");
+  model->Set("Ar37Minus", G4Colour(0.8, 0.1, 0.8));
+  model->Set("Ar37Neutral", "cyan");
+  model->Set("e-", "red");
+  visManager->RegisterModel(model);
+  visManager->SelectTrajectoryModel(model->Name());
 #endif
 
-   // Get the pointer to the User Interface manager
-   //
-   G4UImanager * UImanager = G4UImanager::GetUIpointer();
+  // Get the pointer to the User Interface manager
+  //
+  G4UImanager * UImanager = G4UImanager::GetUIpointer();
 
-   if (argc != 1) {  // batch mode
-      G4String command = "/control/execute ";
-      G4String fileName = argv[1];
-      UImanager->ApplyCommand(command+fileName);
-   } else {       // interactive mode : define UI session
+  if (argc != 1) {  // batch mode
+    G4String command = "/control/execute ";
+    G4String fileName = argv[1];
+    UImanager->ApplyCommand(command+fileName);
+  } else {       // interactive mode : define UI session
 #ifdef G4UI_USE
-      G4UIExecutive * ui = new G4UIExecutive(argc, argv);
+    G4UIExecutive * ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-      UImanager->ApplyCommand("/control/execute vis.mac");
+    UImanager->ApplyCommand("/control/execute vis.mac");
 #endif
-      if (ui->IsGUI()) {
-         UImanager->ApplyCommand("/control/execute gui.mac");
-      }
-      ui->SessionStart();
-      delete ui;
-#endif
-
-#ifdef G4VIS_USE
-
-      if (visManager) {
-         delete visManager;
-      }
-      // if(model){delete model;}
-      // delete visManager;
-#endif
-   }
-
-   /*
-      G4UImanager* UI = G4UImanager::GetUIpointer();
-
-
-
-      if (argc!=1)   // batch mode
-      {
-      G4String command = "/control/execute ";
-      G4String fileName = argv[1];
-      UI->ApplyCommand(command+fileName);
-      }
-
-      else           // interactive mode : define visualization and UI terminal
-      {
-#ifdef G4VIS_USE
-G4VisManager* visManager = new G4VisExecutive;
-visManager->Initialize();
-#endif
-
-G4UIsession * session = 0;
-
-#ifdef G4UI_USE_TCSH
-session = new G4UIterminal(new G4UItcsh);
-#else
-session = new G4UIterminal();
+    if (ui->IsGUI()) {
+      UImanager->ApplyCommand("/control/execute gui.mac");
+    }
+    ui->SessionStart();
+    delete ui;
 #endif
 
 #ifdef G4VIS_USE
-UI->ApplyCommand("/control/execute vis.mac");
+
+    if (visManager) {
+      delete visManager;
+    }
+    // if(model){delete model;}
+    // delete visManager;
 #endif
+  }
 
-session->SessionStart();
-delete session;
+  /*
+    G4UImanager* UI = G4UImanager::GetUIpointer();
 
-#ifdef G4VIS_USE
-delete visManager;
-#endif
-}
-*/
 
-// Job termination
-// Free the store: user actions, physics_list and detector_description are
-//                 owned and deleted by the run manager, so they should not
-//                 be deleted in the main() program !
-if (field)       {
-   delete field;
-}
-if (runManager)  {
-   delete runManager;
-}
-if (verbosity)   {
-   delete verbosity;
-}
-if (annihilation) {
-   delete annihilation;
-}
-if (APEI)        {
-   delete APEI;
-}
-if (evGen)       {
-   delete evGen;
-}
-if (volumesTheBetaEntered)       {
-   delete volumesTheBetaEntered;
-}
-if (histo)       {
-   delete histo;
-}
-// if(visManager)        {delete visManager;}
-// delete betaGenerator;
 
-delete the_aggregator;
-return 0;
+    if (argc!=1)   // batch mode
+    {
+    G4String command = "/control/execute ";
+    G4String fileName = argv[1];
+    UI->ApplyCommand(command+fileName);
+    }
+
+    else           // interactive mode : define visualization and UI terminal
+    {
+    #ifdef G4VIS_USE
+    G4VisManager* visManager = new G4VisExecutive;
+    visManager->Initialize();
+    #endif
+
+    G4UIsession * session = 0;
+
+    #ifdef G4UI_USE_TCSH
+    session = new G4UIterminal(new G4UItcsh);
+    #else
+    session = new G4UIterminal();
+    #endif
+
+    #ifdef G4VIS_USE
+    UI->ApplyCommand("/control/execute vis.mac");
+    #endif
+
+    session->SessionStart();
+    delete session;
+
+    #ifdef G4VIS_USE
+    delete visManager;
+    #endif
+    }
+  */
+
+  // Job termination
+  // Free the store: user actions, physics_list and detector_description are
+  //                 owned and deleted by the run manager, so they should not
+  //                 be deleted in the main() program !
+  if (field)       {
+    delete field;
+  }
+  if (runManager)  {
+    delete runManager;
+  }
+  if (verbosity)   {
+    delete verbosity;
+  }
+  if (annihilation) {
+    delete annihilation;
+  }
+  if (APEI)        {
+    delete APEI;
+  }
+  if (evGen)       {
+    delete evGen;
+  }
+  if (volumesTheBetaEntered)       {
+    delete volumesTheBetaEntered;
+  }
+  if (histo)       {
+    delete histo;
+  }
+  // if(visManager)        {delete visManager;}
+  // delete betaGenerator;
+
+  delete the_aggregator;
+  return 0;
 }
 
 // ....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....

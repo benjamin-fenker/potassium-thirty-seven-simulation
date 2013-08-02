@@ -9,9 +9,9 @@
 K37CloudSize::K37CloudSize(G4ThreeVector cloud_center,
                            G4ThreeVector cloud_temperature,
                            G4ThreeVector cloud_size_start)
-    : cloud_center_(cloud_center),
-      initial_cloud_size_(cloud_size_start), cycleTime(2.9472*ms),
-      expansion_before_polarized_(300*microsecond) {
+: cloud_center_(cloud_center),
+  initial_cloud_size_(cloud_size_start), temperature_(cloud_temperature),
+  cycleTime(2.9472*ms), expansion_before_polarized_(300*microsecond) {
   SetupSigma(cloud_temperature);
 }
 
@@ -89,6 +89,7 @@ void K37CloudSize::SetFinalPosition(G4ThreeVector initial_position,
 }
 
 void K37CloudSize::SetTemperature(G4ThreeVector temp) {
+  temperature_ = temp;
   if (temp.x() < 0 || temp.y() < 0 || temp.z() < 0) {
     G4cout << "ERROR! Cannot set negative temperature" << G4endl;
   } else {

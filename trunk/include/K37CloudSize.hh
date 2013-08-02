@@ -22,6 +22,9 @@ class K37CloudSize {
   ~K37CloudSize();
   void makeEvent();
   G4ThreeVector GetFinalPosition() {return final_position_;}
+  G4ThreeVector GetCloudCenter() {return cloud_center_;}
+  G4ThreeVector GetInitialCloudSize() {return initial_cloud_size_;}
+  G4ThreeVector GetTemperature() {return temperature_;}
   void SetCloudCenter(G4ThreeVector center) {cloud_center_ = center;}
   void SetTemperature(G4ThreeVector temp);
   void SetTemperature(G4double temp);
@@ -33,6 +36,7 @@ class K37CloudSize {
   G4ThreeVector initial_cloud_size_;
   G4ThreeVector velocity_sigma_;
   G4ThreeVector final_position_;
+  G4ThreeVector temperature_;
 
   G4double cycleTime;
   G4double expansion_before_polarized_;
