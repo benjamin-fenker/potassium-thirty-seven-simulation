@@ -134,6 +134,10 @@ K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
   recoil_mcp_particle_   = new Generic_Channel("ION_MCP_PARTICLE_PDG",
                                                303, "/D");
   recoil_charge_state_   = new Generic_Channel("ION_CHARGE", 304, "/D");
+  upper_pmt_particle_    = new Generic_Channel("UPPER_SCINTILLATOR_PDG",
+                                               305, "/D");
+  lower_pmt_particle_    = new Generic_Channel("LOWER_SCINTILLATOR_PDG",
+                                               305, "/D");
 
   // Information to match analyzer (not really simulated)
   run_action_       = new Generic_Channel("Run_Number"      , 401, "/D");
@@ -175,6 +179,8 @@ K37RunAction::~K37RunAction() {
   delete ttlbit_sigmaplus_;
   delete recoil_charge_state_;
   delete ttlbit_op_beam_;
+  delete upper_pmt_particle_;
+  delete lower_pmt_particle_;
 }
 
 //----------------------------------
@@ -334,6 +340,8 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(ttlbit_sigmaplus_);
   RegisterChannel(recoil_charge_state_);
   RegisterChannel(ttlbit_op_beam_);
+  RegisterChannel(upper_pmt_particle_);
+  RegisterChannel(lower_pmt_particle_);
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();
