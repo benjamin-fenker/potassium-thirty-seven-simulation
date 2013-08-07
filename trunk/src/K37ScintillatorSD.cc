@@ -80,7 +80,8 @@ G4bool K37ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
   } else {
     newHit -> SetBound(1.);
   }
-
+  newHit -> SetParticlePDG(theTrack ->
+                           GetParticleDefinition() -> GetPDGEncoding());
   fullenergy1Collection -> insert(newHit);
   return true;
 }

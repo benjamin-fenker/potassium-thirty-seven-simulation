@@ -1,3 +1,4 @@
+
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
 #include "G4HCofThisEvent.hh"

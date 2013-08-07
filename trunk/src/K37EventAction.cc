@@ -190,6 +190,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   G4double time_upper_scintillator = 0.0;
   G4double time_lower_scintillator = 0.0;
 
+  G4int upper_scintillator_pdg = 0;
+  G4int lower_scintillator_pdg = 0;
+
   // Total energy stored in all the strips (each detector, each direction)
   // Pretty redundant, but a good check for bugs
   G4double sd_energy_total_plusZ_X = 0.0;
@@ -258,6 +261,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       } else {
         energy_upper_scintillator_secondaries += hit -> GetEdep();
       }
+      if (i == 0) {                     // First hit - get particle
+        upper_scintillator_pdg = hit -> GetParticlePDG();
+      }
     }
     if (energy_upper_scintillator>0) {
       isThereEnergySili = true;
@@ -280,6 +286,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         energy_lower_scintillator_primaries += hit -> GetEdep();
       } else {
         energy_lower_scintillator_secondaries += hit -> GetEdep();
+      }
+      if (i == 0) {                     // First hit - get particle
+        lower_scintillator_pdg = hit -> GetParticlePDG();
       }
     }
     if (energy_lower_scintillator>0) {
@@ -412,6 +421,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
     (*active_channels_)["ION_MCP_PARTICLE_PDG"] ->
         InsertData((G4double)recoil_pdg);
+    (*active_channels_)["UPPER_SCINTILLATOR_PDG"] ->
+        InsertData((G4double)upper_scintillator_pdg);
+    (*active_channels_)["LOWER_SCINTILLATOR_PDG"] ->
+        InsertData((G4double)lower_scintillator_pdg);
+
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
