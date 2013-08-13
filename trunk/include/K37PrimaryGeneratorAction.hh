@@ -55,6 +55,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetAlignment(G4double ali);
   G4double GetAlignment() {return alignment_;}
   void SetRecoilCharge(G4int charge);
+  G4int GetRecoilCharge() {return recoil_charge_;}
   K37CloudSize* GetCloudSize() {return cloud;}
   void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {

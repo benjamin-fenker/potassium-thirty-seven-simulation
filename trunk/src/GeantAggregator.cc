@@ -1,5 +1,4 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
-
 #include <TArrayD.h>
 
 #include "GeantAggregator.hh"
@@ -7,7 +6,7 @@
 GeantAggregator::GeantAggregator() {}
 
 void GeantAggregator::EndRun() {
-  TArrayD *parameters = new TArrayD(14);
+  TArrayD *parameters = new TArrayD(18);
   parameters -> AddAt(primary_generator_action_ -> GetPolarization()       , 0);
   parameters -> AddAt(primary_generator_action_ -> GetAlignment()          , 1);
   parameters -> AddAt(electric_field_setup_ ->
@@ -34,7 +33,10 @@ void GeantAggregator::EndRun() {
                       GetTemperature().y()/kelvin, 12);
   parameters -> AddAt(primary_generator_action_ -> GetCloudSize() ->
                       GetTemperature().z()/kelvin, 13);
-
+  parameters -> AddAt(primary_generator_action_ -> GetRecoilCharge(), 14);
+  parameters -> AddAt(event_action_ -> GetElectronMCPthreshold(), 15);
+  parameters -> AddAt(event_action_ -> GetUpperScintillatorThreshold(), 16);
+  parameters -> AddAt(event_action_ -> GetLowerScintillatorThreshold(), 17);
   TFile *file = Aggregator::GetRootFile();
   file -> WriteObject(parameters, "RunParameters");
   Aggregator::EndRun();

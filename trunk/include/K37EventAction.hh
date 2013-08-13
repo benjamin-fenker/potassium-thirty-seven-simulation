@@ -54,6 +54,13 @@ class K37EventAction : public G4UserEventAction {
   void SetLowerScintillatorThreshold(double t)
   {lower_scintillator_threshold_ = t;}
   void SetElectronMCPthreshold(double t) {electron_mcp_threshold_ = t;}
+  G4double GetUpperScintillatorThreshold() {
+    return upper_scintillator_threshold_;
+  }
+  G4double GetLowerScintillatorThreshold() {
+    return lower_scintillator_threshold_;
+  }
+  G4double GetElectronMCPthreshold() {return electron_mcp_threshold_;}
   void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
