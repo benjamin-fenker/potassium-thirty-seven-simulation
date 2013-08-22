@@ -45,11 +45,11 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   // G4ParticleGun* GetParticleGun() {return particleGun;};
   G4double getVelocity(G4double kineticEnergy,
                        G4double massOfParticle = 0.510998);
-  void setRandomFlag(G4String val) {randomFlag = val;}
   void SetRecoil(G4String val) {use_recoil_ = val;}
   void setBetaVertex();
   void setDaughterVertex(G4double recoil_charge);
   void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
+  void SetPhotoionizationVertices(G4Event *ev);
   void SetPolarization(G4double pol);
   G4double GetPolarization() {return polarization_;}
   void SetAlignment(G4double ali);
@@ -83,7 +83,6 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4String use_recoil_;
   K37DetectorConstruction* detector;
   // K37EventMaker*     evMaker;
-  G4String      randomFlag;  // flag for a random momentum direction
   K37PrimaryGeneratorMessenger* gunMessenger;   // messenger of this class
   // Container that gathers all of the event information from the most
   // convient sources.
@@ -100,9 +99,9 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
   void NormalizeChargeStateRatio();
   G4double GetChargeStateThisEvent();
-
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
+  G4ThreeVector GetMomentumIsotropic(G4double kinetic_energy, G4double mass);
 };
 
 #endif

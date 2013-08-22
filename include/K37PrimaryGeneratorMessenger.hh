@@ -27,7 +27,7 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
  private:
   K37PrimaryGeneratorAction* action_;
   G4UIdirectory*          gunDir;
-  G4UIcmdWithAString*     RndmCmd;
+  //  G4UIcmdWithAString*     RndmCmd;
   G4UIcmdWithADouble *set_pol_cmd_;
   G4UIcmdWithADouble *set_ali_cmd_;
   G4UIcmdWithAnInteger *set_recoil_charge_cmd_;
