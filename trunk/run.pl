@@ -133,6 +133,7 @@ while ($choice  != 0) {
     print "[3] Alignment                      = $alignment\n";
     print "[4] Recoil charge                  = $recoil_charge\n";
     print "                                     (-2 for mixed)\n";
+    print "                                     (-3 for photoions)\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {

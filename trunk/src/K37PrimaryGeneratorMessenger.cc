@@ -11,14 +11,6 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   gunDir = new G4UIdirectory("/K37/gun/");
   gunDir->SetGuidance("PrimaryGenerator control");
 
-  RndmCmd = new G4UIcmdWithAString("/K37/gun/betaDistribution", this);
-  RndmCmd->SetGuidance("Shoot with beta distribution the incident particle.");
-  RndmCmd->SetGuidance("  Choice : on(default), off");
-  RndmCmd->SetParameterName("choice", true);
-  RndmCmd->SetDefaultValue("on");
-  RndmCmd->SetCandidates("on off");
-  RndmCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
-
   set_pol_cmd_ = new G4UIcmdWithADouble("/K37/gun/setPolarization", this);
   set_pol_cmd_ -> SetGuidance("Enter a new polarization (-1 -> 1)");
   set_pol_cmd_ -> SetParameterName("Polarization", false);
@@ -86,7 +78,7 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
 // ----------------------------------
 
 K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
-  delete RndmCmd;
+  //  delete RndmCmd;
   delete gunDir;
   delete set_pol_cmd_;
   delete set_ali_cmd_;
@@ -102,9 +94,9 @@ K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
 
 void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
                                                G4String newValue) {
-  if (command == RndmCmd) {
-    action_ -> setRandomFlag(newValue);
-  }
+  // if (command == RndmCmd) {
+  //   action_ -> setRandomFlag(newValue);
+  // }
   if (command == set_pol_cmd_) {
     action_ -> SetPolarization(set_pol_cmd_->GetNewDoubleValue(newValue));
   }

@@ -30,7 +30,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            K37AllPossibleEventInformation* APEI,
                            K37EventGenerator* evGen) :
     polarization_(1.0), alignment_(1.0), charge_state_ratio_(8, 1.0/8.0),
-    detector(det), randomFlag("on"), EventInformation(APEI), v(), vertex(NULL),
+    detector(det), EventInformation(APEI), v(), vertex(NULL),
     EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
     K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen) {
   gunMessenger = new K37PrimaryGeneratorMessenger(this);
@@ -84,6 +84,7 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
   delete cloud;
 }
 
+
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   G4double recoil_charge_this_event;
   if (recoil_charge_ == -2) {
@@ -93,50 +94,38 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   }
   (*active_channels_)["ION_CHARGE"] ->  InsertData(recoil_charge_this_event);
 
-  bool testingEVGenerator = false;
+  // Get cloud position
+  cloud -> makeEvent();
+  EventVertex = cloud -> GetFinalPosition();
 
-  evGenerator -> MakeEvent(polarization_, alignment_, recoil_charge_this_event);
-
-  //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  //  ion = particleTable->FindIon(18, 37, 0);
-
-  if (!testingEVGenerator) {
-    cloud -> makeEvent();
-    EventVertex = cloud -> GetFinalPosition();
-
-    // EventVertex.set(0*mm, 0*mm, 0*mm);
-    // G4cout << "Starting from x = " << cloud -> xFinal()/mm << G4endl
-    //        << "\t y = "  << cloud -> yFinal()/mm << G4endl << "\t z = "
-    //        << cloud -> zFinal()/mm << G4endl;
-    EventInformation->
+  // Leftover stuff from Spencer...
+  EventInformation ->
       setMetaStableTimeOfDeath(CLHEP::RandExponential::shoot(260));
+  EventInformation->setVertexPosition(EventVertex);
+  EventInformation->setOriginalTheta(EventVertex.theta());
 
-    EventInformation->setVertexPosition(EventVertex);
-    EventInformation->setOriginalTheta(EventVertex.theta());
+  // Set initial position of all particles where the cloud tells you
+  particleGun->SetParticlePosition(EventVertex);
+  //  vertex = new G4PrimaryVertex(EventVertex, 0);
 
-    particleGun->SetParticlePosition(EventVertex);
+  if (recoil_charge_ == -3) {            // photoions
+    SetPhotoionizationVertices(anEvent);
+  } else {                              // beta-decay
+    // Setup initial momenta of B-decay particles
+    evGenerator -> MakeEvent(polarization_, alignment_,
+                             recoil_charge_this_event);
+    rho = 1;
+    this->setBetaVertex();
+    anEvent->AddPrimaryVertex(vertex);
 
-    if (randomFlag == "on") {
-      // evMaker->MakeEvent();
-      rho = 1;
-      vertex = new G4PrimaryVertex(EventVertex, 0);
-      this->setBetaVertex();
-      anEvent->AddPrimaryVertex(vertex);
+    this->setDaughterVertex(recoil_charge_this_event);
+    anEvent->AddPrimaryVertex(vertex);
 
-      this->setDaughterVertex(recoil_charge_this_event);
-      anEvent->AddPrimaryVertex(vertex);
-      EventInformation->
+    EventInformation->
         setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
                                           evGenerator->dMomentumY(),
                                           evGenerator->dMomentumZ()));
-      SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
-    } else {
-      vertex = new G4PrimaryVertex(EventVertex, 0);
-      G4PrimaryParticle* particle =
-        new G4PrimaryParticle(electron, 0, -1097.906*keV, 0);
-      vertex->SetPrimary(particle);
-      anEvent->AddPrimaryVertex(vertex);
-    }
+    SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
   }
 }
 
@@ -154,6 +143,32 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
     new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
                           evGenerator->eMomentumY(), evGenerator->eMomentumZ());
   vertex->SetPrimary(particle);
+}
+
+void K37PrimaryGeneratorAction::SetPhotoionizationVertices(G4Event *ev) {
+  vertex = new G4PrimaryVertex(EventVertex, 0);
+  G4double e_kinetic_energy = 0.8 * eV;
+  G4ThreeVector momentum = GetMomentumIsotropic(e_kinetic_energy,
+                                                electron_mass_c2);
+  G4PrimaryParticle *photoelectron = new G4PrimaryParticle(electron,
+                                                           momentum.getX(),
+                                                           momentum.getY(),
+                                                           momentum.getZ());
+  vertex -> SetPrimary(photoelectron);
+  ev -> AddPrimaryVertex(vertex);
+
+  vertex = new G4PrimaryVertex(EventVertex, 0);
+  G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition *ion = particleTable -> GetIon(19, 37, 0);  // 37K
+
+  G4cout << "Ratio = " << electron_mass_c2 / ion -> GetPDGMass() << G4endl;
+  G4PrimaryParticle *photoion = new G4PrimaryParticle(ion,
+                                                      -1.0*momentum.getX(),
+                                                      -1.0*momentum.getY(),
+                                                      -1.0*momentum.getZ());
+  photoion -> SetCharge(1.0 * eplus);
+  vertex -> SetPrimary(photoion);
+  ev -> AddPrimaryVertex(vertex);
 }
 
 void K37PrimaryGeneratorAction::setDaughterVertex(G4double recoil_charge) {
@@ -190,36 +205,44 @@ void K37PrimaryGeneratorAction::setDaughterVertex(G4double recoil_charge) {
   vertex->SetPrimary(particle);
 }
 
+G4ThreeVector K37PrimaryGeneratorAction::GetMomentumIsotropic(
+    G4double kinetic_energy, G4double mass) {
+  G4bool debug = false;
+  G4double total_energy = kinetic_energy + mass;
+  G4double momentum = sqrt((total_energy*total_energy) - (mass * mass));
+  G4double mu = 1.0 - 2.0*G4UniformRand();
+  G4double theta = acos(mu);
+  G4double phi = 2.0*M_PI*G4UniformRand();
+  G4double px, py, pz;
+  px = momentum * sin(theta) * cos(phi);
+  py = momentum * sin(theta) * sin(phi);
+  pz = momentum * cos(theta);
+  if (debug) {
+    G4cout << "\tT = " << G4BestUnit(kinetic_energy, "Energy") << "\tE = "
+           << G4BestUnit(total_energy, "Energy") << "\tP = "
+           << momentum << G4endl;
+    G4cout << "\ttheta = " << theta << "\tphi = " << phi << G4endl;
+    G4cout << "\tpx = " << px << "\tpy = " << py << "\tpz = " << pz << G4endl;
+  }
+  return G4ThreeVector(px, py, pz);
+}
+
 void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
                                                       G4int num_so_electrons) {
-  G4bool debug = false;
   for (G4int i = 0; i < num_so_electrons; i++) {
-    G4double kinetic_energy = -1.0, total_energy, momentum, mu, phi, theta;
-    G4double px, py, pz;
+    G4double kinetic_energy = -1.0;
     // Ar binding energy is 15.7 eV and SOE have around this energy
     // The 5.0 eV width is a total guess
     while (kinetic_energy < 0.0) {
       kinetic_energy = CLHEP::RandGauss::shoot(15.7*eV, 5.0*eV);
     }
-    total_energy = kinetic_energy + electron_mass_c2;
+    G4ThreeVector momentum =
+        GetMomentumIsotropic(kinetic_energy, electron_mass_c2);
 
-    momentum = sqrt((total_energy * total_energy) -
-                    (electron_mass_c2 * electron_mass_c2));
-    mu = 1.0 - 2.0*G4UniformRand();
-    theta = acos(mu);
-    phi = 2.0*M_PI*G4UniformRand();
-    px = momentum * sin(theta) * cos(phi);
-    py = momentum * sin(theta) * sin(phi);
-    pz = momentum * cos(theta);
-    if (debug) {
-      G4cout << "SOE " << i << G4endl;
-      G4cout << "\tT = " << G4BestUnit(kinetic_energy, "Energy") << "\tE = "
-             << G4BestUnit(total_energy, "Energy") << "\tP = "
-             << momentum << G4endl;
-      G4cout << "\ttheta = " << theta << "\tphi = " << phi << G4endl;
-      G4cout << "\tpx = " << px << "\tpy = " << py << "\tpz = " << pz << G4endl;
-    }
-    G4PrimaryParticle *particle = new G4PrimaryParticle(electron, px, py, pz);
+    G4PrimaryParticle *particle = new G4PrimaryParticle(electron,
+                                                        momentum.getX(),
+                                                        momentum.getY(),
+                                                        momentum.getZ());
     vertex = new G4PrimaryVertex(EventVertex, 0);  // 0 means occurs at t = 0
     vertex -> SetPrimary(particle);
     ev -> AddPrimaryVertex(vertex);
@@ -245,7 +268,7 @@ void K37PrimaryGeneratorAction::SetAlignment(G4double ali) {
 }
 
 void K37PrimaryGeneratorAction::SetRecoilCharge(G4int charge) {
-  if (charge < 0 && charge != -2) {
+  if (charge < 0 && charge != -2 && charge != -3) {
     G4cout << "Negative ions not supported as primary particles. "
            << " No change...Recoil charge = " << recoil_charge_ << G4endl;
   } else if (charge == -2) {
