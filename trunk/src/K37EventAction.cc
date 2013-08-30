@@ -356,9 +356,14 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       recoil_mcp_z_pos = hit -> GetZPos();
       recoil_mcp_time  = hit -> GetTime();
       recoil_pdg       = hit -> GetParticlePDG();
+      /* DELETE HERE DELETE HERE */
       // G4cout << "Recoil MCP hit at x = "
       //        << G4BestUnit(recoil_mcp_x_pos, "Length") << " and y = "
       //        << G4BestUnit(recoil_mcp_z_pos, "Length") << G4endl;
+      // for (G4int i = 0; i < recoil_mcp_hit_collection -> entries(); i++) {
+      //   G4cout << "Ion Hit " << i << " at time "
+      //          << G4BestUnit(recoil_mcp_time, "Time") << G4endl;
+      // }
     } else {
       // G4cout << "Got no hits in rMCP!" << G4endl;
       recoil_mcp_x_pos = 0.0;
@@ -379,6 +384,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       for (int i = 0; i < n_hit; i++) {
         hit = (*electron_mcp_hit_collection)[i];
         electron_mcp_energy += hit -> GetEnergy();
+        /* DELETE HERE DELETE HERE */
+        // G4cout << "Electron Hit " << i << " at time "
+        //        << G4BestUnit(electron_mcp_time, "Time") << G4endl;
       }
     }
   }
@@ -417,14 +425,24 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
+
+    /* DELETE HERE DELETE HERE */
+    //    G4cout << "TDC time: " << G4BestUnit(recoil_mcp_time, "Time") << G4endl;
+    (*active_channels_)["RECOIL_MCP_N_HITS"] ->
+        InsertData((G4double)recoil_mcp_hit_collection -> entries());
     (*active_channels_)["TDC_ELECTRON_MCP"] ->
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
+    (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
+        InsertData((G4double)electron_mcp_hit_collection -> entries());
     (*active_channels_)["ION_MCP_PARTICLE_PDG"] ->
         InsertData((G4double)recoil_pdg);
     (*active_channels_)["UPPER_SCINTILLATOR_PDG"] ->
         InsertData((G4double)upper_scintillator_pdg);
     (*active_channels_)["LOWER_SCINTILLATOR_PDG"] ->
         InsertData((G4double)lower_scintillator_pdg);
+
+    /* DELETE HERE DELETE HERE */
+    //    if (recoil_mcp_time - electron_mcp_time > 1510.0*ns) LookAtEvent(evt);
 
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
@@ -661,4 +679,19 @@ bool K37EventAction::EventPassesTrigger(double upper_scintillator_energy,
   return (upper_scintillator_energy > upper_scintillator_threshold_ ||
           lower_scintillator_energy > lower_scintillator_threshold_ ||
           electron_mcp_energy > electron_mcp_threshold_);
+}
+
+void K37EventAction::LookAtEvent(const G4Event *event) {
+  G4TrajectoryContainer *trajectory = event -> GetTrajectoryContainer();
+  G4VTrajectory *v_trajectory;
+  for (unsigned int i = 0; i < trajectory -> size(); i++) {
+    v_trajectory = (*trajectory)[i];
+    v_trajectory -> ShowTrajectory();
+    v_trajectory -> DrawTrajectory();
+    G4cout << G4endl;
+  }
+  G4cout << G4endl << "Any number to continue..." << G4endl;
+  G4int j;
+  G4cin >> j;
+  G4cout << j << G4endl;
 }

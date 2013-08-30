@@ -39,7 +39,7 @@ K37ElectricFieldSetup::K37ElectricFieldSetup()
   fFieldMessenger = new K37FieldMessenger(this);
   fEquation = new G4EqMagElectricField(fEMfield);
   fMinStep     = 0.010*mm;  // minimal step of 10 microns
-  fStepperType = 4;         // ClassicalRK4 -- the default stepper
+  fStepperType = 5;         // ClassicalRK4 -- the default stepper
 
   fFieldManager = GetGlobalFieldManager();
   UpdateField();

@@ -10,6 +10,7 @@
 #include "globals.hh"
 #include "G4THitsMap.hh"
 #include "G4ThreeVector.hh"
+#include "G4TrajectoryContainer.hh"
 #include "G4UserEventAction.hh"
 #include "G4Electron.hh"
 
@@ -91,7 +92,7 @@ class K37EventAction : public G4UserEventAction {
   bool EventPassesTrigger(double upper_scintillator_energy,
                           double lower_scintillator_energy,
                           double electron_mcp_energy);
-
+  void LookAtEvent(const G4Event *event);
   //  G4THitsMap<G4double>* energyBTdedxMap;
   //  G4THitsMap<G4double>* energyBTscintillatorMap;
   // G4THitsMap<G4double>* energyMirror2Map;
