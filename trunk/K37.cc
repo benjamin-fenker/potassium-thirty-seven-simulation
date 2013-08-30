@@ -164,8 +164,8 @@ int main(int argc, char** argv) {
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive();
   visManager->Initialize();
-  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID();
-  model->SetDefault("cyan");
+  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID("ParticleType");
+  model->SetDefault("white");
   model->Set("gamma", "green");
   model->Set("e+", "blue");
   model->Set("Ar37Minus", G4Colour(0.8, 0.1, 0.8));

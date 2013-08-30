@@ -169,6 +169,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     // a non const pointer that can later be delete avoiding a memory
     // leak.
     world_logVisAttributes = new G4VisAttributes(false);
+    //world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
 
     if (makeScintillators) ConstructScintillators(SDman);
@@ -204,7 +205,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
                         upper_scintillator_log_, "scint_plusZ_phys", world_log_,
                         false, 0);
 
-  scint_logVisAttributes_plusZ = new G4VisAttributes(G4Colour(1.0, 0.0, 1.0));
+  scint_logVisAttributes_plusZ = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
   scint_logVisAttributes_plusZ -> SetForceSolid(true);
   upper_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_plusZ);
 
@@ -215,7 +216,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
       new G4PVPlacement(0, G4ThreeVector(0., 0., -Scint_zPosition),
                        lower_scintillator_log_, "scint_minusZ_phys", world_log_,
                         false, 0);
-  scint_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(1.0, 1.0, 0.0));
+  scint_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
   scint_logVisAttributes_minusZ-> SetForceSolid(true);
   lower_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_minusZ);
 
@@ -247,7 +248,7 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
                                                         0, 0, 0);
   new G4PVPlacement(0, dedx_PlusZ_pos, dedx_plusZ_log, "dedx_plusZ_phys",
                     world_log_, false, 0);
-  dedx_logVisAttributes = new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
+  dedx_logVisAttributes = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
   dedx_logVisAttributes-> SetForceSolid(true);
   dedx_plusZ_log -> SetVisAttributes(dedx_logVisAttributes);
   // G4MultiFunctionalDetector* dedxDetectorPlusZ =
@@ -265,7 +266,7 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
                                                          0, 0);
   new G4PVPlacement(0, dedx_MinusZ_pos, dedx_MinusZ_log, "dedx_minusZ_phys",
                     world_log_, false, 0);
-  dedx_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(0.0, 1.0, 1.0));
+  dedx_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
   // G4VisAttributes* dedx_logVisAttributes_minusZ =
   //   new G4VisAttributes(G4Colour(0.0, 1.0, 1.0));
 
@@ -309,7 +310,7 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   G4LogicalVolume* dedxFrame_log =
     new G4LogicalVolume(dedxFrame_sol, SiliconDetectorFrameMaterial,
                         "dedxFrame_log", 0, 0, 0);
-  dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(1.0, 0.7, 0.5));
+  dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
   dedxFrame_logVisAttributes-> SetForceSolid(true);
   dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
   new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 98.5*mm), dedxFrame_log,
@@ -587,7 +588,7 @@ void K37DetectorConstruction::ConstructChamber() {
                     "OPRF_plusZ_phys", world_log_, false, 0);
   new G4PVPlacement(0, G4ThreeVector(0., 0., -182*mm), OPRF_log,
                     "OPRF_minusZ_phys", world_log_, false, 0);
-  OPRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.0));
+  OPRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   OPRF_logVisAttributes-> SetForceSolid(true);
   // chamber_logVisAttributes-> SetForceWireframe(true);
   OPRF_log -> SetVisAttributes(OPRF_logVisAttributes);
@@ -598,7 +599,7 @@ void K37DetectorConstruction::ConstructChamber() {
                                   50.673*mm, 2.5*mm, 0.0*deg, 360.0*deg);
   G4LogicalVolume* RFD_log = new G4LogicalVolume(RFD_sol, ChamberMaterial,
                                                  "RFD_log", 0, 0, 0);
-  RFD_logVisAttributes = new G4VisAttributes(G4Colour(0.8, 0.4, 0.5));
+  RFD_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   RFD_logVisAttributes-> SetForceSolid(true);
   RFD_log -> SetVisAttributes(RFD_logVisAttributes);
 
@@ -653,7 +654,7 @@ void K37DetectorConstruction::ConstructChamber() {
   G4LogicalVolume* FFRF_log = new G4LogicalVolume(FFRF_sol, ChamberMaterial,
                                                   "FFRF_log", 0, 0, 0);
 
-  FFRF_logVisAttributes = new G4VisAttributes(G4Colour(0.8, 0.4, 0.5));
+  FFRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   // G4VisAttributes* FFRF_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.8, 0.4, 0.5));
 
@@ -689,7 +690,7 @@ void K37DetectorConstruction::ConstructMirrors() {
   new G4PVPlacement(MirrorRotation,
                     G4ThreeVector(0, 0, -MirrorPositionZ), mirror_log,
                     "mirror_minusZ_phys", world_log_, false, 0);
-  mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.1, 0.8, 0.1));
+  mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.9, 0.1, 0.1, 0.9));
   mirror_logVisAttributes-> SetForceSolid(true);
   mirror_log -> SetVisAttributes(mirror_logVisAttributes);
   // ------------------------------ Mirror Mount (MM)
@@ -720,12 +721,12 @@ void K37DetectorConstruction::ConstructMirrors() {
                                                 MirrorMountMaterial,
                                                 "MM_log", 0, 0, 0);
 
-  MM_logVisAttributes = new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
+  MM_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   // G4VisAttributes* MM_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
 
-  // MM_logVisAttributes-> SetForceSolid(true);
-  MM_logVisAttributes-> SetForceWireframe(true);
+  MM_logVisAttributes-> SetForceSolid(true);
+  //MM_logVisAttributes-> SetForceWireframe(true);
   MM_log -> SetVisAttributes(MM_logVisAttributes);
 
   new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 85.0*mm), MM_log,
@@ -744,7 +745,7 @@ void K37DetectorConstruction::ConstructHoops() {
   hoopRotation->rotateX(90.*deg);
 
   cut_ESP_logVisAttributes =
-    new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
+    new G4VisAttributes(G4Colour(0.0, 0.0, 0.0, 1.0));
   cut_ESP_logVisAttributes-> SetForceSolid(true);
 
   // ------------------------------  3 - 6  The definitions for these came
@@ -889,7 +890,7 @@ void K37DetectorConstruction::ConstructHoops() {
   //                       StainlessSteel, "hoop_7_log", 0, 0, 0);
   G4LogicalVolume *hoop_2_log =
     new G4LogicalVolume(cut_hoop_7_withHolesAndBeamsAndRecoil_sol,
-                        HoopMaterial, "hoop_2_log", 0, 0, 0);
+                        Hoop7Material, "hoop_2_log", 0, 0, 0);
   // ------------------------------  7
   // G4double hoop_7_x = (180./2.)*mm;
   // G4double hoop_7_y = (90./2.)*mm;
@@ -1030,7 +1031,7 @@ void K37DetectorConstruction::ConstructHoops() {
   // G4VisAttributes* cut_ESP_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
   cut_ESP_logVisAttributes-> SetForceSolid(true);
-  hoop7_logVisAttributes = new G4VisAttributes(G4Colour(0.2, 0.1, 0.6));
+  hoop7_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
   // G4VisAttributes* hoop7_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.2, 0.1, 0.6));
   hoop7_logVisAttributes-> SetForceSolid(true);
@@ -1038,7 +1039,7 @@ void K37DetectorConstruction::ConstructHoops() {
   hoop_3through6_box_log ->
     SetVisAttributes(cut_ESP_logVisAttributes);  // 3-6
   hoop_7_log -> SetVisAttributes(hoop7_logVisAttributes);    // 7
-  hoop_2_log -> SetVisAttributes(cut_ESP_logVisAttributes);  // 2
+  hoop_2_log -> SetVisAttributes(hoop7_logVisAttributes);    // 2
   hoop_1_log -> SetVisAttributes(cut_ESP_logVisAttributes);  // 1
 
   // G4RotationMatrix* hoopRotation = new G4RotationMatrix();
@@ -1066,7 +1067,7 @@ void K37DetectorConstruction::ConstructHoops() {
 }  // End construct hoops
 
 void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
-  G4double SOED_rmax = 80./2.*mm;
+  G4double SOED_rmax = 40./2.*mm;
   G4double SOED_rmin = 0     *mm;
   G4double SOED_dz   = 10./2.*mm;
   G4double SOED_Sphi = 0.    *deg;
@@ -1078,7 +1079,7 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
                                                    "SOED_log", 0, 0, 0);
   new G4PVPlacement(changeZtoX, G4ThreeVector(0., SOED_z_pos, 0), SOED_log,
                     "SOED_phys", world_log_, false, 0);
-  SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.1, 0.8, 0.8));
+  SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   SOED_logVisAttributes-> SetForceSolid(true);
   SOED_log -> SetVisAttributes(SOED_logVisAttributes);
 
@@ -1091,7 +1092,8 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
 }  // End construct EMCP
 
 void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
-  G4double rmcp_rmax = 83./2.*mm;
+  //G4double rmcp_rmax = 83./2.*mm;
+  G4double rmcp_rmax = 80./2.*mm;
   G4double rmcp_rmin = 0     *mm;
   G4double rmcp_dz   = 10./2.*mm;
   G4double rmcp_start_phi = 0.    *deg;
@@ -1105,7 +1107,7 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
                                                    "rmcp_log", 0, 0, 0);
   new G4PVPlacement(changeZtoX, G4ThreeVector(0., rmcp_z_pos, 0), rmcp_log,
                     "rmcp_phys", world_log_, false, 0);
-  rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.7, 0.2, 0.2));
+  rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   rmcp_logVisAttributes_ -> SetForceSolid(true);
   rmcp_log -> SetVisAttributes(rmcp_logVisAttributes_);
 
@@ -1134,7 +1136,7 @@ void K37DetectorConstruction::ConstructCoils() {
   new G4PVPlacement(0, G4ThreeVector(0., 0., -65.), coils_log,
                     "coils_minusZ_phys", world_log_, false, 0);
 
-  coils_logVisAttributes= new G4VisAttributes(G4Colour(0.2, 0.3, 0.1));
+  coils_logVisAttributes= new G4VisAttributes(G4Colour(0.6, 0.35, 0.0, 1.0));
   // G4VisAttributes* coils_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.2, 0.3, 0.1));
 
@@ -1201,6 +1203,7 @@ void K37DetectorConstruction::DefineMaterials() {
   SiliconDiOxide->AddElement(Si, natoms = 1);
   SiliconDiOxide->AddElement(O , natoms = 2);
 
+
   G4Material* MagnesiumOxide = new G4Material("MagnesiumOxide",
                                               density = 3.58*g/cm3, nel = 2);
   MagnesiumOxide->AddElement(Mg, natoms = 1);
@@ -1250,6 +1253,10 @@ void K37DetectorConstruction::DefineMaterials() {
                                           a = 28.086*g/mole,
                                           density= 2.329*g/cm3);
 
+  G4Material* Titanium = new G4Material("Titanium", z = 22.,
+                                          a = 47.867*g/mole,
+                                          density= 4.507*g/cm3);
+
   G4Material* Sapphire = new G4Material("Sapphire", density = 3.98*g/cm3,
                                         nel = 2);
   Sapphire -> AddElement(Al, natoms = 2);
@@ -1282,7 +1289,7 @@ void K37DetectorConstruction::DefineMaterials() {
   HoopMaterial = GlassyCarbon;
   MirrorMountMaterial= StainlessSteel;
   CoilsMaterial = StainlessSteel;
-  Hoop7Material = StainlessSteel;
+  Hoop7Material = Titanium;
   MCPMaterial = SiliconMat;
 }
 
