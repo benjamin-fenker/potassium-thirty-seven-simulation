@@ -181,7 +181,7 @@ double K37ComplexGammaFunction::realPart(char choice, double Real,
 
 double K37ComplexGammaFunction::absSquaredComplexGamma(char choice, double Real,
                                                        double Imaginary) {
-  if ( choice != 'l' && choice != 'g' ) {
+  if ( (choice != 'l') && (choice != 'g') ) {
     return 4.23e17;
   }
 

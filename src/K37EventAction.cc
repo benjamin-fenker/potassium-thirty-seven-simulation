@@ -417,7 +417,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
-    G4cout << "TDC_ION_MCP: " << recoil_mcp_time/ns << G4endl;
     (*active_channels_)["TDC_ELECTRON_MCP"] ->
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
     (*active_channels_)["ION_MCP_PARTICLE_PDG"] ->
