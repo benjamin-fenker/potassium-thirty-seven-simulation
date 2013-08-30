@@ -739,50 +739,13 @@ void K37DetectorConstruction::ConstructMirrors() {
 }  // End ConstructMirrors
 
 void K37DetectorConstruction::ConstructHoops() {
-  G4double hoop_rmax = 91./2.     *mm;
-  G4double hoop_rmin = 0          *mm;
-  G4double hoop_dz   = 1.         *mm;
-  G4double hoop_Sphi = 0.         *deg;
-  G4double hoop_Dphi = 360.       *deg;
-
-  G4Tubs * hoop_sol = new G4Tubs("hoop_sol", hoop_rmin, hoop_rmax,
-                                 hoop_dz, hoop_Sphi, hoop_Dphi);
-
-  // G4RotationMatrix* hoopRotation = new G4RotationMatrix();
+  
   hoopRotation = new G4RotationMatrix();
   hoopRotation->rotateX(90.*deg);
 
-  G4double hoop_x = (140./2.)*mm;
-  G4double hoop_y = (106./2.)*mm;
-  G4double hoop_z = (1./2.)*mm;
-
-  G4Box * electrostaticplate_sol = new G4Box("electrostaticplate_sol",
-                                             hoop_x , hoop_y, hoop_z);
-
-  G4SubtractionSolid* cut_ESP_sol =
-    new G4SubtractionSolid("cut_ESP_sol", electrostaticplate_sol, hoop_sol);
-
-  G4LogicalVolume *cut_ESP_log = new G4LogicalVolume(cut_ESP_sol, HoopMaterial,
-                                                     "cut_ESP_log", 0, 0, 0);
   cut_ESP_logVisAttributes =
     new G4VisAttributes(G4Colour(0.2, 0.8, 0.1));
   cut_ESP_logVisAttributes-> SetForceSolid(true);
-  // MM_logVisAttributes-> SetForceWireframe(true);
-  cut_ESP_log -> SetVisAttributes(cut_ESP_logVisAttributes);
-
-  G4double cut_ESP_ypos_0 = 49*mm;
-  G4double cut_ESP_ypos_1 = 27.5*mm;
-  G4double cut_ESP_ypos_2 = -27.5*mm;
-  G4double cut_ESP_ypos_3 = -49*mm;
-
-  new G4PVPlacement(hoopRotation, G4ThreeVector(0., cut_ESP_ypos_0, 0.),
-                    cut_ESP_log, "cut_ESP_phys_0", world_log_, false, 0);
-  new G4PVPlacement(hoopRotation, G4ThreeVector(0., cut_ESP_ypos_1, 0.),
-                    cut_ESP_log, "cut_ESP_phys_1", world_log_, false, 0);
-  new G4PVPlacement(hoopRotation, G4ThreeVector(0., cut_ESP_ypos_2, 0.),
-                    cut_ESP_log, "cut_ESP_phys_2", world_log_, false, 0);
-  new G4PVPlacement(hoopRotation, G4ThreeVector(0., cut_ESP_ypos_3, 0.),
-                    cut_ESP_log, "cut_ESP_phys_3", world_log_, false, 0);
 
   // ------------------------------  3 - 6  The definitions for these came
   // from Alexandre and a drawing for them is in /Drawings/hoops.pdf
