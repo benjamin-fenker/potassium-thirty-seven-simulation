@@ -26,6 +26,15 @@ K37SteppingAction::K37SteppingAction(K37ListOfVolumeNames* list,
 K37SteppingAction::~K37SteppingAction() {}
 
 void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
+  /* DELETE HERE DELETE HERE */
+  // G4ThreeVector pos = theStep -> GetPreStepPoint() -> GetPosition();
+  // G4cout << "Particle "
+  //        << theStep -> GetTrack() -> GetDefinition() -> GetParticleName()
+  //        << "\t Position Pre = " << pos.x()/mm << " mm,  " << pos.y()/mm
+  //        << " mm,  " << pos.z()/mm << " mm\t Time = "
+  //        << theStep -> GetPreStepPoint() -> GetGlobalTime()/ns << " n "
+  //        << G4endl;
+
   G4Track * theTrack = theStep->GetTrack();
   const G4ParticleDefinition* theDefinition = theTrack->GetParticleDefinition();
   G4String theParticleName = theDefinition->GetParticleName();

@@ -31,7 +31,7 @@ G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
   G4Track *track = step -> GetTrack();
 
   new_hit -> SetEnergy(step -> GetTotalEnergyDeposit());
-  new_hit -> SetTime(track -> GetGlobalTime());
+  new_hit -> SetTime(track -> GetLocalTime());
   // PreStep and PostStep both exist.  The examples all use PreStep so that's
   // what I'll go with
   new_hit -> SetXPos(step -> GetPreStepPoint() -> GetPosition().x());

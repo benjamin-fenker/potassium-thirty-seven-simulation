@@ -81,11 +81,11 @@ K37DetectorConstruction::K37DetectorConstruction()
   // ******SET CONSTRUCTION FLAGS HERE**************************************
     makeScintillators = true;     // Must be true!
     makeStripDetectors = true;    // Must be true!
-    makeChamber = true;
-    makeMirrors = true;
-    makeHoops = true;
+    makeChamber = false;
+    makeMirrors = false;
+    makeHoops = false;
     makeElectronMCP = true;
-    makeCoils = true;
+    makeCoils = false;
     make_r_mcp_ = true;
 }
 
@@ -152,7 +152,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
       volumes can be added and subtracted more easily.
       ------------------------------------------------------------------------*/
     G4SDManager* SDman = G4SDManager::GetSDMpointer();
-
+    G4UserLimits *step_limit = new G4UserLimits(1.0 * cm);
     // G4double world_x = 1.0*m;
     // G4double world_y = 1.0*m;
     // G4double world_z = 1.0*m;
@@ -161,6 +161,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
                            world_size_/2.0, world_size_/2.0);
     world_log_  = new G4LogicalVolume(world_box_, world_material_, "world_log",
                                      0, 0, 0);
+    world_log_ -> SetUserLimits(step_limit);
     world_phys_ = new G4PVPlacement(0, G4ThreeVector(), world_log_,
                                     "world_phys", 0, false, 0);
 

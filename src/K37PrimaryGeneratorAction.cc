@@ -148,25 +148,36 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
 void K37PrimaryGeneratorAction::SetPhotoionizationVertices(G4Event *ev) {
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4double e_kinetic_energy = 0.8 * eV;
-  G4ThreeVector momentum = GetMomentumIsotropic(e_kinetic_energy,
-                                                electron_mass_c2);
-  G4PrimaryParticle *photoelectron = new G4PrimaryParticle(electron,
-                                                           momentum.getX(),
-                                                           momentum.getY(),
-                                                           momentum.getZ());
+  // G4ThreeVector momentum = GetMomentumIsotropic(e_kinetic_energy,
+  //                                               electron_mass_c2);
+  G4ThreeVector e_momentum = G4RandomDirection();
+  (*active_channels_)["MU_GEN_ELE"] -> InsertData(e_momentum.cosTheta());
+  //  G4cout << "Px = " << e_momentum.getX() << G4endl;
+  G4PrimaryParticle *photoelectron = new G4PrimaryParticle(electron);
+  photoelectron -> SetMomentumDirection(e_momentum);
+  photoelectron -> SetKineticEnergy(e_kinetic_energy);
+
   vertex -> SetPrimary(photoelectron);
   ev -> AddPrimaryVertex(vertex);
 
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition *ion = particleTable -> GetIon(19, 37, 0);  // 37K
-
-  G4cout << "Ratio = " << electron_mass_c2 / ion -> GetPDGMass() << G4endl;
-  G4PrimaryParticle *photoion = new G4PrimaryParticle(ion,
-                                                      -1.0*momentum.getX(),
-                                                      -1.0*momentum.getY(),
-                                                      -1.0*momentum.getZ());
+  G4ThreeVector r_momentum = e_momentum;
+  r_momentum *= -1.0;
+  (*active_channels_)["MU_GEN_RECOIL"] -> InsertData(r_momentum.cosTheta());
+  G4double mass_ratio = electron_mass_c2 / ion -> GetPDGMass();
+  //  G4cout << "Ratio = " <<  mass_ratio << G4endl;
+  G4double ion_energy = e_kinetic_energy * mass_ratio;
+  //  G4cout << "Ion energy = " << ion_energy / keV << " keV " << G4endl;
+  //  G4cout << "Px = " << r_momentum.getX() << G4endl;
+  G4PrimaryParticle *photoion = new G4PrimaryParticle(ion);
+  photoion -> SetMomentumDirection(r_momentum);
+  photoion -> SetKineticEnergy(ion_energy);
   photoion -> SetCharge(1.0 * eplus);
+
+  //  G4cout << "Px = " << r_momentum.getX() << G4endl;
+
   vertex -> SetPrimary(photoion);
   ev -> AddPrimaryVertex(vertex);
 }

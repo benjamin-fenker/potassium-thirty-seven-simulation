@@ -10,6 +10,7 @@
 #include "Aggregator.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
+#include "G4RandomDirection.hh"
 #include "K37_Data.hh"
 #include "Randomize.hh"
 #include "globals.hh"

@@ -134,6 +134,7 @@ void K37PhysicsList::ConstructEM() {
       ionIoni->SetEmModel(new G4IonParametrisedLossModel());
       ionIoni->SetStepFunction(0.1, 20*um);
       pmanager->AddProcess(ionIoni, -1, 2, 2);
+      pmanager -> AddProcess(new G4StepLimiter(1.0*cm), -1, -1, 4);
     } else if (particleName == "Ar37Neutral" || particleName == "Ar37PlusOne") {
       // OBJECT may be dynamically created as either a GenericIon or nucleus
       // G4Nucleus exists and therefore has particle type nucleus
