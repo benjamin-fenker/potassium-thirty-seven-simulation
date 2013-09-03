@@ -19,3 +19,9 @@
 /vis/verbose warnings
 /vis/viewer/set/background 0.0 0.3 0.3
 /vis/viewer/set/background 0.0 0.3 0.3
+
+#These are the picture print settings that 
+#I have had luck with.
+#/vis/ogl/set/printMode pixmap
+#/vis/ogl/set/printSize 800 800
+#/vis/ogl/printEPS
