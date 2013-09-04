@@ -62,6 +62,9 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
   }
+  void SetMakeBeta(G4bool flag) {make_beta_ = flag;}
+  void SetMakeRecoil(G4bool flag) {make_recoil_ = flag;}
+  void SetMakeShakeoffElectrons(G4bool flag) {make_shakeoff_electrons_ = flag;}
 
  private:
   G4double      distanceToTrap;
@@ -103,6 +106,9 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
   G4ThreeVector GetMomentumIsotropic(G4double kinetic_energy, G4double mass);
+  G4bool make_beta_;
+  G4bool make_recoil_;
+  G4bool make_shakeoff_electrons_;
 };
 
 #endif

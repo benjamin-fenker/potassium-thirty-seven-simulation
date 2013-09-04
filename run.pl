@@ -21,7 +21,7 @@ sub repeatRun {
             `mv $dir/$tempFile $dir/$finalFile`;
         } else {
             `mv $dir/$finalFile $dir/temp$id_num.root`;
-            `hadd $dir/$finalFile $dir/$tempFile $dir/temp$id_num.root`;
+            `hadd $dir/$finalFile $dir/$tempFile $dir/temp$id_num.root 2> log.txt`;
         }
         $i++;
     }
@@ -41,7 +41,7 @@ sub runOnce {
     my @temp = @_[15..17];
     my $dir = $_[18];
     my $fna = $_[19];
-
+    my @particle = @_[20..22];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
     if ($id_num == 0) {
@@ -63,11 +63,15 @@ sub runOnce {
     print MACRO "/K37/gun/setCloudSizeV @size mm\n";
     print MACRO "/K37/gun/setCloudCenter @center mm\n";
     print MACRO "/K37/gun/setRecoilCharge $rec\n";
+    print MACRO "/K37/gun/setMakeBeta $particle[0]\n";
+    print MACRO "/K37/gun/setMakeRecoil $particle[1]\n";
+    print MACRO "/K37/gun/setMakeShakeoffElectrons $particle[2]\n";
     print MACRO "/K37/RunControls/setConfigurationFile ";
     print MACRO "runFiles/parallelConfig$id_num.txt\n";
     print MACRO "/K37/RunControls/setOutputDirectory runFiles\n";
     print MACRO "/K37/RunControls/setFilename out$id_num\n";
     print MACRO "/run/beamOn $events_per_run\n";
+
     close MACRO;
  
     
@@ -88,6 +92,7 @@ my $recoil_charge = -2;                    #-2 = mixed
 my @input;
 my $directory = `pwd`; chomp($directory);
 my $file_name = "output";
+my @particle = ("true", "true", "true");
 
 if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($threshold[0] = <PARAMSin>);
@@ -108,6 +113,9 @@ if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($temperature[2] = <PARAMSin>);
     chomp($directory = <PARAMSin>);
     chomp($file_name = <PARAMSin>);
+    chomp($particle[0] = <PARAMSin>);
+    chomp($particle[1] = <PARAMSin>);
+    chomp($particle[2] = <PARAMSin>);
 } else {
     print "\nNo parameter file...starting with default values\n\n";
 }
@@ -167,6 +175,19 @@ while ($choice  != 0) {
 }
 
 $choice = -1;
+while($choice != 0) {
+    print "[1] Make Beta                          = $particle[0]\n";
+    print "[2] Make Recoils                       = $particle[1]\n";
+    print "[3] Make Shakeoff Electrons            = $particle[2]\n";
+    print "Enter number to change or 0 to quit\n";
+    chomp($choice = <STDIN>);
+    if ($choice != 0) {
+        printf "Enter new value for $choice\n";
+        chomp($particle[$choice-1] = <STDIN>);
+    }
+}
+
+$choice = -1;
 my $ovw = "n";
 while ($choice  != 0) {
     print "[1] Output directory                     = $directory\n";
@@ -187,6 +208,7 @@ while ($choice  != 0) {
         if ($ovw eq "n" || $ovw eq "N") {
 #            $choice = -1;
         }
+
     } else {
         print "File $directory/$file_name does not exist\n";
     }
@@ -195,8 +217,17 @@ while ($choice  != 0) {
 #Remove white spaces
 $directory =~ s/\s+//g;
 $file_name =~ s/\s+//g;
+my $proc = 1;
+chomp(my $os = `uname`);
+printf("OS: $os\n");
+if ($os eq "Linux") {
+    chomp($proc = `nproc`);
+} elsif ($os eq "Darwin") {
+    chomp($proc = `sysctl -n hw.ncpu`);
+} else {
+    printf("Unknown operating system... assuming $proc processors\n");
+}
 
-chomp(my $proc = `nproc`);
 print "You have $proc processors...how many do you want to use?\n";
 chomp($choice = <STDIN>);
 if ($choice <= $proc && $choice > 0) {
@@ -215,7 +246,7 @@ print "$thread_events per thread\n";
 
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
-                 $file_name);
+                 $file_name, @particle);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;
@@ -250,7 +281,7 @@ if (-e "$directory/$file_name.root" && ($ovw eq "n" || $ovw eq "N")) {
     print "Moving old file to $directory/$file_name$z.root\n";
     `mv $directory/$file_name.root $directory/$file_name$z.root`;
 }
-`hadd -f $directory/$file_name.root @tempfiles`;
+`hadd -f $directory/$file_name.root @tempfiles 2>log.txt`;
 
 # Print the most recently used parameters to a file
 open(PARAMS, ">runFiles/params.txt") ||

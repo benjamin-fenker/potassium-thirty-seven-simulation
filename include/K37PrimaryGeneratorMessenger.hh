@@ -4,6 +4,7 @@
 #define K37PrimaryGeneratorMessenger_h 1
 
 #include "G4UIcmdWith3VectorAndUnit.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
@@ -36,6 +37,9 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   G4UIcmdWith3VectorAndUnit *set_initial_cloud_size_v_;
   G4UIcmdWithADoubleAndUnit *set_initial_cloud_size_d_;
   G4UIcmdWith3VectorAndUnit *set_cloud_center_;
+  G4UIcmdWithABool *set_make_beta_;
+  G4UIcmdWithABool *set_make_recoil_;
+  G4UIcmdWithABool *set_make_shakeoff_electrons_;
 };
 
 //----------------------------------

@@ -81,11 +81,11 @@ K37DetectorConstruction::K37DetectorConstruction()
   // ******SET CONSTRUCTION FLAGS HERE**************************************
     makeScintillators = true;     // Must be true!
     makeStripDetectors = true;    // Must be true!
-    makeChamber = false;
-    makeMirrors = false;
-    makeHoops = false;
+    makeChamber = true;
+    makeMirrors = true;
+    makeHoops = true;
     makeElectronMCP = true;
-    makeCoils = false;
+    makeCoils = true;
     make_r_mcp_ = true;
 }
 
@@ -152,7 +152,6 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
       volumes can be added and subtracted more easily.
       ------------------------------------------------------------------------*/
     G4SDManager* SDman = G4SDManager::GetSDMpointer();
-    G4UserLimits *step_limit = new G4UserLimits(1.0 * cm);
     // G4double world_x = 1.0*m;
     // G4double world_y = 1.0*m;
     // G4double world_z = 1.0*m;
@@ -161,7 +160,6 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
                            world_size_/2.0, world_size_/2.0);
     world_log_  = new G4LogicalVolume(world_box_, world_material_, "world_log",
                                      0, 0, 0);
-    world_log_ -> SetUserLimits(step_limit);
     world_phys_ = new G4PVPlacement(0, G4ThreeVector(), world_log_,
                                     "world_phys", 0, false, 0);
 
@@ -170,7 +168,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     // a non const pointer that can later be delete avoiding a memory
     // leak.
     world_logVisAttributes = new G4VisAttributes(false);
-    //world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
+    // world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
 
     if (makeScintillators) ConstructScintillators(SDman);
@@ -206,7 +204,8 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
                         upper_scintillator_log_, "scint_plusZ_phys", world_log_,
                         false, 0);
 
-  scint_logVisAttributes_plusZ = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
+  scint_logVisAttributes_plusZ =
+      new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
   scint_logVisAttributes_plusZ -> SetForceSolid(true);
   upper_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_plusZ);
 
@@ -217,7 +216,8 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
       new G4PVPlacement(0, G4ThreeVector(0., 0., -Scint_zPosition),
                        lower_scintillator_log_, "scint_minusZ_phys", world_log_,
                         false, 0);
-  scint_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
+  scint_logVisAttributes_minusZ =
+      new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
   scint_logVisAttributes_minusZ-> SetForceSolid(true);
   lower_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_minusZ);
 
@@ -727,7 +727,7 @@ void K37DetectorConstruction::ConstructMirrors() {
   //   new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
 
   MM_logVisAttributes-> SetForceSolid(true);
-  //MM_logVisAttributes-> SetForceWireframe(true);
+  // MM_logVisAttributes-> SetForceWireframe(true);
   MM_log -> SetVisAttributes(MM_logVisAttributes);
 
   new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 85.0*mm), MM_log,
@@ -741,7 +741,6 @@ void K37DetectorConstruction::ConstructMirrors() {
 }  // End ConstructMirrors
 
 void K37DetectorConstruction::ConstructHoops() {
-  
   hoopRotation = new G4RotationMatrix();
   hoopRotation->rotateX(90.*deg);
 
@@ -1093,7 +1092,7 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
 }  // End construct EMCP
 
 void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
-  //G4double rmcp_rmax = 83./2.*mm;
+  // G4double rmcp_rmax = 83./2.*mm;
   G4double rmcp_rmax = 80./2.*mm;
   G4double rmcp_rmin = 0     *mm;
   G4double rmcp_dz   = 10./2.*mm;

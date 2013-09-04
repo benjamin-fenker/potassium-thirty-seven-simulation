@@ -32,7 +32,8 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
     polarization_(1.0), alignment_(1.0), charge_state_ratio_(8, 1.0/8.0),
     detector(det), EventInformation(APEI), v(), vertex(NULL),
     EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
-    K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen) {
+    K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen),
+    make_beta_(true), make_recoil_(true), make_shakeoff_electrons_(true) {
   gunMessenger = new K37PrimaryGeneratorMessenger(this);
   insideCollimator = detector->GetSubtraction();
   distanceToTrap =detector->GetDistanceToTrap();
@@ -115,17 +116,23 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     evGenerator -> MakeEvent(polarization_, alignment_,
                              recoil_charge_this_event);
     rho = 1;
-    this->setBetaVertex();
-    anEvent->AddPrimaryVertex(vertex);
 
-    this->setDaughterVertex(recoil_charge_this_event);
-    anEvent->AddPrimaryVertex(vertex);
+    if (make_beta_) {
+      this->setBetaVertex();
+      anEvent->AddPrimaryVertex(vertex);
+    }
+    if (make_recoil_) {
+      this->setDaughterVertex(recoil_charge_this_event);
+      anEvent->AddPrimaryVertex(vertex);
+    }
+    if (make_shakeoff_electrons_) {
+      SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
+    }
 
     EventInformation->
         setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
                                           evGenerator->dMomentumY(),
                                           evGenerator->dMomentumZ()));
-    SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
   }
 }
 
