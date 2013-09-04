@@ -425,9 +425,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
-
-    /* DELETE HERE DELETE HERE */
-    //    G4cout << "TDC time: " << G4BestUnit(recoil_mcp_time, "Time") << G4endl;
     (*active_channels_)["RECOIL_MCP_N_HITS"] ->
         InsertData((G4double)recoil_mcp_hit_collection -> entries());
     (*active_channels_)["TDC_ELECTRON_MCP"] ->

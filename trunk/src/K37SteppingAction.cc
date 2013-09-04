@@ -39,7 +39,6 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep) {
   const G4ParticleDefinition* theDefinition = theTrack->GetParticleDefinition();
   G4String theParticleName = theDefinition->GetParticleName();
 
-
   if (listOfEnteredVolumes -> getShouldVolumeNamesBeRecorded()) {
     if (theParticleName == "e+" &&
         theTrack -> GetTrackStatus() != fStopAndKill) {

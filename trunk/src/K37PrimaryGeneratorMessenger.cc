@@ -73,6 +73,24 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   set_cloud_center_ -> SetParameterName("x", "y", "z", true);
   set_cloud_center_ -> SetDefaultValue(G4ThreeVector(0.0, 0.0, 0.0));
   set_cloud_center_ -> SetUnitCategory("Length");
+
+  set_make_beta_ = new G4UIcmdWithABool("/K37/gun/setMakeBeta", this);
+  set_make_beta_ -> SetGuidance("Enter bool to generate primary betas or not");
+  set_make_beta_ -> SetParameterName("Make Recoils", true);
+  set_make_beta_ -> SetDefaultValue(true);
+
+  set_make_recoil_ = new G4UIcmdWithABool("/K37/gun/setMakeRecoil", this);
+  set_make_recoil_ ->
+      SetGuidance("Enter bool to generate primary recoils or not");
+  set_make_recoil_ -> SetParameterName("Make Recoils", true);
+  set_make_recoil_ -> SetDefaultValue(true);
+
+  set_make_shakeoff_electrons_ =
+      new G4UIcmdWithABool("/K37/gun/setMakeShakeoffElectrons", this);
+  set_make_shakeoff_electrons_ ->
+      SetGuidance("Enter bool to generate primary SOEs or not");
+  set_make_shakeoff_electrons_ -> SetParameterName("Make SOEs", true);
+  set_make_shakeoff_electrons_ -> SetDefaultValue(true);
 }
 
 // ----------------------------------
@@ -128,6 +146,16 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
   if (command == set_cloud_center_) {
     action_ -> GetCloudSize() ->
         SetCloudCenter(set_cloud_center_ -> GetNew3VectorValue(newValue));
+  }
+  if (command == set_make_beta_) {
+    action_ -> SetMakeBeta(set_make_beta_ -> GetNewBoolValue(newValue));
+  }
+  if (command == set_make_recoil_) {
+    action_ -> SetMakeRecoil(set_make_recoil_ -> GetNewBoolValue(newValue));
+  }
+  if (command == set_make_shakeoff_electrons_) {
+    action_ -> SetMakeShakeoffElectrons(set_make_shakeoff_electrons_ ->
+                                        GetNewBoolValue(newValue));
   }
 }
 
