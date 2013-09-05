@@ -6,6 +6,11 @@ cd $K37SOURCEDIRECTORY;
 K37_VERSION=`svn info |grep Revision: | cut -c11-`;
 export K37_VERSION;
 cd $K37BUILDDIRECTORY ;
+outputDir="runFiles"
+if [ ! -d "$outputDir" ]; then
+     # Control will enter here if $DIRECTORY doesn't exist.
+     mkdir "$outputDir";
+fi
 O_CPP_FLAGS="-O3 -Wall" #optimized build compiler options
 D_CPP_FLAGS="-g -O0 -Wall" #debug build compiler options 
 #ReleaseType="DEBUG" #you can choose to use the debug build options
