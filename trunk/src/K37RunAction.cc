@@ -9,7 +9,6 @@
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37DetectorConstruction.hh"
 #include "K37ListOfVolumeNames.hh"
-#include "K37AnnihilationPosition.hh"
 // Just need for testing
 #include "JTW_Event.hh"
 
@@ -32,11 +31,9 @@ G4bool fillAllSDData = true;
 //----------------------------------
 
 K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
-                           K37AnnihilationPosition* anhilP,
                            K37HistogramManager * his)
 :listOfEnteredVolumes(list),
    runMessenger(0),
-   annihilationPosition(anhilP),
    histograms(his)
 {
   recordAnnihilationPosition = false;
@@ -201,13 +198,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
     listOfEnteredVolumes->deleteFile();
   }
 
-  if (recordAnnihilationPosition == true) {
-    annihilationPosition->touchFile();
-    annihilationPosition->clearList();
-    annihilationPosition->setShouldAnnihilationBeRecorded();
-  } else {
-    annihilationPosition->deleteFile();
-  }
   accepted = 0;
   accepted_bs = 0;
   bs = 0;
@@ -364,9 +354,6 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
 
   this->PrintResultsToScreen();
   this->PrintResultsToRunstat();
-  if (recordAnnihilationPosition == true) {
-    annihilationPosition->checkIfPrintIsNeeded(true);
-  }
   if (recordVolumeNames == true) {
     listOfEnteredVolumes->checkIfPrintIsNeeded(true);
   }
