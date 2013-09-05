@@ -6,7 +6,6 @@
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37DetectorConstruction.hh"
 #include "K37PrimaryGeneratorMessenger.hh"
-#include "K37AllPossibleEventInformation.hh"
 #include "K37CloudSize.hh"
 #include "K37EventGenerator.hh"
 
@@ -27,10 +26,9 @@
 
 K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
                            K37DetectorConstruction* det,
-                           K37AllPossibleEventInformation* APEI,
                            K37EventGenerator* evGen) :
     polarization_(1.0), alignment_(1.0), charge_state_ratio_(8, 1.0/8.0),
-    detector(det), EventInformation(APEI), v(), vertex(NULL),
+    detector(det), v(), vertex(NULL),
     EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
     K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen),
     make_beta_(true), make_recoil_(true), make_shakeoff_electrons_(true) {
@@ -99,12 +97,6 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   cloud -> makeEvent();
   EventVertex = cloud -> GetFinalPosition();
 
-  // Leftover stuff from Spencer...
-  EventInformation ->
-      setMetaStableTimeOfDeath(CLHEP::RandExponential::shoot(260));
-  EventInformation->setVertexPosition(EventVertex);
-  EventInformation->setOriginalTheta(EventVertex.theta());
-
   // Set initial position of all particles where the cloud tells you
   particleGun->SetParticlePosition(EventVertex);
   //  vertex = new G4PrimaryVertex(EventVertex, 0);
@@ -129,10 +121,6 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
       SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
     }
 
-    EventInformation->
-        setDaughterMomentum(G4ThreeVector(evGenerator->dMomentumX(),
-                                          evGenerator->dMomentumY(),
-                                          evGenerator->dMomentumZ()));
   }
 }
 

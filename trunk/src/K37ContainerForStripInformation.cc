@@ -4,11 +4,9 @@
 #include "globals.hh"
 #include "K37ContainerForStripInformation.hh"
 #include "G4ThreeVector.hh"
-#include "K37AllPossibleEventInformation.hh"
 
-K37ContainerForStripInformation::K37ContainerForStripInformation(
-                                     K37AllPossibleEventInformation* APEI)
-  :EventInformation(APEI) {
+K37ContainerForStripInformation::K37ContainerForStripInformation()
+{
   InitializeDetectorMap();
   DetectorPlusZ_X_secondary.clear();
   DetectorPlusZ_Y_secondary.clear();
@@ -315,7 +313,6 @@ void K37ContainerForStripInformation::PassTheMinusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setMinusZStrip_X_beta((*listIterator), energyTemp);
   }
 
   for (listIterator = listMinusZ_Y_beta.begin();
@@ -328,7 +325,6 @@ void K37ContainerForStripInformation::PassTheMinusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setMinusZStrip_Y_beta((*listIterator), energyTemp);
   }
 
   for (listIterator = listMinusZ_X_secondary.begin();
@@ -341,7 +337,6 @@ void K37ContainerForStripInformation::PassTheMinusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setMinusZStrip_X_gamma((*listIterator), energyTemp);
   }
 
   for (listIterator = listMinusZ_Y_secondary.begin();
@@ -354,7 +349,6 @@ void K37ContainerForStripInformation::PassTheMinusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setMinusZStrip_Y_gamma((*listIterator), energyTemp);
   }
 }
 
@@ -382,7 +376,6 @@ void K37ContainerForStripInformation::PassThePlusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setPlusZStrip_X_beta((*listIterator), energyTemp);
   }
 
   for (listIterator = listPlusZ_Y_beta.begin();
@@ -395,7 +388,6 @@ void K37ContainerForStripInformation::PassThePlusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setPlusZStrip_Y_beta((*listIterator), energyTemp);
   }
 
   for (listIterator = listPlusZ_X_secondary.begin();
@@ -408,7 +400,6 @@ void K37ContainerForStripInformation::PassThePlusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setPlusZStrip_X_gamma((*listIterator), energyTemp);
   }
 
   for (listIterator = listPlusZ_Y_secondary.begin();
@@ -421,6 +412,5 @@ void K37ContainerForStripInformation::PassThePlusZDetectors() {
       energyTemp += (*iteratorOfValues).second;
     }
     // G4cout << (*listIterator)<< " =>"<<energyTemp/keV<<G4endl;
-    EventInformation -> setPlusZStrip_Y_gamma((*listIterator), energyTemp);
   }
 }

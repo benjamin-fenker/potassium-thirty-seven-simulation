@@ -20,7 +20,6 @@ class G4Event;
 class G4SingleParticleSource;
 class K37DetectorConstruction;
 class K37PrimaryGeneratorMessenger;
-class K37AllPossibleEventInformation;
 class G4ParticleDefinition;
 class G4PrimaryVertex;
 class G4DecayTable;
@@ -37,7 +36,6 @@ using std::vector;
 class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   K37PrimaryGeneratorAction(K37DetectorConstruction*,
-                            K37AllPossibleEventInformation*,
                             K37EventGenerator*);
   ~K37PrimaryGeneratorAction();
 
@@ -90,7 +88,6 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   K37PrimaryGeneratorMessenger* gunMessenger;   // messenger of this class
   // Container that gathers all of the event information from the most
   // convient sources.
-  K37AllPossibleEventInformation* EventInformation;
   G4ThreeVector v;
   G4PrimaryVertex* vertex;
   G4ThreeVector EventVertex;

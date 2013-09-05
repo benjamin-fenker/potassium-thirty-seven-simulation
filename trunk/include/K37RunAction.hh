@@ -29,13 +29,13 @@ class K37PrimaryGeneratorAction;
 class K37ListOfVolumeNames;
 // class K37RunMessenger;
 class K37AnnihilationPosition;
-class K37AllPossibleEventInformation;
 class K37HistogramManager;
 
 class K37RunAction : public G4UserRunAction {
  public:
   K37RunAction(K37ListOfVolumeNames*, K37AnnihilationPosition*,
-               K37AllPossibleEventInformation*, K37HistogramManager*);
+        K37HistogramManager*);
+
   ~K37RunAction();
   void BeginOfRunAction(const G4Run*);
   void EndOfRunAction(const G4Run*);
@@ -166,7 +166,6 @@ class K37RunAction : public G4UserRunAction {
   K37RunMessenger* runMessenger;
 
   K37AnnihilationPosition* annihilationPosition;
-  K37AllPossibleEventInformation* AllEventInformation;
   G4bool recordAnnihilationPosition;
   G4bool recordVolumeNames;
   G4bool recordEventInformation;
