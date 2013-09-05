@@ -4,6 +4,7 @@
 #define K37StackingActionMessenger_h 1
 
 #include "G4UIcmdWithABool.hh"
+#include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
 #include "globals.hh"
 
