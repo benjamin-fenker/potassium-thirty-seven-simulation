@@ -4,12 +4,15 @@
 #define K37StackingAction_h 1
 
 #include "G4UserStackingAction.hh"
-#include "globals.hh"
-#include "K37ScintillatorHit.hh"
-#include "K37StripDetectorHit.hh"
 #include "G4ParticleDefinition.hh"
+#include "globals.hh"
+
+#include "K37ScintillatorHit.hh"
+#include "K37StackingActionMessenger.hh"
+#include "K37StripDetectorHit.hh"
 
 class G4Track;
+class K37StackingActionMessenger;
 
 // -----------------------------------------------
 
@@ -21,6 +24,7 @@ class K37StackingAction : public G4UserStackingAction {
   G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track*);
   void NewStage();
   void PrepareNewEvent();
+  void SetTrackSecondaries(G4bool track) {track_secondaries_ = track;}
 
  private:
   K37ScintillatorHitsCollection* scintillatorPlusZHits;
@@ -36,6 +40,9 @@ class K37StackingAction : public G4UserStackingAction {
   G4ParticleDefinition *ArMinus;
   G4ParticleDefinition *ArNeutral;
   G4ParticleDefinition *ArPlus;
+
+  K37StackingActionMessenger *messenger_;
+  G4bool track_secondaries_;
 };
 
 #endif

@@ -23,8 +23,10 @@ K37StackingAction::K37StackingAction()
     gamma(G4Gamma::GammaDefinition()),
     ArMinus(K37Ar37Minus::Ar37MinusDefinition()),
     ArNeutral(K37Ar37Neutral::Ar37NeutralDefinition()),
-    ArPlus(K37Ar37PlusOne::Ar37PlusOneDefinition())
-{}
+    ArPlus(K37Ar37PlusOne::Ar37PlusOneDefinition()),
+    track_secondaries_(true) {
+  messenger_ = new K37StackingActionMessenger(this);
+}
 
 //-----------------------------------------------
 
@@ -37,7 +39,6 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
   G4ClassificationOfNewTrack  classification = fWaiting;
 
   // kill all secondaries
-  // if(aTrack->GetParentID() != 0) classification = fKill;
 
   G4ParticleDefinition * particleType = aTrack->GetDefinition();
 
@@ -58,6 +59,11 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
   if (particleType -> GetParticleType() == "nucleus") {
     classification = fUrgent;
   }
+
+  if (!track_secondaries_) {
+    if (aTrack -> GetParentID() != 0) classification = fKill;
+  }
+
   return classification;
 }
 
