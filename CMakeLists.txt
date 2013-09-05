@@ -2,7 +2,8 @@
 # Setup the project
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(K37)
-ADD_DEFINITIONS(-g -O0 -Wall) #for debug builds 
+
+#It is best to set the build type from the build.sh
 
 #----------------------------------------------------------------------------
 # Find Root so that we can link the aggregator class to it
@@ -65,6 +66,7 @@ target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
 set(K37_SCRIPTS
   vis.mac
   IOconfiguration.mac
+  run.pl
   )
 
 foreach(_script ${K37_SCRIPTS})
