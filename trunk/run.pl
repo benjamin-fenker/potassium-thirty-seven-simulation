@@ -19,7 +19,7 @@ sub repeatRun {
         if ($id_num == 0) {
             print "Thread $id_num on call $i\n";
         }
-        `K37 $macro_name`;
+        `./K37 $macro_name`;
         if ($i == 0) {
             `mv $dir/$tempFile $dir/$finalFile`;
         } else {
