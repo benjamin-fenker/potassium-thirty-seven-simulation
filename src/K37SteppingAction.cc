@@ -15,7 +15,6 @@
 #include "K37EventAction.hh"
 #include "K37SteppingAction.hh"
 #include "K37ListOfVolumeNames.hh"
-#include "K37AnnihilationPosition.hh"
 
 K37SteppingAction::K37SteppingAction(K37ListOfVolumeNames* list)
     : listOfEnteredVolumes(list)

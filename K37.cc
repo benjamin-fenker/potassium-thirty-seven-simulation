@@ -28,7 +28,6 @@
 #include "K37TrackingAction.hh"
 #include "K37SteppingAction.hh"
 #include "K37SteppingVerbose.hh"
-#include "K37AnnihilationPosition.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
 #include "K37Config.hh"
@@ -55,9 +54,6 @@ int main(int argc, char** argv) {
   // G4bool nowewont = 0;
   // G4bool yeswewill = 0;
   // G4cin>> shouldwe>> nowewont>> yeswewill;
-
-  K37AnnihilationPosition* annihilation =
-      new K37AnnihilationPosition("annihilate.txt", 1000);
 
   //   AGG::Aggregator *the_aggregator= new AGG::Aggregator();
   GeantAggregator *the_aggregator = new GeantAggregator();
@@ -129,8 +125,7 @@ int main(int argc, char** argv) {
       new K37ListOfVolumeNames("volumeNames.txt", 1000);
 
 
-  K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered,
-                                              annihilation, histo);
+  K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered, histo);
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
   runManager -> SetUserAction(run_action);
@@ -254,9 +249,6 @@ int main(int argc, char** argv) {
   }
   if (verbosity)   {
     delete verbosity;
-  }
-  if (annihilation) {
-    delete annihilation;
   }
   if (evGen)       {
     delete evGen;
