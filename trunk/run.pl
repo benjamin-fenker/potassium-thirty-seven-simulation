@@ -16,6 +16,9 @@ sub repeatRun {
     my $finalFile = "sum$id_num.root";
     my $i = 0;
     while ($i < $iters) {
+        if ($id_num == 0) {
+            print "Thread $id_num on call $i\n";
+        }
         `K37 $macro_name`;
         if ($i == 0) {
             `mv $dir/$tempFile $dir/$finalFile`;
@@ -42,6 +45,7 @@ sub runOnce {
     my $dir = $_[18];
     my $fna = $_[19];
     my @particle = @_[20..22];
+    my $secondaries = $_[23];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
     if ($id_num == 0) {
@@ -66,6 +70,7 @@ sub runOnce {
     print MACRO "/K37/gun/setMakeBeta $particle[0]\n";
     print MACRO "/K37/gun/setMakeRecoil $particle[1]\n";
     print MACRO "/K37/gun/setMakeShakeoffElectrons $particle[2]\n";
+    print MACRO "/K37/Stacking/setTrackSecondaries $secondaries\n";
     print MACRO "/K37/RunControls/setConfigurationFile ";
     print MACRO "runFiles/parallelConfig$id_num.txt\n";
     print MACRO "/K37/RunControls/setOutputDirectory runFiles\n";
@@ -76,7 +81,8 @@ sub runOnce {
  
     
     repeatRun($iters, $id_num, "runFiles/runParallel$id_num.mac", "runFiles");
-    `./K37 runFiles/runParallel$id_num.mac`;
+#   `./K37 runFiles/runParallel$id_num.mac`;
+    print "Thread $id_num done\n";
     `mv runFiles/sum$id_num.root runFiles/$fna$id_num.root`;
 }
 
@@ -93,6 +99,7 @@ my @input;
 my $directory = `pwd`; chomp($directory);
 my $file_name = "output";
 my @particle = ("true", "true", "true");
+my $secondaries = "true";
 
 if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($threshold[0] = <PARAMSin>);
@@ -116,6 +123,7 @@ if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($particle[0] = <PARAMSin>);
     chomp($particle[1] = <PARAMSin>);
     chomp($particle[2] = <PARAMSin>);
+    chomp($secondaries = <PARAMSin>);
 } else {
     print "\nNo parameter file...starting with default values\n\n";
 }
@@ -179,11 +187,16 @@ while($choice != 0) {
     print "[1] Make Beta                          = $particle[0]\n";
     print "[2] Make Recoils                       = $particle[1]\n";
     print "[3] Make Shakeoff Electrons            = $particle[2]\n";
+    print "[4] Track secondaries                  = $secondaries\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {
         printf "Enter new value for $choice\n";
-        chomp($particle[$choice-1] = <STDIN>);
+        if ($choice <= 3) {
+            chomp($particle[$choice-1] = <STDIN>);
+        } else {
+            chomp($secondaries = <STDIN>);
+        }
     }
 }
 
@@ -246,7 +259,7 @@ print "$thread_events per thread\n";
 
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
-                 $file_name, @particle);
+                 $file_name, @particle, $secondaries);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;
