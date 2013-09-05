@@ -19,7 +19,6 @@
 #include "G4ios.hh"
 #include "G4UnitsTable.hh"
 
-#include "K37AllPossibleEventInformation.hh"
 #include "K37Analysis.hh"
 #include "K37AnalysisNumbering.hh"
 #include "K37Config.hh"
@@ -42,12 +41,14 @@ using std::left;
 extern G4bool fillAllSDData;
 
 K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
-                               K37AllPossibleEventInformation* APEI,
-                               K37HistogramManager * his) :
-    v1190_factor_ns(0.09765625), runAct(run), listOfEnteredVolumes(list),
-    stripHandler(0),
-  EventInformation(APEI), histograms(his) {
-  stripHandler = new K37ContainerForStripInformation(EventInformation);
+                               K37HistogramManager * his)
+:v1190_factor_ns(0.09765625),
+   runAct(run),
+   listOfEnteredVolumes(list),
+   stripHandler(0),
+   histograms(his)
+{
+  stripHandler = new K37ContainerForStripInformation();
 
   spot.clear();
   start.clear();
@@ -267,9 +268,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     if (energy_upper_scintillator>0) {
       isThereEnergySili = true;
-      if (energy_upper_scintillator_primaries == 0) {
-        EventInformation->setGammaFiredScintillatorPlusZToTrue();
-      }
     }
   }
 
@@ -293,9 +291,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     if (energy_lower_scintillator>0) {
       isThereEnergySili2 = true;
-      if (energy_lower_scintillator_primaries == 0) {
-        EventInformation->setGammaFiredScintillatorMinusZToTrue();
-      }
     }
   }
 
@@ -410,9 +405,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     accepted++;
     runAct->SetAccepted();
 
-
-    EventInformation->setThisIsAnAccepterEvent();
-
     (*active_channels_)["QDC_UpperPMT"] ->
         InsertData(energy_upper_scintillator/keV);
     (*active_channels_)["QDC_LowerPMT"] ->
@@ -456,28 +448,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       // stripHandler->PrintMaps();
       stripHandler->PassThePlusZDetectors();
 
-      // ofstream detectorADA;
-      // detectorADA.open("detectorADA.txt", ofstream::out | ofstream::app);
-      // detectorADA.setf(std::ios::fixed, std::ios::floatfield);
-      // detectorADA << setw(15) << left << energyDedx/keV << setw(15) << left
-      //             << energy_upper_scintillator/keV << G4endl;
-      // detectorADA.close();
-
-      // histograms->FillNtuple(1, 0, energy_upper_scintillator);
-      // histograms->FillNtuple(0, 0, energyDedx);
-      // histograms->AddRowNtuple(1);
-      // histograms->AddRowNtuple(0);
-
-
       runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
                                                     energy_upper_scintillator));
 
-      EventInformation ->
-          setTotalEnergyInScintillator(energy_upper_scintillator);
-      EventInformation -> setTotalEnergyInStripDetector(energyDedx);
-      EventInformation -> setPlusZDetectorsFiredToTrue();
-      EventInformation ->
-          setStartStripDetectorTime((*upper_sd_hit_collection)[0] -> GetTime());
       if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
         listOfEnteredVolumes -> setEnteredVolumeName("----------------------A",
                                                      0, 0);
@@ -487,26 +460,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (isThereEnergyDedx2 == true) {
       stripHandler->PassTheMinusZDetectors();
 
-      // ofstream detectorODA;
-      // detectorODA.open("detectorODA.txt", ofstream::out | ofstream::app);
-      // detectorODA.setf(std::ios::fixed, std::ios::floatfield);
-      // detectorODA << setw(15)<< left << energyDedx2/keV << setw(15) << left
-      //             << energy_lower_scintillator/keV << G4endl;
-      // detectorODA.close();
-
-      // histograms->FillNtuple(3, 0, energy_lower_scintillator);
-      // histograms->FillNtuple(2, 0, energyDedx2);
-      // histograms->AddRowNtuple(3);
-      // histograms->AddRowNtuple(2);
-
       runAct ->
           incrementMinusZ_vc(GetRelativisticFactor(emass,
                                                    energy_lower_scintillator));
-      EventInformation ->
-          setTotalEnergyInScintillator(energy_lower_scintillator);
-      EventInformation -> setTotalEnergyInStripDetector(energyDedx2);
-      EventInformation ->
-          setStartStripDetectorTime((*lower_sd_hit_collection)[0]->GetTime());
 
       if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
         listOfEnteredVolumes -> setEnteredVolumeName("----------------------O",

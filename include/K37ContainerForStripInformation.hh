@@ -10,11 +10,9 @@
 #include "globals.hh"
 #include "G4ThreeVector.hh"
 
-class K37AllPossibleEventInformation;
-
 class K37ContainerForStripInformation {
  public:
-  explicit K37ContainerForStripInformation(K37AllPossibleEventInformation* api);
+  explicit K37ContainerForStripInformation();
   ~K37ContainerForStripInformation();
 
   void StoreStripInformation(G4ThreeVector, G4double, G4bool, G4bool);
@@ -25,7 +23,6 @@ class K37ContainerForStripInformation {
 
  private:
   void InitializeDetectorMap();
-  K37AllPossibleEventInformation * EventInformation;
   G4int FindStripNumberForHit(G4double);
   std::map<G4int, G4double> mapOfDetectorStrips;
   std::map<G4int, G4double>::iterator iteratorOfDetectorMap;

@@ -29,7 +29,6 @@
 #include "K37SteppingAction.hh"
 #include "K37SteppingVerbose.hh"
 #include "K37AnnihilationPosition.hh"
-#include "K37AllPossibleEventInformation.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
 #include "K37Config.hh"
@@ -59,9 +58,6 @@ int main(int argc, char** argv) {
 
   K37AnnihilationPosition* annihilation =
       new K37AnnihilationPosition("annihilate.txt", 1000);
-
-  K37AllPossibleEventInformation* APEI =
-      new K37AllPossibleEventInformation("EventInformation.txt");
 
   //   AGG::Aggregator *the_aggregator= new AGG::Aggregator();
   GeantAggregator *the_aggregator = new GeantAggregator();
@@ -123,7 +119,7 @@ int main(int argc, char** argv) {
   evGen -> SetActiveChannels(&active_channels);
 
   K37PrimaryGeneratorAction* gen_action =
-      new K37PrimaryGeneratorAction(detector, APEI, evGen);
+      new K37PrimaryGeneratorAction(detector, evGen);
   gen_action -> SetAggregator(the_aggregator);
   gen_action -> SetActiveChannels(&active_channels);
   runManager -> SetUserAction(gen_action);
@@ -134,14 +130,14 @@ int main(int argc, char** argv) {
 
 
   K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered,
-                                              annihilation, APEI, histo);
+                                              annihilation, histo);
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
   runManager -> SetUserAction(run_action);
 
   K37EventAction* event_action = new K37EventAction(run_action,
                                                     volumesTheBetaEntered,
-                                                    APEI, histo);
+                                                    histo);
   event_action -> SetAggregator(the_aggregator);
   event_action -> SetActiveChannels(&active_channels);
   event_action -> SetPrimaryGenerator(gen_action);
@@ -152,7 +148,7 @@ int main(int argc, char** argv) {
   runManager->SetUserAction(tracking_action= new K37TrackingAction());
 
   K37SteppingAction* stepping_action =
-      new K37SteppingAction(volumesTheBetaEntered, APEI);
+      new K37SteppingAction(volumesTheBetaEntered);
   runManager->SetUserAction(stepping_action);
 
   // get the pointer to the User Interface manager
@@ -261,9 +257,6 @@ int main(int argc, char** argv) {
   }
   if (annihilation) {
     delete annihilation;
-  }
-  if (APEI)        {
-    delete APEI;
   }
   if (evGen)       {
     delete evGen;

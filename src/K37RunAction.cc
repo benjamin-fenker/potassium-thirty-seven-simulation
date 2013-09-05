@@ -10,7 +10,6 @@
 #include "K37DetectorConstruction.hh"
 #include "K37ListOfVolumeNames.hh"
 #include "K37AnnihilationPosition.hh"
-#include "K37AllPossibleEventInformation.hh"
 // Just need for testing
 #include "JTW_Event.hh"
 
@@ -34,10 +33,12 @@ G4bool fillAllSDData = true;
 
 K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
                            K37AnnihilationPosition* anhilP,
-                           K37AllPossibleEventInformation* APEI,
-                           K37HistogramManager * his) :
-  listOfEnteredVolumes(list), runMessenger(0), annihilationPosition(anhilP),
-  AllEventInformation(APEI), histograms(his) {
+                           K37HistogramManager * his)
+:listOfEnteredVolumes(list),
+   runMessenger(0),
+   annihilationPosition(anhilP),
+   histograms(his)
+{
   recordAnnihilationPosition = false;
   // recordAnnihilationPosition = true;
   recordVolumeNames = false;
@@ -206,12 +207,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
     annihilationPosition->setShouldAnnihilationBeRecorded();
   } else {
     annihilationPosition->deleteFile();
-  }
-  if (recordEventInformation== true) {
-    AllEventInformation->clearEventInformation();
-    AllEventInformation->setShouldEventInformationBeRecorded();
-  } else {
-    AllEventInformation->deleteFile();
   }
   accepted = 0;
   accepted_bs = 0;

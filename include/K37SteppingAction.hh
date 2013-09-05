@@ -9,11 +9,10 @@
 class K37EventAction;
 class K37ListOfVolumeNames;
 class K37AnnihilationPosition;
-class K37AllPossibleEventInformation;
 
 class K37SteppingAction : public G4UserSteppingAction {
  public:
-  K37SteppingAction(K37ListOfVolumeNames*, K37AllPossibleEventInformation*);
+  K37SteppingAction(K37ListOfVolumeNames*);
   virtual ~K37SteppingAction();
 
   virtual void UserSteppingAction(const G4Step*);
@@ -22,7 +21,6 @@ class K37SteppingAction : public G4UserSteppingAction {
   //  K37EventAction*             eventAction;
   K37ListOfVolumeNames*       listOfEnteredVolumes;
   //  K37AnnihilationPosition* annihilationPosition;
-  K37AllPossibleEventInformation* AllTheInformation;
 };
 
 #endif
