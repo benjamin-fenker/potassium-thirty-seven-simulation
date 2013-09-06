@@ -4,7 +4,52 @@ use threads;
 use warnings;
 use POSIX;
 use List::Util qw[min];
+use Time::HiRes qw( gettimeofday tv_interval);
+use vars qw($t0);
 #use dignostics;
+$t0 = [gettimeofday];
+
+sub statusBar
+{
+   #$| = 1; #turn of buffering to STDOUT
+   select((select(STDOUT), $|=1)[0]);
+   my $currentValue = $_[0];
+   my $maxValue = $_[1];
+   my $segments = 50.0;
+   my $barPercent = 100.0*(($maxValue/$segments)/$maxValue);
+   my $percentComplete = 100.0*($currentValue/$maxValue);
+   my $numberOfBars = 1; 
+   my $barTotal = 0;
+   while ($barTotal <= $percentComplete)
+   {
+      $barTotal = $numberOfBars*$barPercent;
+      ++$numberOfBars;
+   }
+   --$numberOfBars;
+   my $theBars;
+   while($numberOfBars > 0)
+   {
+      $theBars .= "=";
+      --$numberOfBars;
+   }
+
+   my $elapsedTime = tv_interval($t0, [gettimeofday]);
+   $elapsedTime = $elapsedTime/60.0;
+   if($percentComplete == 0)
+   {
+      printf("|%-50s|%5.1f%% Complete | %7.2f min.", $theBars,
+            $percentComplete, $elapsedTime);
+   }
+   else
+   {
+      printf("\r|%-50s|%5.1f%% Complete | %7.2f min.", $theBars,
+            $percentComplete, $elapsedTime);
+   }
+   if(($currentValue + 1) == $maxValue)
+   {
+      printf("\n ... Simulation Complete Waitng for hadd and other threads ... \n");
+   }
+}
 
 sub repeatRun {
     my $iters = $_[0];
@@ -17,7 +62,8 @@ sub repeatRun {
     my $i = 0;
     while ($i < $iters) {
         if ($id_num == 0) {
-            print "Thread $id_num on call $i\n";
+            #print "Thread $id_num on call $i\n";
+            statusBar($i, $iters);
         }
         `./K37 $macro_name`;
         if ($i == 0) {
