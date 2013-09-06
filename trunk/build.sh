@@ -11,7 +11,7 @@ if [ ! -d "$outputDir" ]; then
      # Control will enter here if $DIRECTORY doesn't exist.
      mkdir "$outputDir";
 fi
-O_CPP_FLAGS="-O3 -Wall" #optimized build compiler options
+O_CPP_FLAGS="-O4 -Wall" #optimized build compiler options
 D_CPP_FLAGS="-g -O0 -Wall" #debug build compiler options 
 #ReleaseType="DEBUG" #you can choose to use the debug build options
 ReleaseType="RELEASE" #you can choose to use the release build options 
