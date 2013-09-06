@@ -25,7 +25,6 @@
 #include "K37ContainerForStripInformation.hh"
 #include "K37ElectronMCPHit.hh"
 #include "K37EventAction.hh"
-#include "K37MirrorHit.hh"
 #include "K37RecoilMCPHit.hh"
 #include "K37RunAction.hh"
 #include "K37ScintillatorHit.hh"
