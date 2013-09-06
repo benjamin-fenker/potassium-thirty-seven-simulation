@@ -26,7 +26,7 @@
 #include "K37RunAction.hh"
 #include "K37EventAction.hh"
 #include "K37TrackingAction.hh"
-#include "K37SteppingAction.hh"
+//#include "K37SteppingAction.hh"
 #include "K37SteppingVerbose.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
@@ -142,9 +142,9 @@ int main(int argc, char** argv) {
   K37TrackingAction* tracking_action;
   runManager->SetUserAction(tracking_action= new K37TrackingAction());
 
-  K37SteppingAction* stepping_action =
-      new K37SteppingAction(volumesTheBetaEntered);
-  runManager->SetUserAction(stepping_action);
+  //K37SteppingAction* stepping_action =
+      //new K37SteppingAction(volumesTheBetaEntered);
+  //runManager->SetUserAction(stepping_action);
 
   // get the pointer to the User Interface manager
   runManager->SetUserAction(new K37StackingAction);
