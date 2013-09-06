@@ -23,11 +23,11 @@
 #include "K37RunAction.hh"
 #include "K37EventAction.hh"
 #include "K37TrackingAction.hh"
-//#include "K37SteppingAction.hh"
 #include "K37SteppingVerbose.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
 #include "K37Config.hh"
+#include "G4VisTrajContext.hh"
 #include "Aggregator.hh"
 #include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
@@ -140,7 +140,12 @@ int main(int argc, char** argv) {
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive();
   visManager->Initialize();
-  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID("ParticleType");
+  G4VisTrajContext *theContext = new G4VisTrajContext("ParticleTypeContext");
+  theContext->SetDrawAuxPts(true);
+  theContext->SetDrawStepPts(true);
+  //theContext->SetTimeSliceInterval(5);
+  G4TrajectoryDrawByParticleID* model = new G4TrajectoryDrawByParticleID(
+        "ParticleType", theContext);
   model->SetDefault("white");
   model->Set("gamma", "green");
   model->Set("e+", "blue");

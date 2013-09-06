@@ -11,6 +11,7 @@
 /vis/viewer/set/viewpointThetaPhi 90. 180.
 /vis/viewer/zoom 2.1
 /vis/scene/add/trajectories smooth
+#/vis/scene/add/trajectories rich
 #/vis/modeling/trajectories/create/drawByCharge
 #/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
 #/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1
