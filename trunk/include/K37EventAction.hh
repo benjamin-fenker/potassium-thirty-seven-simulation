@@ -182,9 +182,6 @@ class K37EventAction : public G4UserEventAction {
   vector< G4ThreeVector > spot;
   vector< G4ThreeVector > start;
 
-  unsigned int sizeOfListOfEnteredVolumes;
-  //  int differenceInListSizeFromStartToEnd;
-
   double upper_scintillator_threshold_;
   double lower_scintillator_threshold_;
   double electron_mcp_threshold_;

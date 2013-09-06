@@ -4,7 +4,6 @@
 #include "K37DetectorConstruction.hh"
 #include "K37DetectorMessenger.hh"
 #include "K37ScintillatorSD.hh"
-#include "K37MirrorSD.hh"
 #include "K37StripDetectorSD.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37ElectronMCPSD.hh"
