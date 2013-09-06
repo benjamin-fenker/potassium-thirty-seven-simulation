@@ -25,7 +25,6 @@
 #include "K37ContainerForStripInformation.hh"
 #include "K37ElectronMCPHit.hh"
 #include "K37EventAction.hh"
-#include "K37HistogramManager.hh"
 #include "K37MirrorHit.hh"
 #include "K37RecoilMCPHit.hh"
 #include "K37RunAction.hh"
@@ -39,11 +38,10 @@ using std::left;
 
 extern G4bool fillAllSDData;
 
-K37EventAction::K37EventAction(K37RunAction* run, K37HistogramManager * his)
+K37EventAction::K37EventAction(K37RunAction* run)
 :v1190_factor_ns(0.09765625),
    runAct(run),
-   stripHandler(0),
-   histograms(his)
+   stripHandler(0)
 {
   stripHandler = new K37ContainerForStripInformation();
 

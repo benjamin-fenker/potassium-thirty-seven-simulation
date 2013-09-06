@@ -28,12 +28,11 @@ using K37_ABC::K37_Data;
 
 class K37ContainerForStripInformation;
 class K37EventMessenger;
-class K37HistogramManager;
 class K37RunAction;
 
 class K37EventAction : public G4UserEventAction {
  public:
-  K37EventAction(K37RunAction* ra, K37HistogramManager* hm);
+  K37EventAction(K37RunAction* ra);
   ~K37EventAction();
 
   void BeginOfEventAction(const G4Event*);
@@ -185,7 +184,6 @@ class K37EventAction : public G4UserEventAction {
 
   unsigned int sizeOfListOfEnteredVolumes;
   //  int differenceInListSizeFromStartToEnd;
-  K37HistogramManager * histograms;
 
   double upper_scintillator_threshold_;
   double lower_scintillator_threshold_;

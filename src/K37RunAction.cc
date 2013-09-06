@@ -1,8 +1,6 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
 #include <iomanip>
-
-#include "K37HistogramManager.hh"
 #include "K37RunAction.hh"
 
 #include "K37EventAction.hh"
@@ -29,9 +27,8 @@ G4bool fillAllSDData = true;
 
 //----------------------------------
 
-K37RunAction::K37RunAction(K37HistogramManager * his)
-:runMessenger(0),
-   histograms(his)
+K37RunAction::K37RunAction()
+:runMessenger(0)
 {
   recordAnnihilationPosition = false;
   // recordAnnihilationPosition = true;
@@ -173,7 +170,6 @@ K37RunAction::~K37RunAction() {
 //----------------------------------
 
 void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
-  histograms->book();
 
   NbofEvents = 0;
 
@@ -272,7 +268,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 }
 
 void K37RunAction::EndOfRunAction(const G4Run* aRun) {
-  histograms->save();
 
   NbofEvents = aRun->GetNumberOfEvent();
 

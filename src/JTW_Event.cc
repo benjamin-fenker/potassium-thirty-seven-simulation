@@ -1,7 +1,6 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
 #include <cmath>
-#include "K37HistogramManager.hh"
 #include "K37Analysis.hh"
 #include "JTW_Event.hh"
 #include "K37FermiFunction.hh"
