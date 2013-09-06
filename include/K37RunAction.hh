@@ -26,13 +26,12 @@ using std::string;
 class G4Run;
 class K37DetectorConstruction;
 class K37PrimaryGeneratorAction;
-class K37ListOfVolumeNames;
 // class K37RunMessenger;
 class K37HistogramManager;
 
 class K37RunAction : public G4UserRunAction {
  public:
-  K37RunAction(K37ListOfVolumeNames*, K37HistogramManager*);
+  K37RunAction(K37HistogramManager*);
 
   ~K37RunAction();
   void BeginOfRunAction(const G4Run*);
@@ -158,9 +157,6 @@ class K37RunAction : public G4UserRunAction {
   G4int    vetoed;
   G4int    nonVetoed;
 
-  //  K37DetectorConstruction* detector;
-  //  K37PrimaryGeneratorAction* kinematic;
-  K37ListOfVolumeNames* listOfEnteredVolumes;
   K37RunMessenger* runMessenger;
 
   G4bool recordAnnihilationPosition;

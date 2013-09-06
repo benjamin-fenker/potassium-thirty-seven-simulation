@@ -29,13 +29,11 @@ using K37_ABC::K37_Data;
 class K37ContainerForStripInformation;
 class K37EventMessenger;
 class K37HistogramManager;
-class K37ListOfVolumeNames;
 class K37RunAction;
 
 class K37EventAction : public G4UserEventAction {
  public:
-  K37EventAction(K37RunAction* ra, K37ListOfVolumeNames* lovn,
-        K37HistogramManager* hm);
+  K37EventAction(K37RunAction* ra, K37HistogramManager* hm);
   ~K37EventAction();
 
   void BeginOfEventAction(const G4Event*);
@@ -102,7 +100,6 @@ class K37EventAction : public G4UserEventAction {
   // G4THitsMap<G4double>* energyFaceMap;
 
   K37RunAction*  runAct;
-  K37ListOfVolumeNames* listOfEnteredVolumes;
   K37ContainerForStripInformation* stripHandler;
 
   G4int fullenergy1CollID;

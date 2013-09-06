@@ -8,7 +8,6 @@
 #include "K37EventAction.hh"
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37DetectorConstruction.hh"
-#include "K37ListOfVolumeNames.hh"
 // Just need for testing
 #include "JTW_Event.hh"
 
@@ -30,10 +29,8 @@ G4bool fillAllSDData = true;
 
 //----------------------------------
 
-K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
-                           K37HistogramManager * his)
-:listOfEnteredVolumes(list),
-   runMessenger(0),
+K37RunAction::K37RunAction(K37HistogramManager * his)
+:runMessenger(0),
    histograms(his)
 {
   recordAnnihilationPosition = false;
@@ -46,9 +43,6 @@ K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
   accepted = 0;
   accepted_bs = 0;
   bs = 0;
-  // secondaryInSiLi = 0;
-  // secondaryInDedx = 0;
-  // secondaryInBoth = 0;
   falsePositive = 0;
   falsePositiveWithSili = 0;
   falsePositiveWithDedx = 0;
@@ -57,15 +51,6 @@ K37RunAction::K37RunAction(K37ListOfVolumeNames* list,
   acceptedWithSili2 = 0;
 
   acceptedWithDedx2 = 0;
-  /*acceptedWithDedx2SecondaryFiredDedx=0;
-    acceptedWithDedx2SecondaryFiredSili=0;
-    acceptedWithDedx2SecondaryFiredDedx2=0;
-    acceptedWithDedx2SecondaryFiredSiliAndDedx2=0;
-    acceptedWithDedx2SecondaryFiredDedxAndSili=0;
-    acceptedWithDedx2SecondaryFiredDedxAndDedx2=0;
-    acceptedWithDedx2SPrimaryFiredAll=0;
-    acceptedWithDedx2SecondaryFiredAll=0;
-  */
 
   plusZHits_vc = 0.0;
   minusZHits_vc = 0.0;
@@ -191,19 +176,10 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   histograms->book();
 
   NbofEvents = 0;
-  if (recordVolumeNames == true) {
-    listOfEnteredVolumes->clearList();
-    listOfEnteredVolumes->setShouldVolumeNamesBeRecorded();
-  } else {
-    listOfEnteredVolumes->deleteFile();
-  }
 
   accepted = 0;
   accepted_bs = 0;
   bs = 0;
-  // secondaryInSiLi = 0;
-  // secondaryInDedx = 0;
-  // secondaryInBoth = 0;
   falsePositive = 0;
   falsePositiveWithSili = 0;
   falsePositiveWithDedx = 0;
@@ -211,15 +187,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   acceptedWithSili2 = 0;
   acceptedWithDedx2 = 0;
-  /*acceptedWithDedx2SecondaryFiredDedx=0;
-    acceptedWithDedx2SecondaryFiredSili=0;
-    acceptedWithDedx2SecondaryFiredDedx2=0;
-    acceptedWithDedx2SecondaryFiredSiliAndDedx2=0;
-    acceptedWithDedx2SecondaryFiredDedxAndSili=0;
-    acceptedWithDedx2SecondaryFiredDedxAndDedx2=0;
-    acceptedWithDedx2SPrimaryFiredAll=0;
-    acceptedWithDedx2SecondaryFiredAll=0;
-  */
   acceptedWithNone = 0;
   acceptedWithNoneSecondaryFiredDedx = 0;
   acceptedWithNoneSecondaryFiredSili = 0;
@@ -239,49 +206,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
   G4RunManager::GetRunManager()->SetRandomNumberStore(true);
-
-  /* outfile << "This sentence is appended to the file content\n";
-     outfile<< "Event Number: "<<G4endl;
-     outfile<< "energyDedx / keV" << "\t"<< "energySiLi / keV" << "\t"<< "(energyTotal)/ keV" << G4endl;
-     outfile<< "Position and time since start of e+ exit from volume"<<G4endl;
-     outfile<< "1= dedx 2=Sili"<< "\t"<<"time(ns)" << "\t"<<"X"<< "\t"<<"Y"<< "\t"<<"Z" <<G4endl;
-     outfile<<G4endl;
-     outfile<< "---------------------"<<G4endl;
-  */
-
-  // std::ofstream zpos;
-  // zpos.open ("alive.txt", std::ofstream::out | std::ofstream::trunc);
-  // zpos.close();
-
-  /*
-    std::ofstream projectionFront;
-    projectionFront.open ("projectionFront.txt", std::ofstream::out | std::ofstream::trunc);
-    projectionFront.close();
-
-    std::ofstream projectionBack;
-    projectionBack.open ("projectionBack.txt", std::ofstream::out | std::ofstream::trunc);
-    projectionBack.close();
-  */
-
-
-  // std::ofstream runstat;
-  // runstat.open ("runstat.txt", std::ofstream::out | std::ofstream::trunc);
-  // runstat.close();
-
-  // std::ofstream detectorADA;
-  // detectorADA.open("detectorADA.txt",
-  //                  std::ofstream::out | std::ofstream::trunc);
-  // detectorADA.close();
-
-  // std::ofstream detectorODA;
-  // detectorODA.open("detectorODA.txt",
-  //                  std::ofstream::out | std::ofstream::trunc);
-  // detectorODA.close();
-
-
-  // std::ofstream theta;
-  // theta.open ("theta.txt", std::ofstream::out | std::ofstream::trunc);
-  // theta.close();
 
 
   ///////////////////////// My new stuff //////////////////
@@ -354,9 +278,6 @@ void K37RunAction::EndOfRunAction(const G4Run* aRun) {
 
   this->PrintResultsToScreen();
   this->PrintResultsToRunstat();
-  if (recordVolumeNames == true) {
-    listOfEnteredVolumes->checkIfPrintIsNeeded(true);
-  }
 
   // JTW_Event *mytester = new JTW_Event();
   // FILE *f = fopen("RecheckA_beta.dat", "a");
