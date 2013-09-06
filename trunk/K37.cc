@@ -19,7 +19,6 @@
 #include "JTW_Event.hh"
 #include "K37_Data.hh"
 #include "K37FermiFunction.hh"
-#include "K37ListOfVolumeNames.hh"
 #include "K37DetectorConstruction.hh"
 #include "K37PhysicsList.hh"
 #include "K37PrimaryGeneratorAction.hh"
@@ -121,17 +120,12 @@ int main(int argc, char** argv) {
   runManager -> SetUserAction(gen_action);
   the_aggregator -> SetPrimaryGeneratorAction(gen_action);
 
-  K37ListOfVolumeNames *volumesTheBetaEntered =
-      new K37ListOfVolumeNames("volumeNames.txt", 1000);
-
-
-  K37RunAction* run_action = new K37RunAction(volumesTheBetaEntered, histo);
+  K37RunAction* run_action = new K37RunAction(histo);
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
   runManager -> SetUserAction(run_action);
 
   K37EventAction* event_action = new K37EventAction(run_action,
-                                                    volumesTheBetaEntered,
                                                     histo);
   event_action -> SetAggregator(the_aggregator);
   event_action -> SetActiveChannels(&active_channels);
@@ -141,10 +135,6 @@ int main(int argc, char** argv) {
 
   K37TrackingAction* tracking_action;
   runManager->SetUserAction(tracking_action= new K37TrackingAction());
-
-  //K37SteppingAction* stepping_action =
-      //new K37SteppingAction(volumesTheBetaEntered);
-  //runManager->SetUserAction(stepping_action);
 
   // get the pointer to the User Interface manager
   runManager->SetUserAction(new K37StackingAction);
@@ -252,9 +242,6 @@ int main(int argc, char** argv) {
   }
   if (evGen)       {
     delete evGen;
-  }
-  if (volumesTheBetaEntered)       {
-    delete volumesTheBetaEntered;
   }
   if (histo)       {
     delete histo;

@@ -26,7 +26,6 @@
 #include "K37ElectronMCPHit.hh"
 #include "K37EventAction.hh"
 #include "K37HistogramManager.hh"
-#include "K37ListOfVolumeNames.hh"
 #include "K37MirrorHit.hh"
 #include "K37RecoilMCPHit.hh"
 #include "K37RunAction.hh"
@@ -40,11 +39,9 @@ using std::left;
 
 extern G4bool fillAllSDData;
 
-K37EventAction::K37EventAction(K37RunAction* run, K37ListOfVolumeNames* list,
-                               K37HistogramManager * his)
+K37EventAction::K37EventAction(K37RunAction* run, K37HistogramManager * his)
 :v1190_factor_ns(0.09765625),
    runAct(run),
-   listOfEnteredVolumes(list),
    stripHandler(0),
    histograms(his)
 {
@@ -122,11 +119,6 @@ K37EventAction::~K37EventAction() {
 void K37EventAction::BeginOfEventAction(const G4Event* ev) {
   if (ev -> GetEventID() % 1000 == 0) {
     G4cout << "Event " << ev -> GetEventID() << G4endl;
-  }
-
-  // spot.clear();
-  if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
-    sizeOfListOfEnteredVolumes = listOfEnteredVolumes->checkSizeOfList();
   }
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
@@ -449,25 +441,16 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       stripHandler->PassThePlusZDetectors();
 
       runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
-                                                    energy_upper_scintillator));
+               energy_upper_scintillator));
 
-      if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
-        listOfEnteredVolumes -> setEnteredVolumeName("----------------------A",
-                                                     0, 0);
-      }
     }  // End energy in plusZ
 
     if (isThereEnergyDedx2 == true) {
       stripHandler->PassTheMinusZDetectors();
 
-      runAct ->
-          incrementMinusZ_vc(GetRelativisticFactor(emass,
-                                                   energy_lower_scintillator));
+      runAct -> incrementMinusZ_vc(GetRelativisticFactor(emass,
+               energy_lower_scintillator));
 
-      if (listOfEnteredVolumes-> getShouldVolumeNamesBeRecorded()) {
-        listOfEnteredVolumes -> setEnteredVolumeName("----------------------O",
-                                                     0, 0);
-      }
     }  // End energy in minusZ
 
     // Add a new row here to add a new row for only accpeted events where
