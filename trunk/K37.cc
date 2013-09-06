@@ -12,8 +12,6 @@
 #include "G4UnitsTable.hh"
 #include "G4TrajectoryDrawByParticleID.hh"
 
-#include "K37HistogramManager.hh"
-
 #include "K37EventGenerator.hh"
 #include "Holstein_Event.hh"
 #include "JTW_Event.hh"
@@ -73,8 +71,6 @@ int main(int argc, char** argv) {
   // delete testChan; testChan = 0;
   //-------------------------------------------------------------
 
-  K37HistogramManager* histo = new K37HistogramManager();
-
   CLHEP::Ranlux64Engine randomEngine;
   CLHEP::HepRandom::setTheEngine(&randomEngine);
 
@@ -120,13 +116,12 @@ int main(int argc, char** argv) {
   runManager -> SetUserAction(gen_action);
   the_aggregator -> SetPrimaryGeneratorAction(gen_action);
 
-  K37RunAction* run_action = new K37RunAction(histo);
+  K37RunAction* run_action = new K37RunAction();
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
   runManager -> SetUserAction(run_action);
 
-  K37EventAction* event_action = new K37EventAction(run_action,
-                                                    histo);
+  K37EventAction* event_action = new K37EventAction(run_action);
   event_action -> SetAggregator(the_aggregator);
   event_action -> SetActiveChannels(&active_channels);
   event_action -> SetPrimaryGenerator(gen_action);
@@ -242,9 +237,6 @@ int main(int argc, char** argv) {
   }
   if (evGen)       {
     delete evGen;
-  }
-  if (histo)       {
-    delete histo;
   }
   // if(visManager)        {delete visManager;}
   // delete betaGenerator;
