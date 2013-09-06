@@ -10,8 +10,12 @@
 #/vis/scene/add/axes 0 0 0 1 m
 /vis/viewer/set/viewpointThetaPhi 90. 180.
 /vis/viewer/zoom 2.1
-/vis/scene/add/trajectories smooth
-#/vis/scene/add/trajectories rich
+
+#Tell Geant what sort of Tracks to use
+#/vis/scene/add/trajectories          #makes straight tracks 
+/vis/scene/add/trajectories smooth   #makes cureved tracks
+#/vis/scene/add/trajectories rich    #Keeps additional information
+
 #/vis/modeling/trajectories/create/drawByCharge
 #/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
 #/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1

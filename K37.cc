@@ -22,7 +22,6 @@
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37RunAction.hh"
 #include "K37EventAction.hh"
-#include "K37TrackingAction.hh"
 #include "K37SteppingVerbose.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
@@ -127,9 +126,6 @@ int main(int argc, char** argv) {
   event_action -> SetPrimaryGenerator(gen_action);
   runManager   -> SetUserAction(event_action);
   the_aggregator -> SetEventAction(event_action);
-
-  K37TrackingAction* tracking_action;
-  runManager->SetUserAction(tracking_action= new K37TrackingAction());
 
   // get the pointer to the User Interface manager
   runManager->SetUserAction(new K37StackingAction);
