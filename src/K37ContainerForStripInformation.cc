@@ -5,8 +5,7 @@
 #include "K37ContainerForStripInformation.hh"
 #include "G4ThreeVector.hh"
 
-K37ContainerForStripInformation::K37ContainerForStripInformation()
-{
+K37ContainerForStripInformation::K37ContainerForStripInformation() {
   InitializeDetectorMap();
   DetectorPlusZ_X_secondary.clear();
   DetectorPlusZ_Y_secondary.clear();

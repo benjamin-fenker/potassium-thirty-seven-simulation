@@ -22,14 +22,10 @@ using AGG::Aggregator;
 using std::string;
 
 G4bool fillEvGenData = true;
-G4bool fillAllSDData = true;
-
-
 //----------------------------------
 
 K37RunAction::K37RunAction()
-:runMessenger(0)
-{
+    :runMessenger(0), record_strip_detector_data_(true) {
   recordAnnihilationPosition = false;
   // recordAnnihilationPosition = true;
   recordVolumeNames = false;
@@ -170,7 +166,6 @@ K37RunAction::~K37RunAction() {
 //----------------------------------
 
 void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
-
   NbofEvents = 0;
 
   accepted = 0;
@@ -215,8 +210,10 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   FILE *io_file;
   char data_type[80], out_file[80];
   io_file = fopen(GetConfigurationFileName(), "r");
-  fscanf(io_file, "%s %s", data_type, out_file);
-
+  int result = fscanf(io_file, "%s %s", data_type, out_file);
+  if (result != 2) {
+     G4cout << "WARNING PROBLEMS READING CONFIG FILE" << G4endl;
+  }
   G4cout << "Opening file: " << out_file << G4endl;
   // Analysis Version 3! Spencer's Aggregator---should be IDENTICAL to what we
   // get from the analyzer.
@@ -226,11 +223,13 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(qdc_lower_pmt_);
   RegisterChannel(dl_x_pos_);
   RegisterChannel(dl_z_pos_);
-  for (G4int i = 0; i < 40; i++) {
-    RegisterChannel(strip_detector_upper_x_[i]);
-    RegisterChannel(strip_detector_upper_y_[i]);
-    RegisterChannel(strip_detector_lower_x_[i]);
-    RegisterChannel(strip_detector_lower_y_[i]);
+  if (record_strip_detector_data_) {
+    for (G4int i = 0; i < 40; i++) {
+      RegisterChannel(strip_detector_upper_x_[i]);
+      RegisterChannel(strip_detector_upper_y_[i]);
+      RegisterChannel(strip_detector_lower_x_[i]);
+      RegisterChannel(strip_detector_lower_y_[i]);
+    }
   }
   RegisterChannel(tdc_scint_top_);
   RegisterChannel(tdc_scint_bottom_);
@@ -268,7 +267,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 }
 
 void K37RunAction::EndOfRunAction(const G4Run* aRun) {
-
   NbofEvents = aRun->GetNumberOfEvent();
 
   this->PrintResultsToScreen();

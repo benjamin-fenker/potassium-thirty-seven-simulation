@@ -35,13 +35,8 @@ using std::ofstream;
 using std::setw;
 using std::left;
 
-extern G4bool fillAllSDData;
-
 K37EventAction::K37EventAction(K37RunAction* run)
-:v1190_factor_ns(0.09765625),
-   runAct(run),
-   stripHandler(0)
-{
+    :v1190_factor_ns(0.09765625), runAct(run), stripHandler(0) {
   stripHandler = new K37ContainerForStripInformation();
 
   spot.clear();
@@ -406,7 +401,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
-    //G4cout << "TDC_ION_MCP: " << recoil_mcp_time/ns << G4endl;
+    // G4cout << "TDC_ION_MCP: " << recoil_mcp_time/ns << G4endl;
     (*active_channels_)["TDC_ELECTRON_MCP"] ->
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
     (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
@@ -424,7 +419,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     // runAct->SetAcceptedPrimaryScatteredOffHoops();
     // Note: Dedx means strip detector and SiLi means scintillator
     // Fill all the ntuples with data from the vectors
-    if (fillAllSDData) {
+    if (runAct -> RecordStripDetectorData()) {
       // New (Aggregator) way
       fillSDNtuples(sd_energy_minsZ_X, "STRIP_LX_");
       fillSDNtuples(sd_energy_minsZ_Y, "STRIP_LY_");
@@ -438,7 +433,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
       runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
                energy_upper_scintillator));
-
     }  // End energy in plusZ
 
     if (isThereEnergyDedx2 == true) {
@@ -446,7 +440,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
       runAct -> incrementMinusZ_vc(GetRelativisticFactor(emass,
                energy_lower_scintillator));
-
     }  // End energy in minusZ
 
     // Add a new row here to add a new row for only accpeted events where

@@ -10,7 +10,6 @@
 #include "globals.hh"
 
 extern G4bool fillEvGenData;
-extern G4bool fillAllSDData;
 
 //---------------------------------
 
@@ -138,7 +137,8 @@ void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   }
 
   if (command == setFillAllSDData) {
-    fillAllSDData = setFillAllSDData -> GetNewBoolValue(newValues);
+    runAction -> SetRecordStripDetectorData(setFillAllSDData ->
+                                            GetNewBoolValue(newValues));
   }
 
   if (command == setFileName) {

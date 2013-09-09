@@ -106,6 +106,10 @@ class K37RunAction : public G4UserRunAction {
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
   }
+  void SetRecordStripDetectorData(G4bool record) {
+    record_strip_detector_data_ = record;
+  }
+  G4bool RecordStripDetectorData() {return record_strip_detector_data_;}
 
  private:
   void RegisterChannel(K37_Data* channel);
@@ -161,6 +165,7 @@ class K37RunAction : public G4UserRunAction {
   G4bool recordAnnihilationPosition;
   G4bool recordVolumeNames;
   G4bool recordEventInformation;
+  G4bool record_strip_detector_data_;
 
   // ROOT output filename
   G4String outFileName;
