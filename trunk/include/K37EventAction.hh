@@ -32,7 +32,7 @@ class K37RunAction;
 
 class K37EventAction : public G4UserEventAction {
  public:
-  K37EventAction(K37RunAction* ra);
+  explicit K37EventAction(K37RunAction* ra);
   ~K37EventAction();
 
   void BeginOfEventAction(const G4Event*);

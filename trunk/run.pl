@@ -92,6 +92,7 @@ sub runOnce {
     my $fna = $_[19];
     my @particle = @_[20..22];
     my $secondaries = $_[23];
+    my $strips = $_[24];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
     if ($id_num == 0) {
@@ -117,6 +118,7 @@ sub runOnce {
     print MACRO "/K37/gun/setMakeRecoil $particle[1]\n";
     print MACRO "/K37/gun/setMakeShakeoffElectrons $particle[2]\n";
     print MACRO "/K37/Stacking/setTrackSecondaries $secondaries\n";
+    print MACRO "/K37/RunControls/fillAllSDData $strips\n";
     print MACRO "/K37/RunControls/setConfigurationFile ";
     print MACRO "runFiles/parallelConfig$id_num.txt\n";
     print MACRO "/K37/RunControls/setOutputDirectory runFiles\n";
@@ -124,8 +126,6 @@ sub runOnce {
     print MACRO "/run/beamOn $events_per_run\n";
 
     close MACRO;
- 
-    
     repeatRun($iters, $id_num, "runFiles/runParallel$id_num.mac", "runFiles");
 #   `./K37 runFiles/runParallel$id_num.mac`;
     print "Thread $id_num done\n";
@@ -146,6 +146,7 @@ my $directory = `pwd`; chomp($directory);
 my $file_name = "output";
 my @particle = ("true", "true", "true");
 my $secondaries = "true";
+my $strips = "true";
 
 if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($threshold[0] = <PARAMSin>);
@@ -170,6 +171,7 @@ if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($particle[1] = <PARAMSin>);
     chomp($particle[2] = <PARAMSin>);
     chomp($secondaries = <PARAMSin>);
+    chomp($strips = <PARAMSin>);
 } else {
     print "\nNo parameter file...starting with default values\n\n";
 }
@@ -234,14 +236,19 @@ while($choice != 0) {
     print "[2] Make Recoils                       = $particle[1]\n";
     print "[3] Make Shakeoff Electrons            = $particle[2]\n";
     print "[4] Track secondaries                  = $secondaries\n";
+    print "[5] Record DSSD Data                   = $strips\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {
         printf "Enter new value for $choice\n";
         if ($choice <= 3) {
             chomp($particle[$choice-1] = <STDIN>);
-        } else {
+        } elsif ($choice == 4) {
             chomp($secondaries = <STDIN>);
+        } elsif ($choice == 5) {
+            chomp($strips = <STDIN>);
+        } else {
+            print "Unknown value.  Try again\n";
         }
     }
 }
@@ -305,7 +312,7 @@ print "$thread_events per thread\n";
 
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
-                 $file_name, @particle, $secondaries);
+                 $file_name, @particle, $secondaries, $strips);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;

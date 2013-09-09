@@ -120,7 +120,6 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     if (make_shakeoff_electrons_) {
       SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
     }
-
   }
 }
 
