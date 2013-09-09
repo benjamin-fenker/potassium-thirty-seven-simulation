@@ -1,6 +1,43 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
+
+// CLHEP files
 #include <CLHEP/Vector/Rotation.h>
 
+// Geant Files
+#include "G4Box.hh"
+#include "G4Colour.hh"
+#include "G4Cons.hh"
+#include "G4Element.hh"
+#include "G4ElementTable.hh"
+#include "G4EllipticalTube.hh"
+#include "G4FieldManager.hh"
+#include "G4GeometryManager.hh"
+#include "G4LogicalVolume.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4Material.hh"
+#include "G4MaterialTable.hh"
+#include "G4MultiFunctionalDetector.hh"
+#include "G4NistManager.hh"
+#include "G4PSEnergyDeposit.hh"
+#include "G4PVParameterised.hh"
+#include "G4PVPlacement.hh"
+#include "G4PVReplica.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4RotationMatrix.hh"
+#include "G4RunManager.hh"
+#include "G4SDParticleFilter.hh"
+#include "G4SolidStore.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4ThreeVector.hh"
+#include "G4Transform3D.hh"
+#include "G4TransportationManager.hh"
+#include "G4Trd.hh"
+#include "G4UnionSolid.hh"
+#include "G4VPrimitiveScorer.hh"
+#include "G4VSDFilter.hh"
+#include "G4VisAttributes.hh"
+
+// Our Files
 #include "K37DetectorConstruction.hh"
 #include "K37DetectorMessenger.hh"
 #include "K37ScintillatorSD.hh"
@@ -8,42 +45,6 @@
 #include "K37ElectricFieldSetup.hh"
 #include "K37ElectronMCPSD.hh"
 #include "K37RecoilMCPSD.hh"
-
-// materials
-#include "G4Material.hh"
-#include "G4MaterialTable.hh"
-#include "G4Element.hh"
-#include "G4ElementTable.hh"
-#include "G4Box.hh"
-#include "G4EllipticalTube.hh"
-#include "G4Cons.hh"
-#include "G4Trd.hh"
-#include "G4UnionSolid.hh"
-#include "G4SubtractionSolid.hh"
-#include "G4LogicalVolume.hh"
-#include "G4ThreeVector.hh"
-#include "G4PVPlacement.hh"
-#include "G4PVParameterised.hh"
-#include "G4Transform3D.hh"
-#include "G4RotationMatrix.hh"
-#include "G4FieldManager.hh"
-#include "G4TransportationManager.hh"
-#include "G4VisAttributes.hh"
-#include "G4Colour.hh"
-
-#include "G4MultiFunctionalDetector.hh"
-#include "G4VPrimitiveScorer.hh"
-#include "G4PSEnergyDeposit.hh"
-#include "G4VSDFilter.hh"
-#include "G4SDParticleFilter.hh"
-#include "G4PVReplica.hh"
-
-// So that the geometry can be cleared between runs
-#include "G4GeometryManager.hh"
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
-#include "G4RunManager.hh"
 
 K37DetectorConstruction::K37DetectorConstruction()
     : world_material_(0), world_box_(0), world_log_(0), world_phys_(0),
@@ -1148,6 +1149,7 @@ void K37DetectorConstruction::ConstructCoils() {
 }  // End construct coils
 
 void K37DetectorConstruction::DefineMaterials() {
+  G4NistManager* nist_manager = G4NistManager::Instance();
   // ------------------------------------------------------ materials
   // atomic mass, atomic number, density, fractional mass
   G4double a, z, density, fractionmass;
@@ -1279,6 +1281,20 @@ void K37DetectorConstruction::DefineMaterials() {
   Macor -> AddMaterial(BoronOxide    , fractionmass = 7*perCent);
   Macor -> AddElement(F, fractionmass = 4*perCent);
 
+  G4Material *lead_glass = nist_manager -> FindOrBuildMaterial("G4_GLASS_LEAD");
+  /* Pre-defined material:
+     density = 6.22 g/cm3
+     mean excitation energy = 526.4 eV
+     radiation length = 1.266 cm
+     nuclear interaction length = 25.755 cm
+     Composition by mass:
+                   Lead     (Z = 82) - 0.751938
+                   Oxygen   (Z = 8)  - 0.156453
+                   Silicon  (Z = 14) - 0.080866
+                   Titanium (Z = 22) - 0.008092
+                   Arsenic  (Z = 33) - 0.002651
+   */
+
   // Set default materials
   MirrorMaterial = SiliconCarbide;
   world_material_ = vacuum;
@@ -1291,7 +1307,7 @@ void K37DetectorConstruction::DefineMaterials() {
   MirrorMountMaterial= StainlessSteel;
   CoilsMaterial = StainlessSteel;
   Hoop7Material = Titanium;
-  MCPMaterial = SiliconMat;
+  MCPMaterial = lead_glass;
 }
 
 void K37DetectorConstruction::SetMirrorMaterial(G4String materialChoice) {
