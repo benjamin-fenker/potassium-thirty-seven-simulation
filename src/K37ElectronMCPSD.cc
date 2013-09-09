@@ -26,6 +26,8 @@ G4bool K37ElectronMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
 
   new_hit -> SetEnergy(step -> GetTotalEnergyDeposit());
   new_hit -> SetTime(track -> GetLocalTime());
+  new_hit ->
+      SetParticlePDG(track -> GetParticleDefinition() -> GetPDGEncoding());
   emcp_hit_collection_ -> insert(new_hit);
   return true;
 }
