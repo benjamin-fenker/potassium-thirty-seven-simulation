@@ -198,6 +198,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // eMCP info
   G4double electron_mcp_time = 0.0;
   G4double electron_mcp_energy = 0.0;
+  G4int electron_pdg = 0;
 
   if (fullenergy1CollID < 0 || dedx1CollID < 0) return;
 
@@ -358,8 +359,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   if (electron_mcp_hit_collection) {      // rMCP
     if (electron_mcp_hit_collection -> entries() > 0) {
       int n_hit = electron_mcp_hit_collection -> entries();
+
       K37ElectronMCPHit *hit = (*electron_mcp_hit_collection)[0];
       electron_mcp_time = hit -> GetTime();
+      electron_pdg = hit -> GetParticlePDG();
+
       for (int i = 0; i < n_hit; i++) {
         hit = (*electron_mcp_hit_collection)[i];
         electron_mcp_energy += hit -> GetEnergy();
@@ -401,13 +405,16 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
-    // G4cout << "TDC_ION_MCP: " << recoil_mcp_time/ns << G4endl;
+    G4cout << "TDC_ION_MCP     : " << recoil_mcp_time/ns << G4endl;
+    G4cout << "TDC_ELECTRON_MCP: " << electron_mcp_time/ns << G4endl;
     (*active_channels_)["TDC_ELECTRON_MCP"] ->
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
     (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
         InsertData((G4double)electron_mcp_hit_collection -> entries());
     (*active_channels_)["ION_MCP_PARTICLE_PDG"] ->
         InsertData((G4double)recoil_pdg);
+    (*active_channels_)["ELECTRON_MCP_PARTICLE_PDG"] ->
+        InsertData((G4double)electron_pdg);
     (*active_channels_)["UPPER_SCINTILLATOR_PDG"] ->
         InsertData((G4double)upper_scintillator_pdg);
     (*active_channels_)["LOWER_SCINTILLATOR_PDG"] ->

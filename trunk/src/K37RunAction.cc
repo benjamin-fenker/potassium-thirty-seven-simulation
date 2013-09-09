@@ -117,6 +117,8 @@ K37RunAction::K37RunAction()
   num_hits_r_mcp_        = new Generic_Channel("RECOIL_MCP_N_HITS", 306, "/D");
   num_hits_e_mcp_        = new Generic_Channel("ELECTRON_MCP_N_HITS", 307,
                                                "/D");
+  electron_mcp_particle_ = new Generic_Channel("ELECTRON_MCP_PARTICLE_PDG", 303,
+                                               "/D");
   // Information to match analyzer (not really simulated)
   run_action_       = new Generic_Channel("Run_Number"      , 401, "/D");
   tnim_op_beam_     = new Generic_Channel("TNIM_OP_Beam"    , 402, "/l");
@@ -161,6 +163,7 @@ K37RunAction::~K37RunAction() {
   delete lower_pmt_particle_;
   delete num_hits_r_mcp_;
   delete num_hits_e_mcp_;
+  delete electron_mcp_particle_;
 }
 
 //----------------------------------
@@ -252,6 +255,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(lower_pmt_particle_);
   RegisterChannel(num_hits_r_mcp_);
   RegisterChannel(num_hits_e_mcp_);
+  RegisterChannel(electron_mcp_particle_);
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();
