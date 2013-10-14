@@ -27,7 +27,6 @@
 #include "G4RunManager.hh"
 #include "G4SDParticleFilter.hh"
 #include "G4SolidStore.hh"
-#include "G4SubtractionSolid.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
 #include "G4TransportationManager.hh"
@@ -40,16 +39,22 @@
 // Our Files
 #include "K37DetectorConstruction.hh"
 #include "K37DetectorMessenger.hh"
-#include "K37ScintillatorSD.hh"
-#include "K37StripDetectorSD.hh"
 #include "K37ElectricFieldSetup.hh"
-#include "K37ElectronMCPSD.hh"
-#include "K37RecoilMCPSD.hh"
 
 K37DetectorConstruction::K37DetectorConstruction()
     : world_material_(0), world_box_(0), world_log_(0), world_phys_(0),
-      detectorMessenger(0), mirror_log(0), MirrorMaterial(0),
-      FullEnergyDetectorMaterial(0), DeDxDetectorMaterial(0),
+      scintillator_tubs_(0), upper_scintillator_log_(0),
+      upper_scintillator_phys_(0), upper_scintillator_sens_(0),
+      lower_scintillator_log_(0), lower_scintillator_phys_(0),
+      lower_scintillator_sens_(0), strip_detector_box_(0),
+      upper_strip_detector_log_(0), upper_strip_detector_phys_(0),
+      upper_strip_detector_sens_(0), lower_strip_detector_log_(0),
+      lower_strip_detector_phys_(0), lower_strip_detector_sens_(0),
+      chamber_box_(0), chamber_log_(0), chamber_phys_(0), electron_mcp_tub_(0),
+      electron_mcp_log_(0), electron_mcp_phys_(0), electron_mcp_sens_(0),
+      recoil_mcp_tub_(0), recoil_mcp_log_(0), recoil_mcp_phys_(0),
+      recoil_mcp_sens_(0), detectorMessenger(0), mirror_log(0),
+      MirrorMaterial(0), FullEnergyDetectorMaterial(0), DeDxDetectorMaterial(0),
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), MM_CollimatorCut_sol(0),
@@ -60,9 +65,7 @@ K37DetectorConstruction::K37DetectorConstruction()
       changeYtoBeamAxisForLPP4(0), rotationForOpticalPumpingBeams1(0),
       rotationForOpticalPumpingBeams2(0), RFDRotation(0), FFRFRotation(0),
       MirrorRotation(0), MirrorCutRotation(0), MMRotation(0), hoopRotation(0),
-      world_logVisAttributes(0), scint_logVisAttributes_plusZ(0),
-      scint_logVisAttributes_minusZ(0), dedx_logVisAttributes(0),
-      dedx_logVisAttributes_minusZ(0), dedxFrame_logVisAttributes(0),
+      dedxFrame_logVisAttributes(0),
       chamber_logVisAttributes(0), OPRF_logVisAttributes(0),
       RFD_logVisAttributes(0), beryllium_logVisAttributes(0),
       FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
@@ -113,11 +116,19 @@ K37DetectorConstruction::~K37DetectorConstruction() {
     delete MMRotation;
     delete hoopRotation;
     delete world_log_;
-    delete world_logVisAttributes;
-    delete scint_logVisAttributes_plusZ;
-    delete scint_logVisAttributes_minusZ;
-    delete dedx_logVisAttributes;
-    delete dedx_logVisAttributes_minusZ;
+    delete world_phys_;
+    delete scintillator_tubs_;
+    delete upper_scintillator_log_;
+    delete lower_scintillator_log_;
+    delete strip_detector_box_;
+    delete upper_strip_detector_log_;
+    delete lower_strip_detector_log_;
+    delete chamber_box_;
+    delete chamber_log_;
+    delete electron_mcp_tub_;
+    delete electron_mcp_log_;
+    delete recoil_mcp_tub_;
+    delete recoil_mcp_log_;
     delete dedxFrame_logVisAttributes;
     delete chamber_logVisAttributes;
     delete OPRF_logVisAttributes;
@@ -137,12 +148,11 @@ G4VPhysicalVolume* K37DetectorConstruction::Construct() {
     return this->ConstructK37Experiment();
 }
 G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
-    if (world_phys_) {
-        G4GeometryManager::GetInstance()->OpenGeometry();
-        G4PhysicalVolumeStore::GetInstance()->Clean();
-        G4LogicalVolumeStore::GetInstance()->Clean();
-        G4SolidStore::GetInstance()->Clean();
-    }
+  // Clean old geometry, if any
+  G4GeometryManager::GetInstance()->OpenGeometry();
+  G4PhysicalVolumeStore::GetInstance()->Clean();
+  G4LogicalVolumeStore::GetInstance()->Clean();
+  G4SolidStore::GetInstance()->Clean();
     // ------------------------------------------ Sensitive Detector / filters
 
     /*------------------------------------------------------------------------
@@ -167,7 +177,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     // convience function G4VisAttributes::Invisble becuse it produces
     // a non const pointer that can later be delete avoiding a memory
     // leak.
-    world_logVisAttributes = new G4VisAttributes(false);
+    G4VisAttributes *world_logVisAttributes = new G4VisAttributes(false);
     // world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
 
@@ -191,10 +201,20 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   G4double Scint_deltaPhi = 360.*deg;
   G4double Scint_zPosition= 117.5*mm;
 
-  // Use some solid for both detectors :-)
+  // if (scintillator_tubs_) delete scintillator_tubs_;
+  // if (upper_scintillator_log_) delete upper_scintillator_log_;
+  // if (upper_scintillator_phys_) delete upper_scintillator_phys_;
+  // if (lower_scintillator_log_) delete lower_scintillator_log_;
+  // if (lower_scintillator_phys_) delete lower_scintillator_phys_;
+
+  // Use same solid for both detectors :-)
   scintillator_tubs_ = new G4Tubs("scint_sol", Scint_rmin, Scint_rmax,
                                   (Scint_dz/2.)*mm, Scint_startPhi,
                                   Scint_deltaPhi);
+  // Use same vis attributes for both detectors :-)
+  G4VisAttributes *scintillator_vis = new G4VisAttributes(G4Colour(0.0, 0.0,
+                                                                   1.0, 1.0));
+  scintillator_vis -> SetForceSolid(true);
 
   upper_scintillator_log_ =  new G4LogicalVolume(scintillator_tubs_,
                                                  FullEnergyDetectorMaterial,
@@ -203,11 +223,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
       new G4PVPlacement(0, G4ThreeVector(0., 0., Scint_zPosition),
                         upper_scintillator_log_, "scint_plusZ_phys", world_log_,
                         false, 0);
-
-  scint_logVisAttributes_plusZ =
-      new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
-  scint_logVisAttributes_plusZ -> SetForceSolid(true);
-  upper_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_plusZ);
+  upper_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   lower_scintillator_log_ = new G4LogicalVolume(scintillator_tubs_,
                                                 FullEnergyDetectorMaterial,
@@ -216,22 +232,26 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
       new G4PVPlacement(0, G4ThreeVector(0., 0., -Scint_zPosition),
                        lower_scintillator_log_, "scint_minusZ_phys", world_log_,
                         false, 0);
-  scint_logVisAttributes_minusZ =
-      new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 1.0));
-  scint_logVisAttributes_minusZ-> SetForceSolid(true);
-  lower_scintillator_log_ -> SetVisAttributes(scint_logVisAttributes_minusZ);
+  lower_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   // Set up sensitive detectors
   G4String fullenergy1SDname = "/mydet/scintillatorPlusZ";
-  K37ScintillatorSD * fullenergy1SD = new K37ScintillatorSD(fullenergy1SDname);
-  SDman->AddNewDetector(fullenergy1SD);
-  upper_scintillator_log_ -> SetSensitiveDetector(fullenergy1SD);
+  if (upper_scintillator_sens_) {
+    G4cout << "Deleting upper scintillator..." << G4endl;
+    delete upper_scintillator_sens_;
+  }
+  upper_scintillator_sens_ = new K37ScintillatorSD(fullenergy1SDname);
+  SDman->AddNewDetector(upper_scintillator_sens_);
+  upper_scintillator_log_ -> SetSensitiveDetector(upper_scintillator_sens_);
 
   G4String fullenergy2SDname = "/mydet/scintillatorMinusZ";
-  K37ScintillatorSD * fullenergy2SD =
-    new K37ScintillatorSD(fullenergy2SDname);
-  SDman->AddNewDetector(fullenergy2SD);
-  lower_scintillator_log_ -> SetSensitiveDetector(fullenergy2SD);
+  if (lower_scintillator_sens_) {
+    G4cout << "Deleting lower scintillator..." << G4endl;
+    delete lower_scintillator_sens_;
+  }
+  lower_scintillator_sens_ = new K37ScintillatorSD(fullenergy2SDname);
+  SDman->AddNewDetector(lower_scintillator_sens_);
+  lower_scintillator_log_ -> SetSensitiveDetector(lower_scintillator_sens_);
 }
 
 void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
@@ -240,61 +260,59 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   G4double Dedx_z = 0.3*mm;
 
   G4double Dedx_zPosition = 98.5*mm;
-  G4Box* dedx_sol = new G4Box("dedx_sol", (Dedx_x/2.),
-                              (Dedx_y/2.), (Dedx_z/2.));
+
+  // Same solid for both detectors :-)
+  strip_detector_box_ = new G4Box("dedx_sol", (Dedx_x/2.),
+                                  (Dedx_y/2.), (Dedx_z/2.));
+  // Same vis for both detectors :-)
+  G4VisAttributes *strip_detector_vis = new G4VisAttributes(G4Colour(1.0,
+                                                                     1.0, 1.0));
+  strip_detector_vis -> SetForceSolid(true);
   G4ThreeVector dedx_PlusZ_pos = G4ThreeVector(0.0, 0.0, Dedx_zPosition);
-  G4LogicalVolume* dedx_plusZ_log = new G4LogicalVolume(dedx_sol,
-                                                        DeDxDetectorMaterial,
-                                                        "dedx_plusZ_log",
-                                                        0, 0, 0);
-  new G4PVPlacement(0, dedx_PlusZ_pos, dedx_plusZ_log, "dedx_plusZ_phys",
-                    world_log_, false, 0);
-  dedx_logVisAttributes = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
-  dedx_logVisAttributes-> SetForceSolid(true);
-  dedx_plusZ_log -> SetVisAttributes(dedx_logVisAttributes);
-  // G4MultiFunctionalDetector* dedxDetectorPlusZ =
-  //   new G4MultiFunctionalDetector("DedxDetectorPlusZ");
-  // G4VPrimitiveScorer* dedxEnergyDepositPlusZ =
-  //   new G4PSEnergyDeposit("DedxEnergyDeposited", 0);
-  // dedxDetectorPlusZ->RegisterPrimitive(dedxEnergyDepositPlusZ);
-  // SDman->AddNewDetector(dedxDetectorPlusZ);
-  // dedx_plusZ_log->SetSensitiveDetector(dedxDetectorPlusZ);
+  upper_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
+                                                  DeDxDetectorMaterial,
+                                                  "dedx_plusZ_log", 0, 0, 0);
+  upper_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
+  upper_strip_detector_phys_ = new G4PVPlacement(0, dedx_PlusZ_pos,
+                                                 upper_strip_detector_log_,
+                                                 "dedx_plusZ_phys",
+                                                 world_log_, false, 0);
+
+
 
   G4ThreeVector dedx_MinusZ_pos = G4ThreeVector(0.0, 0.0, -Dedx_zPosition);
-  G4LogicalVolume* dedx_MinusZ_log = new G4LogicalVolume(dedx_sol,
-                                                         DeDxDetectorMaterial,
-                                                         "dedx_MinusZ_log", 0,
-                                                         0, 0);
-  new G4PVPlacement(0, dedx_MinusZ_pos, dedx_MinusZ_log, "dedx_minusZ_phys",
-                    world_log_, false, 0);
-  dedx_logVisAttributes_minusZ = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
-  // G4VisAttributes* dedx_logVisAttributes_minusZ =
-  //   new G4VisAttributes(G4Colour(0.0, 1.0, 1.0));
+  lower_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
+                                                  DeDxDetectorMaterial,
+                                                  "dedx_MinusZ_log", 0,
+                                                  0, 0);
+  lower_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
+  lower_strip_detector_phys_ = new G4PVPlacement(0, dedx_MinusZ_pos,
+                                                 lower_strip_detector_log_,
+                                                 "dedx_minusZ_phys", world_log_,
+                                                 false, 0);
 
-  dedx_logVisAttributes_minusZ-> SetForceSolid(true);
 
-  dedx_MinusZ_log -> SetVisAttributes(dedx_logVisAttributes_minusZ);
-
-  // G4MultiFunctionalDetector* dedxDetectorMinusZ =
-  //   new G4MultiFunctionalDetector("DedxDetectorMinusZ");
-  // G4VPrimitiveScorer* dedxEnergyDepositMinusZ =
-  //   new G4PSEnergyDeposit("DedxEnergyDeposited", 0);
-  // dedxDetectorMinusZ->RegisterPrimitive(dedxEnergyDepositMinusZ);
-  // SDman->AddNewDetector(dedxDetectorMinusZ);
-  // dedx_MinusZ_log->SetSensitiveDetector(dedxDetectorMinusZ);
   G4String dedx1SDname = "/mydet/dsssdPlusZ";
-  K37StripDetectorSD * dedx1SD = new K37StripDetectorSD(dedx1SDname);
+  if (upper_strip_detector_sens_) {
+    G4cout << "Deleting upper strip detector..." << G4endl;
+    delete upper_strip_detector_sens_;
+  }
+  upper_strip_detector_sens_ = new K37StripDetectorSD(dedx1SDname);
   //                        pos_of_center, numStrips, stripWidth
-  dedx1SD -> SetupParameters(dedx_PlusZ_pos, 40, 1.0*mm);
-  SDman->AddNewDetector(dedx1SD);
-  dedx_plusZ_log->SetSensitiveDetector(dedx1SD);
+  upper_strip_detector_sens_ -> SetupParameters(dedx_PlusZ_pos, 40, 1.0*mm);
+  SDman->AddNewDetector(upper_strip_detector_sens_);
+  upper_strip_detector_log_->SetSensitiveDetector(upper_strip_detector_sens_);
 
   G4String dedx2SDname = "/mydet/dsssdMinusZ";
-  K37StripDetectorSD * dedx2SD = new K37StripDetectorSD(dedx2SDname);
+  if (lower_strip_detector_sens_) {
+    G4cout << "Deleting lower strip detector..." << G4endl;
+    delete lower_strip_detector_sens_;
+  }
+  lower_strip_detector_sens_ = new K37StripDetectorSD(dedx2SDname);
   //                        pos_of_center, numStrips, stripWidth
-  dedx2SD -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
-  SDman->AddNewDetector(dedx2SD);
-  dedx_MinusZ_log->SetSensitiveDetector(dedx2SD);
+  lower_strip_detector_sens_ -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
+  SDman->AddNewDetector(lower_strip_detector_sens_);
+  upper_strip_detector_log_->SetSensitiveDetector(lower_strip_detector_sens_);
 
   // ------------------------------ dedx mount
   G4double strip_detector_frame_X  = 44.4*mm;
@@ -553,17 +571,16 @@ void K37DetectorConstruction::ConstructChamber() {
                            rotationForOpticalPumpingBeams2,
                            positionOfOpticalPumpingBeams2);
 
+  chamber_box_ = ChamberCut17_sol;      // Store the final product
   // ------------------------------ Final Product after all of the cuts.
 
-  G4LogicalVolume* chamber_log = new G4LogicalVolume(ChamberCut17_sol,
-                                                     ChamberMaterial,
-                                                     "chamber_log",
-                                                     0, 0, 0);
+  chamber_log_ = new G4LogicalVolume(chamber_box_, ChamberMaterial,
+                                     "chamber_log_", 0, 0, 0);
+  chamber_phys_ = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0),
+                                    chamber_log_, "chamber_phys", world_log_,
+                                    false, 0);
 
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), chamber_log,
-                    "chamber_phys", world_log_, false, 0);
-
-  // chamber_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
+  // chamber_log_VisAttributes = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
   // chamber_logVisAttributes-> SetForceWireframe(true);
 
   // G4VisAttributes(false) means invisible. It is better than using the
@@ -574,7 +591,7 @@ void K37DetectorConstruction::ConstructChamber() {
   // chamber_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5,
   //                                                         0.5, 0.8));
   // chamber_logVisAttributes-> SetForceSolid(true);
-  chamber_log -> SetVisAttributes(chamber_logVisAttributes);
+  chamber_log_ -> SetVisAttributes(chamber_logVisAttributes);
 
   // ------------------------------ Optical Pumping Rentrant Flanges
   // (z+ and z-) (OPRF)
@@ -1075,22 +1092,27 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   G4double SOED_Sphi = 0.    *deg;
   G4double SOED_Dphi = 360.  *deg;
   G4double SOED_z_pos = -82.0 *mm;     // 82 mm
-  G4Tubs * SOED_sol = new G4Tubs("SOED_sol", SOED_rmin, SOED_rmax,  SOED_dz,
+  electron_mcp_tub_ = new G4Tubs("SOED_sol", SOED_rmin, SOED_rmax,  SOED_dz,
                                  SOED_Sphi, SOED_Dphi);
-  G4LogicalVolume * SOED_log = new G4LogicalVolume(SOED_sol, MCPMaterial,
-                                                   "SOED_log", 0, 0, 0);
-  new G4PVPlacement(changeZtoX, G4ThreeVector(0., SOED_z_pos, 0), SOED_log,
-                    "SOED_phys", world_log_, false, 0);
+  electron_mcp_log_ = new G4LogicalVolume(electron_mcp_tub_, MCPMaterial,
+                                          "SOED_log", 0, 0, 0);
+  electron_mcp_phys_ = new G4PVPlacement(changeZtoX,
+                                         G4ThreeVector(0., SOED_z_pos, 0),
+                                         electron_mcp_log_, "SOED_phys",
+                                         world_log_, false, 0);
   SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   SOED_logVisAttributes-> SetForceSolid(true);
-  SOED_log -> SetVisAttributes(SOED_logVisAttributes);
+  electron_mcp_log_ -> SetVisAttributes(SOED_logVisAttributes);
 
+  if (electron_mcp_sens_) {
+    G4cout << "Deleting electron MCP..." << G4endl;
+    delete electron_mcp_sens_;
+    G4cout << "done" << G4endl;
+  }
   // Set up sensitive detector
-  K37ElectronMCPSD *electron_mcp_sd =
-      new K37ElectronMCPSD("/mydet/electron_mcp");
-
-  sd_man -> AddNewDetector(electron_mcp_sd);
-  SOED_log -> SetSensitiveDetector(electron_mcp_sd);
+  electron_mcp_sens_ = new K37ElectronMCPSD("/mydet/electron_mcp");
+  sd_man -> AddNewDetector(electron_mcp_sens_);
+  electron_mcp_log_ -> SetSensitiveDetector(electron_mcp_sens_);
 }  // End construct EMCP
 
 void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
@@ -1103,21 +1125,27 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
   G4double rmcp_z_pos = (102.0 * mm) + rmcp_dz;
   // Extrudes symetrically about this point
 
-  G4Tubs * rmcp_sol = new G4Tubs("rmcp_sol", rmcp_rmin, rmcp_rmax,  rmcp_dz,
-                                 rmcp_start_phi, rmcp_d_phi);
-  G4LogicalVolume * rmcp_log = new G4LogicalVolume(rmcp_sol, MCPMaterial,
-                                                   "rmcp_log", 0, 0, 0);
-  new G4PVPlacement(changeZtoX, G4ThreeVector(0., rmcp_z_pos, 0), rmcp_log,
-                    "rmcp_phys", world_log_, false, 0);
+  recoil_mcp_tub_ = new G4Tubs("rmcp_sol", rmcp_rmin, rmcp_rmax,  rmcp_dz,
+                               rmcp_start_phi, rmcp_d_phi);
+  recoil_mcp_log_ = new G4LogicalVolume(recoil_mcp_tub_, MCPMaterial,
+                                       "rmcp_log", 0, 0, 0);
+  recoil_mcp_phys_ = new G4PVPlacement(changeZtoX,
+                                       G4ThreeVector(0., rmcp_z_pos, 0),
+                                       recoil_mcp_log_, "rmcp_phys", world_log_,
+                                       false, 0);
   rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   rmcp_logVisAttributes_ -> SetForceSolid(true);
-  rmcp_log -> SetVisAttributes(rmcp_logVisAttributes_);
+  recoil_mcp_log_ -> SetVisAttributes(rmcp_logVisAttributes_);
 
   // Set up sensitive detector
-  K37RecoilMCPSD *recoil_mcp_sd =
-      new K37RecoilMCPSD("/mydet/recoil_mcp");
-  sd_man -> AddNewDetector(recoil_mcp_sd);
-  rmcp_log -> SetSensitiveDetector(recoil_mcp_sd);
+  if (recoil_mcp_sens_) {
+    G4cout << "Deleting recoil MCP..." << G4endl;
+    delete recoil_mcp_sens_;
+    G4cout << "done" << G4endl;
+  }
+  recoil_mcp_sens_ = new K37RecoilMCPSD("/mydet/recoil_mcp");
+  sd_man -> AddNewDetector(recoil_mcp_sens_);
+  recoil_mcp_log_ -> SetSensitiveDetector(recoil_mcp_sens_);
 }
 
 
@@ -1327,7 +1355,7 @@ void K37DetectorConstruction::SetMirrorMaterial(G4String materialChoice) {
 
 void K37DetectorConstruction::UpdateGeometry() {
   G4RunManager::GetRunManager() ->
-    DefineWorldVolume(this -> ConstructK37Experiment());
+    DefineWorldVolume(ConstructK37Experiment());
 }
 
 void K37DetectorConstruction::PrintMaterialList() {

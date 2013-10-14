@@ -30,6 +30,7 @@ class K37CloudSize {
   void SetTemperature(G4double temp);
   void SetInitialCloudSize(G4ThreeVector size);
   void SetInitialCloudSize(G4double size);
+  G4double GetDecayTime() {return decay_time_;}
 
  private:
   G4ThreeVector cloud_center_;
@@ -40,7 +41,7 @@ class K37CloudSize {
 
   G4double cycleTime;
   G4double expansion_before_polarized_;
-
+  G4double decay_time_;
   void SetupSigma(G4ThreeVector temperature);
   G4double CalcSigma(G4double temperature);
   void SetFinalPosition(G4ThreeVector initial_position, G4ThreeVector velocity,

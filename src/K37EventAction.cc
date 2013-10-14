@@ -405,8 +405,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_ION_MCP"] ->
         InsertData(recoil_mcp_time/ns/v1190_factor_ns);
-    //G4cout << "TDC_ION_MCP     : " << recoil_mcp_time/ns << G4endl;
-    //G4cout << "TDC_ELECTRON_MCP: " << electron_mcp_time/ns << G4endl;
+    // G4cout << "TDC_ION_MCP     : " << recoil_mcp_time/ns << G4endl;
+    // G4cout << "TDC_ELECTRON_MCP: " << electron_mcp_time/ns << G4endl;
     (*active_channels_)["TDC_ELECTRON_MCP"] ->
         InsertData(electron_mcp_time/ns/v1190_factor_ns);
     (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
@@ -460,13 +460,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     uint64_t  op_time;
     G4double op_bit_onoff;
     if (fabs(polarization) > 0) {  // Polarized
-      op_time = 1000000;   // Will resolove to polarized as if it were real data
+      op_time = primary_generator_ -> GetCloudSize() -> GetDecayTime();
       op_bit_onoff = 1.0;
     } else {               // Not polarized
       op_time = 10;        // Will show up as unpolarized just like real data
       op_bit_onoff = 0.0;
     }
-    (*active_channels_)["TNIM_OP_Beam"] -> InsertDataL(op_time);
+    (*active_channels_)["TNIM_OP_Beam"] -> InsertDataL(op_time/ns);
     (*active_channels_)["TTLBit_OPBeam"] -> InsertData(op_bit_onoff);
     // To match the analyzer TTLBit_Sigmaplus should be one for s+ and 0 for s-
     // Unpolarized light should be vetoed by  TNIM_OP_Beam, but I will give it

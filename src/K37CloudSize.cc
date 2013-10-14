@@ -11,7 +11,8 @@ K37CloudSize::K37CloudSize(G4ThreeVector cloud_center,
                            G4ThreeVector cloud_size_start)
 : cloud_center_(cloud_center),
   initial_cloud_size_(cloud_size_start), temperature_(cloud_temperature),
-  cycleTime(2.9472*ms), expansion_before_polarized_(300*microsecond) {
+  cycleTime(2.9472*ms), expansion_before_polarized_(300*microsecond),
+  decay_time_(-10) {
   SetupSigma(cloud_temperature);
 }
 
@@ -33,9 +34,9 @@ void K37CloudSize::makeEvent() {
   // ~ 100 us for the atoms to polarize.  Therefore the atoms will have been
   // expanidng for at least 300 us (expansion_before_polarized_) before they
   // will be classified as "polarized" and counted.
-  G4double decayTime = -10;
-  while (decayTime < expansion_before_polarized_) {
-    decayTime = cycleTime*G4UniformRand();
+  decay_time_ = -10;
+  while (decay_time_ < expansion_before_polarized_) {
+    decay_time_ = cycleTime*G4UniformRand();
   }
 
   G4ThreeVector velocity =
@@ -43,7 +44,7 @@ void K37CloudSize::makeEvent() {
                     G4RandGauss::shoot(0, velocity_sigma_.y()),
                     G4RandGauss::shoot(0, velocity_sigma_.z()));
 
-  SetFinalPosition(initial_position, velocity, decayTime);
+  SetFinalPosition(initial_position, velocity, decay_time_);
 
   //  Outputs a text file with starting x, y, z, vx, vy, vz, time
   // std::ofstream ofs;
@@ -51,7 +52,7 @@ void K37CloudSize::makeEvent() {
   // ofs << initial_position.x()/mm << "\t" << initial_position.y()/mm << "\t"
   //     << initial_position.z()/mm << "\t"
   //     << velocity.x()/(mm/ns) << "\t" << velocity.y()/(mm/ns) << "\t"
-  //     << velocity.z()/(mm/ns) << "\t" << decayTime/ns  << G4endl;
+  //     << velocity.z()/(mm/ns) << "\t" << decay_time_/ns  << G4endl;
 }
 
 void K37CloudSize::SetupSigma(G4ThreeVector temperature) {
@@ -69,7 +70,8 @@ G4double K37CloudSize::CalcSigma(G4double temperature) {
   G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
   // Mass of Ar37...
   G4double mass = particleTable -> GetIon(18, 37, 0) -> GetPDGMass();
-  return sqrt(temperature * k_Boltzmann * c_squared / mass);
+  G4double mean_velocity = sqrt(temperature * k_Boltzmann * c_squared / mass);
+  return mean_velocity;
 }
 
 void K37CloudSize::SetFinalPosition(G4ThreeVector initial_position,
