@@ -12,30 +12,42 @@
 
 G4Allocator<K37ScintillatorHit> K37ScintillatorHitAllocator;
 
-K37ScintillatorHit::K37ScintillatorHit() {
-}
+K37ScintillatorHit::K37ScintillatorHit()
+:pos1(G4ThreeVector()),
+pos2(G4ThreeVector()),
+edep(0),
+good(0),
+time(0),
+particle_pdg(0),
+primary(false),
+gamma(0)
+{;}
 
 K37ScintillatorHit::~K37ScintillatorHit() {
 }
 
 K37ScintillatorHit::K37ScintillatorHit(const K37ScintillatorHit &right)
     : G4VHit() {
-    edep = right.edep;
     pos1 = right.pos1;
     pos2 = right.pos2;
+    edep = right.edep;
     good = right.good;
     time = right.time;
+    particle_pdg = right.particle_pdg;
     primary = right.primary;
+    gamma = right.gamma;
 }
 
 const K37ScintillatorHit& K37ScintillatorHit::operator=(
                                           const K37ScintillatorHit &right) {
-    edep = right.edep;
     pos1 = right.pos1;
     pos2 = right.pos2;
+    edep = right.edep;
     good = right.good;
     time = right.time;
+    particle_pdg = right.particle_pdg;
     primary = right.primary;
+    gamma = right.gamma;
     return *this;
 }
 

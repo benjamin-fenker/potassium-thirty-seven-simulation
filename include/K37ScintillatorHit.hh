@@ -29,30 +29,40 @@ class K37ScintillatorHit : public G4VHit {
   void Print();
 
  private:
-  G4double edep;
   G4ThreeVector pos1;
   G4ThreeVector pos2;
+  G4double edep;
   G4double good;
   G4double time;
+  G4int particle_pdg;
   G4bool primary;
-  G4int particle_pdg_;
+  G4bool gamma;
   static std::map<G4String, G4AttDef> fAttDefs;
 
  public:
+  inline void SetPos1(G4ThreeVector xyz) {pos1 = xyz;}
+  inline G4ThreeVector GetPos1() {return pos1;}
+  // ----------------------------------------------
+  inline void SetPos2(G4ThreeVector xyz) {pos2 = xyz;}
+  inline G4ThreeVector GetPos2() {return pos2;}
+  // ----------------------------------------------
   inline void SetEdep(G4double de) {edep = de;}
   inline G4double GetEdep() {return edep;}
-  inline void SetPos1(G4ThreeVector xyz) {pos1 = xyz;}
-  inline void SetPos2(G4ThreeVector xyz) {pos2 = xyz;}
-  inline G4ThreeVector GetPos1() {return pos1;}
-  inline G4ThreeVector GetPos2() {return pos2;}
+  // ----------------------------------------------
   inline void SetBound(G4double go) {good = go;}
   inline G4double GetBound() {return good;}
-  inline void SetPrimary(G4bool prim) {primary = prim;}
-  inline G4bool GetPrimary() {return primary;}
+  // ----------------------------------------------
   inline void SetTime(G4double tim) {time = tim;}
   inline G4double GetTime() {return time;}
-  void SetParticlePDG(G4int pdg) {particle_pdg_ = pdg;}
-  G4int GetParticlePDG() {return particle_pdg_;}
+  // ----------------------------------------------
+  inline void SetParticlePDG(G4int pdg_) {particle_pdg = pdg_;}
+  inline G4int GetParticlePDG() {return particle_pdg;}
+  // ----------------------------------------------
+  inline void SetPrimary(G4bool prim) {primary = prim;}
+  inline G4bool GetPrimary() {return primary;}
+  // ----------------------------------------------
+  inline void SetGamma(G4bool gamma_) {gamma = gamma_;}
+  inline G4bool FromAGamma() {return gamma;}
 };
 
 typedef G4THitsCollection<K37ScintillatorHit> K37ScintillatorHitsCollection;
