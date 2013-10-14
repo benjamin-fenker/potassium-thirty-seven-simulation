@@ -54,6 +54,49 @@ K37DetectorMessenger::K37DetectorMessenger(K37DetectorConstruction* myDet)
     PrintAvailableMaterials ->
       SetGuidance("prints a list of all defined materials");
     PrintAvailableMaterials->AvailableForStates(G4State_Idle);
+
+    make_chamber_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeChamber", this);
+    make_chamber_cmd_ -> SetGuidance("Include chamber in simulation?");
+    make_chamber_cmd_ -> SetParameterName("make_chamber", true);
+    make_chamber_cmd_ -> SetDefaultValue(true);
+    make_chamber_cmd_ -> AvailableForStates(G4State_Idle);
+
+    make_mirrors_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeMirrors", this);
+    make_mirrors_cmd_ -> SetGuidance("Include mirrors in simulation?");
+    make_mirrors_cmd_ -> SetParameterName("make_mirrors", true);
+    make_mirrors_cmd_ -> SetDefaultValue(true);
+    make_mirrors_cmd_ -> AvailableForStates(G4State_Idle);
+
+    make_hoops_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeHoops", this);
+    make_hoops_cmd_ -> SetGuidance("Include hoops in simulation?");
+    make_hoops_cmd_ -> SetParameterName("make_hoops", true);
+    make_hoops_cmd_ -> SetDefaultValue(true);
+    make_hoops_cmd_ -> AvailableForStates(G4State_Idle);
+
+    make_electron_mcp_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeElectronMCP", this);
+    make_electron_mcp_cmd_ ->
+        SetGuidance("Include electron_mcp in simulation?");
+    make_electron_mcp_cmd_ -> SetParameterName("make_electron_mcp", true);
+    make_electron_mcp_cmd_ -> SetDefaultValue(true);
+    make_electron_mcp_cmd_ -> AvailableForStates(G4State_Idle);
+
+    make_coils_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeCoils", this);
+    make_coils_cmd_ -> SetGuidance("Include coils in simulation?");
+    make_coils_cmd_ -> SetParameterName("make_coils", true);
+    make_coils_cmd_ -> SetDefaultValue(true);
+    make_coils_cmd_ -> AvailableForStates(G4State_Idle);
+
+    make_recoil_mcp_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeRecoilMCP", this);
+    make_recoil_mcp_cmd_ -> SetGuidance("Include recoil_mcp in simulation?");
+    make_recoil_mcp_cmd_ -> SetParameterName("make_recoil_mcp", true);
+    make_recoil_mcp_cmd_ -> SetDefaultValue(true);
+    make_recoil_mcp_cmd_ -> AvailableForStates(G4State_Idle);
 }
 
 K37DetectorMessenger::~K37DetectorMessenger() {
@@ -62,6 +105,12 @@ K37DetectorMessenger::~K37DetectorMessenger() {
     delete ShouldTheMirrorBeWFEDM;
     delete UpdateGeometryCommand;
     delete PrintAvailableMaterials;
+    delete make_chamber_cmd_;
+    delete make_mirrors_cmd_;
+    delete make_hoops_cmd_;
+    delete make_electron_mcp_cmd_;
+    delete make_coils_cmd_;
+    delete make_recoil_mcp_cmd_;
 }
 
 void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
@@ -79,6 +128,13 @@ void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
     }
     if (command == PrintAvailableMaterials) {
         myDetector-> PrintMaterialList();
+    }
+
+    if (command == make_chamber_cmd_) {
+      myDetector->SetMakeChamber(make_chamber_cmd_->GetNewBoolValue(newValue));
+    }
+    if (command == make_hoops_cmd_) {
+      myDetector -> SetMakeHoops(make_hoops_cmd_->GetNewBoolValue(newValue));
     }
 }
 

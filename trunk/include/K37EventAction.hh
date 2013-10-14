@@ -65,6 +65,7 @@ class K37EventAction : public G4UserEventAction {
   void SetPrimaryGenerator(K37PrimaryGeneratorAction *primary_generator) {
     primary_generator_ = primary_generator;
   }
+  K37PrimaryGeneratorAction* GetPrimaryGenerator() {return primary_generator_;}
 
  private:
   // V1190 TDC Clock beats every 97.65625 ns; output from analyzer is in
