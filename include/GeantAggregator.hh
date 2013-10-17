@@ -7,7 +7,9 @@
 #include "K37CloudSize.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37EventAction.hh"
+#include "K37PhysicsList.hh"
 #include "K37PrimaryGeneratorAction.hh"
+#include "PhysicsList.hh"
 
 class GeantAggregator : public AGG::Aggregator {
  public:
@@ -20,6 +22,7 @@ class GeantAggregator : public AGG::Aggregator {
   }
   void SetCloudSize(K37CloudSize *cs) {cloud_size_ = cs;}
   void SetEventAction(K37EventAction *ea) {event_action_ = ea;}
+  void SetPhysicsList(PhysicsList *list) {physics_list_ = list;}
   void EndRun();
 
  private:
@@ -27,6 +30,7 @@ class GeantAggregator : public AGG::Aggregator {
   K37ElectricFieldSetup *electric_field_setup_;
   K37CloudSize *cloud_size_;
   K37EventAction *event_action_;
+  PhysicsList *physics_list_;
 };
 
 #endif

@@ -3,30 +3,34 @@
 /run/verbose 0
 /vis/open OGL 900x900-0+0
 /vis/viewer/set/autoRefresh false
+/testem/phys/addPhysics local
+/K37/RunControls/setDefaultCut 10 um
+/run/initialize
 /vis/drawVolume
 #/vis/viewer/set/viewpointThetaPhi 90. 0.
 #/vis/viewer/zoom 2.
-#/vis/viewer/set/style wireframe
+/vis/viewer/set/style wireframe
 #/vis/scene/add/axes 0 0 0 1 m
 /vis/viewer/set/viewpointThetaPhi 90. 180.
 /vis/viewer/zoom 2.1
 
 #Tell Geant what sort of Tracks to use
+/tracking/verbose 0
 #/vis/scene/add/trajectories          #makes straight tracks 
 /vis/scene/add/trajectories smooth   #makes cureved tracks
 #/vis/scene/add/trajectories rich    #Keeps additional information
 
-#/vis/modeling/trajectories/create/drawByCharge
-#/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
-#/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1
 /vis/scene/endOfEventAction accumulate
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 /vis/viewer/set/background 0.0 0.3 0.3
-/vis/viewer/set/background 0.0 0.3 0.3
+
 
 #These are the picture print settings that 
 #I have had luck with.
 #/vis/ogl/set/printMode pixmap
-#/vis/ogl/set/printSize 800 800
+# /vis/ogl/set/printSize 800 800
 #/vis/ogl/printEPS

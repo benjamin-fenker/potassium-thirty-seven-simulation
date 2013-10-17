@@ -7,8 +7,7 @@
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 
-class K37RecoilMCPHit : public G4VHit
-{
+class K37RecoilMCPHit : public G4VHit {
  public:
   K37RecoilMCPHit();
   ~K37RecoilMCPHit();

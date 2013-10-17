@@ -62,7 +62,7 @@ sub repeatRun {
     my $i = 0;
     while ($i < $iters) {
         if ($id_num == 0) {
-            #print "Thread $id_num on call $i\n";
+            print "Thread $id_num on call $i\n";
             statusBar($i, $iters);
         }
         `./K37 $macro_name`;
@@ -71,6 +71,7 @@ sub repeatRun {
         } else {
             `mv $dir/$finalFile $dir/temp$id_num.root`;
             `hadd $dir/$finalFile $dir/$tempFile $dir/temp$id_num.root 2> log.txt`;
+            `GrabParameters $dir/temp$id_num.root $dir/$finalFile`;
         }
         $i++;
     }
@@ -93,6 +94,9 @@ sub runOnce {
     my @particle = @_[20..22];
     my $secondaries = $_[23];
     my $strips = $_[24];
+    my $threshold = $_[25];
+    my $physics = $_[26];
+    my $stepLimit = $_[27];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
     if ($id_num == 0) {
@@ -102,6 +106,9 @@ sub runOnce {
 
 
     open(MACRO, ">runFiles/runParallel$id_num.mac") || die;
+    print MACRO "/testem/phys/addPhysics $physics\n";
+    print MACRO "/K37/RunControls/setDefaultCut $threshold um\n";
+    print MACRO "/run/initialize\n";
     print MACRO "/K37/EventControls/ThresholdElectronMCP $threshold[0] keV\n";
     print MACRO
         "/K37/EventControls/ThresholdUpperScintillator $threshold[1] keV\n";
@@ -123,30 +130,34 @@ sub runOnce {
     print MACRO "runFiles/parallelConfig$id_num.txt\n";
     print MACRO "/K37/RunControls/setOutputDirectory runFiles\n";
     print MACRO "/K37/RunControls/setFilename out$id_num\n";
+    print MACRO "/process/msc/StepLimit $stepLimit\n";
     print MACRO "/run/beamOn $events_per_run\n";
 
     close MACRO;
     repeatRun($iters, $id_num, "runFiles/runParallel$id_num.mac", "runFiles");
-#   `./K37 runFiles/runParallel$id_num.mac`;
+    `./K37 runFiles/runParallel$id_num.mac`;
     print "Thread $id_num done\n";
     `mv runFiles/sum$id_num.root runFiles/$fna$id_num.root`;
 }
 
 #Default values in case of no parameter file
 my @threshold = (0, 100, 100); #eMCP, lower scint, upper scint (keV)
-my $e_field  = 35000;          #V/m uniform
+my $e_field  = 35000;         # V/m uniform
 my $polarization = 1.0;
 my $alignment = 1.0;
-my @temperature = (0.0029, 0.0029, 0.0014); #deg K
-my @size = (0.51, 0.51, 0.64);              #mm
-my @center = (1.07, 1.07, -2.05);           #mm
-my $recoil_charge = -2;                    #-2 = mixed 
+my @temperature = (0.0029, 0.0029, 0.0014); # deg K
+my @size = (0.51, 0.51, 0.64);             # mm
+my @center = (1.07, 1.07, -2.05);          # mm
+my $recoil_charge = -2;                   # -2 = mixed 
 my @input;
 my $directory = `pwd`; chomp($directory);
 my $file_name = "output";
 my @particle = ("true", "true", "true");
 my $secondaries = "true";
 my $strips = "true";
+my $prodThres = 10;
+my $physList = "local";
+my $stepLimit = "Minimal";
 
 if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($threshold[0] = <PARAMSin>);
@@ -172,6 +183,9 @@ if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($particle[2] = <PARAMSin>);
     chomp($secondaries = <PARAMSin>);
     chomp($strips = <PARAMSin>);
+    chomp($prodThres = <PARAMSin>);
+    chomp($physList = <PARAMSin>);
+    chomp($stepLimit = <PARAMSin>);
 } else {
     print "\nNo parameter file...starting with default values\n\n";
 }
@@ -237,6 +251,9 @@ while($choice != 0) {
     print "[3] Make Shakeoff Electrons            = $particle[2]\n";
     print "[4] Track secondaries                  = $secondaries\n";
     print "[5] Record DSSD Data                   = $strips\n";
+    print "[6] Production Threshold               = $prodThres um\n";
+    print "[7] Physics List                       = $physList\n";
+    print "[8] Step limit                         = $stepLimit\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {
@@ -247,6 +264,12 @@ while($choice != 0) {
             chomp($secondaries = <STDIN>);
         } elsif ($choice == 5) {
             chomp($strips = <STDIN>);
+        } elsif ($choice == 6) {
+            chomp($prodThres = <STDIN>);
+        } elsif ($choice == 7) {
+            chomp($physList = <STDIN>);
+        } elsif ($choice == 8) {
+            chomp($stepLimit = <STDIN>);
         } else {
             print "Unknown value.  Try again\n";
         }
@@ -312,7 +335,8 @@ print "$thread_events per thread\n";
 
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
-                 $file_name, @particle, $secondaries, $strips);
+                 $file_name, @particle, $secondaries, $strips, $prodThres,
+                 $physList, $stepLimit);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;
@@ -348,6 +372,7 @@ if (-e "$directory/$file_name.root" && ($ovw eq "n" || $ovw eq "N")) {
     `mv $directory/$file_name.root $directory/$file_name$z.root`;
 }
 `hadd -f $directory/$file_name.root @tempfiles 2>log.txt`;
+`GrabParameters $tempfiles[0] $directory/$file_name.root`;
 
 # Print the most recently used parameters to a file
 open(PARAMS, ">runFiles/params.txt") ||

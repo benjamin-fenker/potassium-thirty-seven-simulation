@@ -97,6 +97,13 @@ K37RunMessenger::K37RunMessenger(K37RunAction* RA)
   set_output_directory_ ->
       SetDefaultValue("/home/bfenker/geant4_workdir/K37Build");
   set_output_directory_ -> AvailableForStates(G4State_Idle);
+
+  set_default_cut_cmd_ =
+      new G4UIcmdWithADoubleAndUnit("/K37/RunControls/setDefaultCut", this);
+  set_default_cut_cmd_ -> SetGuidance("Set secondary production threshold");
+  set_default_cut_cmd_ -> SetParameterName("Threshold", false);
+  set_default_cut_cmd_ -> SetUnitCategory("Length");
+  set_default_cut_cmd_ -> AvailableForStates(G4State_PreInit);
 }
 
 //---------------------------------
@@ -112,9 +119,10 @@ K37RunMessenger::~K37RunMessenger() {
   delete printTheVolumeNames;
   delete setFillEvGenData;
   delete setFillAllSDData;
+  delete set_default_cut_cmd_;
 }
 
-//---------------------------------
+
 
 void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
   if (command == SaveFilesCommand) {
@@ -159,6 +167,13 @@ void K37RunMessenger::SetNewValue(G4UIcommand* command, G4String newValues) {
 
   if (command == set_output_directory_) {
     runAction -> SetOutputDirectory(newValues.c_str());
+  }
+
+  if (command == set_default_cut_cmd_) {
+    runAction -> GetPhysicsList() ->
+        SetDefaultCutValue(set_default_cut_cmd_ ->
+                           GetNewDoubleValue(newValues));
+    runAction -> GetPhysicsList() -> SetCuts();
   }
 }
 

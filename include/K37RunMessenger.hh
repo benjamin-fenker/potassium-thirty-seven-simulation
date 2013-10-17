@@ -6,6 +6,7 @@
 #include "globals.hh"
 #include "G4ios.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UImessenger.hh"
 
 //---------------------------------
@@ -37,6 +38,7 @@ class K37RunMessenger: public G4UImessenger {
   G4UIcmdWithABool* printTheVolumeNames;
   G4UIcmdWithABool* setFillEvGenData;
   G4UIcmdWithABool* setFillAllSDData;
+  G4UIcmdWithADoubleAndUnit *set_default_cut_cmd_;
 };
 
 #endif

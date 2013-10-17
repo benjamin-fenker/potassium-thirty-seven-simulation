@@ -9,9 +9,6 @@
 #include "G4HCofThisEvent.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
-#include "K37ArMinusDefinition.hh"
-#include "K37ArNeutralDefinition.hh"
-#include "K37ArPlusOneDefinition.hh"
 
 //-----------------------------------------------
 
@@ -21,9 +18,6 @@ K37StackingAction::K37StackingAction()
     electron(G4Electron::ElectronDefinition()),
     positron(G4Positron::PositronDefinition()),
     gamma(G4Gamma::GammaDefinition()),
-    ArMinus(K37Ar37Minus::Ar37MinusDefinition()),
-    ArNeutral(K37Ar37Neutral::Ar37NeutralDefinition()),
-    ArPlus(K37Ar37PlusOne::Ar37PlusOneDefinition()),
     track_secondaries_(true) {
   messenger_ = new K37StackingActionMessenger(this);
 }
@@ -45,15 +39,6 @@ G4ClassificationOfNewTrack K37StackingAction::ClassifyNewTrack(
   if ((particleType == electron) ||
       (particleType == positron) ||
       (particleType == gamma)) {
-    classification = fUrgent;
-  }
-  if (particleType == ArMinus) {
-    classification = fUrgent;
-  }
-  if (particleType == ArNeutral) {
-    classification = fUrgent;
-  }
-  if (particleType == ArPlus) {
     classification = fUrgent;
   }
   if (particleType -> GetParticleType() == "nucleus") {

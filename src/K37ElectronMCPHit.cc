@@ -14,8 +14,7 @@ K37ElectronMCPHit::~K37ElectronMCPHit()
 {;}
 
 K37ElectronMCPHit::K37ElectronMCPHit(const K37ElectronMCPHit &right)
-: G4VHit()
-{
+  : G4VHit() {
     energy = right.energy;
     time = right.time;
     particle_pdg = right.particle_pdg;
