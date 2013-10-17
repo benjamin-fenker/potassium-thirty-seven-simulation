@@ -12,8 +12,7 @@ K37CloudSize::K37CloudSize(G4ThreeVector cloud_center,
 : cloud_center_(cloud_center),
   initial_cloud_size_(cloud_size_start), temperature_(cloud_temperature),
   cycleTime(2.9472*ms), expansion_before_polarized_(300*microsecond),
-  decay_time_(-10) {
-  SetupSigma(cloud_temperature);
+  decay_time_(-10), initialize_complete_(false) {
 }
 
 K37CloudSize::~K37CloudSize() {
@@ -21,6 +20,7 @@ K37CloudSize::~K37CloudSize() {
 
 void K37CloudSize::makeEvent() {
   // Position of the decaying particle at the instant the cloud starts expanding
+  if (!initialize_complete_) Initialize();
 
   G4ThreeVector initial_position =
       G4ThreeVector(G4RandGauss::shoot(cloud_center_.x(),
@@ -113,4 +113,9 @@ void K37CloudSize::SetInitialCloudSize(G4ThreeVector size) {
 
 void K37CloudSize::SetInitialCloudSize(G4double size) {
   SetInitialCloudSize(G4ThreeVector(size, size, size));
+}
+
+void K37CloudSize::Initialize() {
+  SetupSigma(temperature_);
+  initialize_complete_ = true;
 }

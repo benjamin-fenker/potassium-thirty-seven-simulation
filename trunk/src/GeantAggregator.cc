@@ -1,12 +1,14 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 #include <TArrayD.h>
 
+#include "globals.hh"
+
 #include "GeantAggregator.hh"
 
 GeantAggregator::GeantAggregator() {}
 
 void GeantAggregator::EndRun() {
-  TArrayD *parameters = new TArrayD(18);
+  TArrayD *parameters = new TArrayD(21);
   parameters -> AddAt(primary_generator_action_ -> GetPolarization()       , 0);
   parameters -> AddAt(primary_generator_action_ -> GetAlignment()          , 1);
   parameters -> AddAt(electric_field_setup_ ->
@@ -37,6 +39,20 @@ void GeantAggregator::EndRun() {
   parameters -> AddAt(event_action_ -> GetElectronMCPthreshold(), 15);
   parameters -> AddAt(event_action_ -> GetUpperScintillatorThreshold(), 16);
   parameters -> AddAt(event_action_ -> GetLowerScintillatorThreshold(), 17);
+  parameters -> AddAt(physics_list_ -> GetDefaultCutValue()/micrometer, 18);
+  G4String list_str = physics_list_ -> GetEmName();
+  double list_code = -1;
+  if (list_str == "local") list_code = 4;
+  if (list_str == "emstandard_opt0") list_code = 0;
+  if (list_str == "emstandard_opt1") list_code = 1;
+  if (list_str == "emstandard_opt2") list_code = 2;
+  if (list_str == "emstandard_opt3") list_code = 3;
+  if (list_str == "standardSS") list_code = 5;
+  if (list_str == "standardNR") list_code = 6;
+  if (list_str == "empenelope") list_code = 7;
+  if (list_str == "emlivermore") list_code = 8;
+  if (list_str == "K37") list_code = 9;
+  parameters -> AddAt(list_code, 19);
   TFile *file = Aggregator::GetRootFile();
   file -> WriteObject(parameters, "RunParameters");
   Aggregator::EndRun();

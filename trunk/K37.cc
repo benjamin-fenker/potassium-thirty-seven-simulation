@@ -30,6 +30,7 @@
 #include "Aggregator.hh"
 #include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
+#include "external/PhysicsList.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
@@ -98,10 +99,11 @@ int main(int argc, char** argv) {
   K37DetectorConstruction* detector;
   runManager->SetUserInitialization(detector = new K37DetectorConstruction());
 
-  G4VUserPhysicsList* physics = new K37PhysicsList();
-  runManager->SetUserInitialization(physics);
-
-  runManager->Initialize();
+  //  K37PhysicsList* physics = new K37PhysicsList();
+  PhysicsList *physics = new PhysicsList();
+  runManager -> SetUserInitialization(physics);
+  the_aggregator -> SetPhysicsList(physics);
+  //runManager->Initialize();
 
   // User Action classes
   K37EventGenerator * evGen = new JTW_Event();
@@ -118,6 +120,7 @@ int main(int argc, char** argv) {
   K37RunAction* run_action = new K37RunAction();
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
+  run_action -> SetPhysicsList(physics);
   runManager -> SetUserAction(run_action);
 
   K37EventAction* event_action = new K37EventAction(run_action);
@@ -129,12 +132,11 @@ int main(int argc, char** argv) {
 
   // get the pointer to the User Interface manager
   runManager->SetUserAction(new K37StackingAction);
-
   G4int result = static_cast<G4int>(system("rm -rf detectors.root"));
   if (result != 0) G4cout << "Could not remove detectors.root." << G4endl;
 
 #ifdef G4VIS_USE
-  G4VisManager* visManager = new G4VisExecutive();
+  G4VisManager* visManager = new G4VisExecutive("quiet");
   visManager->Initialize();
   G4VisTrajContext *theContext = new G4VisTrajContext("ParticleTypeContext");
   theContext->SetDrawAuxPts(true);

@@ -46,6 +46,8 @@ class K37CloudSize {
   G4double CalcSigma(G4double temperature);
   void SetFinalPosition(G4ThreeVector initial_position, G4ThreeVector velocity,
                         G4double time);
+  G4bool initialize_complete_;
+  void Initialize();
 };
 
 #endif

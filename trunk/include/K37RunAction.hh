@@ -13,7 +13,9 @@
 #include "Generic_Channel.hh"
 #include "globals.hh"
 #include "K37_Data.hh"
+#include "K37PhysicsList.hh"
 #include "K37RunMessenger.hh"
+#include "external/PhysicsList.hh"
 #include "TDC_Channel.hh"
 
 using AGG::Aggregator;
@@ -110,6 +112,8 @@ class K37RunAction : public G4UserRunAction {
     record_strip_detector_data_ = record;
   }
   G4bool RecordStripDetectorData() {return record_strip_detector_data_;}
+  void SetPhysicsList(PhysicsList *list) {physics_list_ = list;}
+  PhysicsList* GetPhysicsList() {return physics_list_;}
 
  private:
   void RegisterChannel(K37_Data* channel);
@@ -161,6 +165,7 @@ class K37RunAction : public G4UserRunAction {
   G4int    nonVetoed;
 
   K37RunMessenger* runMessenger;
+  PhysicsList *physics_list_;
 
   G4bool recordAnnihilationPosition;
   G4bool recordVolumeNames;
