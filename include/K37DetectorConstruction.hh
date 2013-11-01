@@ -91,13 +91,13 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VPhysicalVolume *lower_strip_detector_phys_;   // ptr to the physical DSSSD
   K37StripDetectorSD *lower_strip_detector_sens_;  // ptr to the sensitive DSSSD
 
-  G4SubtractionSolid *upper_sd_holder_sol_;  // ptr to the solid DSSSD holder
-  G4LogicalVolume *upper_sd_holder_log_;     // ptr to the logical DSSSD holder
-  G4VPhysicalVolume *upper_sd_holder_phys_;  // ptr to the physical DSSSD holder
+//   G4SubtractionSolid *upper_sd_holder_sol_;  // ptr to solid DSSSD holder
+//   G4LogicalVolume *upper_sd_holder_log_;     // ptr to logical DSSSD holder
+//   G4VPhysicalVolume *upper_sd_holder_phys_;  // ptr to physical DSSSD holder
 
-  G4SubtractionSolid *lower_sd_holder_sol_;  // ptr to the solid DSSSD holder
-  G4LogicalVolume *lower_sd_holder_log_;     // ptr to the logical DSSSD holder
-  G4VPhysicalVolume *lower_sd_holder_phys_;  // ptr to the physical DSSSD holder
+//   G4SubtractionSolid *lower_sd_holder_sol_;  // ptr to solid DSSSD holder
+//   G4LogicalVolume *lower_sd_holder_log_;     // ptr to logical DSSSD holder
+//   G4VPhysicalVolume *lower_sd_holder_phys_;  // ptr to physical DSSSD holder
 
   G4SubtractionSolid *chamber_box_;        // pointer to the solid chamber
   G4LogicalVolume *chamber_log_;           // pointer to the logical chamber

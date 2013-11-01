@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(K37)
 
 #It is best to set the build type from the build.sh
+#SET( CMAKE_CXX_COMPILER "g++" )
+#SET( CMAKE_CXX_COMPILER "clang++" )
+#SET( CMAKE_CXX_COMPILER "c++" )
+
 
 #----------------------------------------------------------------------------
 # Find Root so that we can link the aggregator class to it

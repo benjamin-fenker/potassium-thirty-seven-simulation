@@ -64,6 +64,8 @@
 #include <typeinfo>
 #include <sstream>
 
+#define NOT_USED(x) ( (void)(x) )
+
 /// \brief the exception class for c2_function operations.
 class c2_exception : public std::exception {
 public:
@@ -690,11 +692,11 @@ public:
 	/// \brief construct the container with a pre-defined function
 	/// \param f the function to store
 	c2_ptr(c2_function<float_type> &f) : 
-		c2_const_ptr<float_type>() { set_function(&f); } 
+		c2_const_ptr<float_type>() { this -> set_function(&f); } 
 	/// \brief copy constructor
 	/// \param src the container to copy
 	c2_ptr(const c2_ptr<float_type> &src) : 
-		c2_const_ptr<float_type>() { set_function(src.get_ptr()); }
+		c2_const_ptr<float_type>() { this -> set_function(src.get_ptr()); }
 	/// \brief get a checked pointer to our owned function
 	inline c2_function<float_type> &get() const throw(c2_exception) 
 		{ return *const_cast<c2_function<float_type>*>(&c2_const_ptr<float_type>::get()); }
@@ -714,9 +716,9 @@ public:
 		{ set_function(&f); }
 private:
 	/// \brief hidden non-const-safe version of operator=
-	void operator =(const c2_const_ptr<float_type> &f) { }
+        void operator =(const c2_const_ptr<float_type> &f) {NOT_USED(f);}
 	/// \brief hidden non-const-safe version of operator=
-	void operator =(const c2_function<float_type> &f) { }
+        void operator =(const c2_function<float_type> &f) {NOT_USED(f);}
 };
 
 /// \brief create a non-generic container for a c2_function which handles the reference counting.
@@ -797,7 +799,7 @@ public:
 	void set_function(c2_function<float_type> *f) 
 		{
 			func.set_function(f);
-			if(f) set_domain(f->xmin(), f->xmax());
+			if(f) this -> set_domain(f->xmin(), f->xmax());
 		}
 	/// \copydoc c2_function::value_with_derivatives
 	/// Uses the internal function pointer set by set_function().
@@ -873,7 +875,7 @@ protected:
 			const c2_function<float_type> &left,  const c2_function<float_type> &right) : 
 			c2_function<float_type>(), combine(combiner), Left(left), Right(right), stub(false)
 	{ 
-		set_domain(
+		this -> set_domain(
 				   (left.xmin() > right.xmin()) ? left.xmin() : right.xmin(), 
 				   (left.xmax() < right.xmax()) ? left.xmax() : right.xmax()
 				   );
@@ -1143,7 +1145,7 @@ public:
 	c2_constant_p(float_type x) : c2_function<float_type>(), value(x) {}
 	void reset(float_type val) { value=val; }
 	virtual float_type value_with_derivatives(float_type x, float_type *yprime, float_type *yprime2) const throw(c2_exception) 
-	{ if(yprime) *yprime=0; if(yprime2) *yprime2=0; return value; }
+  { NOT_USED(x); if(yprime) *yprime=0; if(yprime2) *yprime2=0; return value; }
 	
 private:
 		float_type value;
