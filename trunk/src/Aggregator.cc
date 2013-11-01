@@ -21,14 +21,17 @@
 //#include "K37RunData.hh"
 #include "Aggregator.hh"
 
+using std::abs;
 using std::cerr;
-using std::endl;
 using std::cout;
+using std::endl;
 using std::left;
+using std::map;
 using std::setw;
 using std::sqrt;
-using std::abs;
-using std::map;
+using std::string;
+
+
 
 namespace AGG {
 class Aggregator::ImplementAGG {
