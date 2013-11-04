@@ -23,5 +23,3 @@ else
    printf '%s\n' "Make failed !!!";
 fi
 
-g++ -c `root-config --cflags` $K37SOURCEDIRECTORY/src/GrabParameters.C
-g++ -o GrabParameters GrabParameters.o `root-config --libs`

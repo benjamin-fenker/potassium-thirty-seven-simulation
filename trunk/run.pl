@@ -71,7 +71,7 @@ sub repeatRun {
         } else {
             `mv $dir/$finalFile $dir/temp$id_num.root`;
             `hadd $dir/$finalFile $dir/$tempFile $dir/temp$id_num.root 2> log.txt`;
-            `GrabParameters $dir/temp$id_num.root $dir/$finalFile`;
+            `./aux/GrabParameters $dir/temp$id_num.root $dir/$finalFile`;
         }
         $i++;
     }
@@ -372,7 +372,7 @@ if (-e "$directory/$file_name.root" && ($ovw eq "n" || $ovw eq "N")) {
     `mv $directory/$file_name.root $directory/$file_name$z.root`;
 }
 `hadd -f $directory/$file_name.root @tempfiles 2>log.txt`;
-`GrabParameters $tempfiles[0] $directory/$file_name.root`;
+`./aux/GrabParameters $tempfiles[0] $directory/$file_name.root`;
 
 # Print the most recently used parameters to a file
 open(PARAMS, ">runFiles/params.txt") ||
