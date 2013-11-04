@@ -18,7 +18,7 @@ ReleaseType="RELEASE" #you can choose to use the release build options
 cmake CMAKE_BINARY_DIR=$K37BUILDDIRECTORY -DGeant4_DIR=$PLACEOFGeant4ConfigCmake $K37SOURCEDIRECTORY -DCMAKE_CXX_FLAGS_DEBUG:STRING="$D_CPP_FLAGS" -DCMAKE_CXX_FLAGS_RELEASE:STRING="$O_CPP_FLAGS" -DCMAKE_BUILD_TYPE:STRING="$ReleaseType";
 make;
 if [ $? -eq 0 ] ; then
-#   ./K37;
+   ./K37;
 else
    printf '%s\n' "Make failed !!!";
 fi
