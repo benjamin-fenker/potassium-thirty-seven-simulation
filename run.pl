@@ -121,7 +121,7 @@ sub runOnce {
     print MACRO "/K37/gun/setTemperatureV @temp K\n";
     print MACRO "/K37/gun/setCloudSizeV @size mm\n";
     print MACRO "/K37/gun/setCloudCenter @center mm\n";
-    print MACRO "/K37/gun/setSailVelocity @sailV mm/ns\n";
+    print MACRO "/K37/gun/setSailVelocity @sailV mm/us\n";
     print MACRO "/K37/gun/setRecoilCharge $rec\n";
     print MACRO "/K37/gun/setMakeBeta $particle[0]\n";
     print MACRO "/K37/gun/setMakeRecoil $particle[1]\n";
@@ -150,7 +150,7 @@ my $alignment = 1.0;
 my @temperature = (0.0029, 0.0029, 0.0014); # deg K
 my @size = (0.51, 0.51, 0.64);             # mm
 my @center = (1.07, 1.07, -2.05);          # mm
-my @sailV = (0.0, 0.0, 0.0);               # mm/ns
+my @sailV = (0.0, 0.0, 0.0);               # mm/us
 my $recoil_charge = -2;                   # -2 = mixed 
 my @input;
 my $directory = `pwd`; chomp($directory);
@@ -240,9 +240,9 @@ while ($choice  != 0) {
     print "[7] Cloud temperature     x         = $temperature[0] K\n";
     print "[8]                       y         = $temperature[1] K\n";
     print "[9]                       z         = $temperature[2] K\n";
-    print "[10] Sail velocity        x         = $sailV[0] mm\n";
-    print "[11]                      y         = $sailV[1] mm\n";
-    print "[12]                      z         = $sailV[2] mm\n";
+    print "[10] Sail velocity        x         = $sailV[0] mm/us\n";
+    print "[11]                      y         = $sailV[1] mm/us\n";
+    print "[12]                      z         = $sailV[2] mm/us\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {
