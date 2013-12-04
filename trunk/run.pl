@@ -97,6 +97,7 @@ sub runOnce {
     my $threshold = $_[25];
     my $physics = $_[26];
     my $stepLimit = $_[27];
+    my @sailV = @_[28..30];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
     if ($id_num == 0) {
@@ -120,6 +121,7 @@ sub runOnce {
     print MACRO "/K37/gun/setTemperatureV @temp K\n";
     print MACRO "/K37/gun/setCloudSizeV @size mm\n";
     print MACRO "/K37/gun/setCloudCenter @center mm\n";
+    print MACRO "/K37/gun/setSailVelocity @sailV mm/ns\n";
     print MACRO "/K37/gun/setRecoilCharge $rec\n";
     print MACRO "/K37/gun/setMakeBeta $particle[0]\n";
     print MACRO "/K37/gun/setMakeRecoil $particle[1]\n";
@@ -148,6 +150,7 @@ my $alignment = 1.0;
 my @temperature = (0.0029, 0.0029, 0.0014); # deg K
 my @size = (0.51, 0.51, 0.64);             # mm
 my @center = (1.07, 1.07, -2.05);          # mm
+my @sailV = (0.0, 0.0, 0.0);               # mm/ns
 my $recoil_charge = -2;                   # -2 = mixed 
 my @input;
 my $directory = `pwd`; chomp($directory);
@@ -186,6 +189,9 @@ if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($prodThres = <PARAMSin>);
     chomp($physList = <PARAMSin>);
     chomp($stepLimit = <PARAMSin>);
+    chomp($sailV[0] = <PARAMSin>);
+    chomp($sailV[1] = <PARAMSin>);
+    chomp($sailV[2] = <PARAMSin>);
 } else {
     print "\nNo parameter file...starting with default values\n\n";
 }
@@ -234,13 +240,17 @@ while ($choice  != 0) {
     print "[7] Cloud temperature     x         = $temperature[0] K\n";
     print "[8]                       y         = $temperature[1] K\n";
     print "[9]                       z         = $temperature[2] K\n";
+    print "[10] Sail velocity        x         = $sailV[0] mm\n";
+    print "[11]                      y         = $sailV[1] mm\n";
+    print "[12]                      z         = $sailV[2] mm\n";
     print "Enter number to change or 0 to quit\n";
     chomp($choice = <STDIN>);
     if ($choice != 0) {
         printf "Enter new value for $choice\n";
         if ($choice <  4) { chomp($center[$choice-1] = <STDIN>); }
         if ($choice >= 4 && $choice < 7) { chomp($size[$choice-4] = <STDIN>); }
-        if ($choice >= 7) { chomp($temperature[$choice-7] = <STDIN>); }
+        if ($choice >= 7 && $choice < 10) { chomp($temperature[$choice-7] = <STDIN>); }
+        if ($choice >= 10) { chomp($sailV[$choice-10] = <STDIN>); }
     }
 }
 
@@ -336,7 +346,7 @@ print "$thread_events per thread\n";
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
                  $file_name, @particle, $secondaries, $strips, $prodThres,
-                 $physList, $stepLimit);
+                 $physList, $stepLimit, @sailV);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;

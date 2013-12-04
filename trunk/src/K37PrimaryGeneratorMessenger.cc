@@ -8,6 +8,8 @@
 K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
                                   K37PrimaryGeneratorAction* Gun)
   :action_(Gun) {
+  new G4UnitDefinition("millimeter/nanosecond", "mm/ns", "Velocity", mm/ns);
+
   gunDir = new G4UIdirectory("/K37/gun/");
   gunDir->SetGuidance("PrimaryGenerator control");
 
@@ -91,6 +93,18 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
       SetGuidance("Enter bool to generate primary SOEs or not");
   set_make_shakeoff_electrons_ -> SetParameterName("Make SOEs", true);
   set_make_shakeoff_electrons_ -> SetDefaultValue(true);
+
+  set_cloud_sail_velocity_v_ =
+      new G4UIcmdWith3VectorAndUnit("/K37/gun/setSailVelocity", this);
+  set_cloud_sail_velocity_v_ -> SetGuidance("Enter the cloud's sail velocity");
+  set_cloud_sail_velocity_v_ -> SetParameterName("vx", "vy", "vz", false);
+  set_cloud_sail_velocity_v_ -> SetUnitCategory("Velocity");
+
+  set_cloud_sail_velocity_d_ =
+      new G4UIcmdWithADoubleAndUnit("/K37/gun/setSailVelocityD", this);
+  set_cloud_sail_velocity_d_ -> SetGuidance("Enter the cloud's sail velocity");
+  set_cloud_sail_velocity_d_ -> SetParameterName("velocity", false);
+  set_cloud_sail_velocity_d_ -> SetUnitCategory("Velocity");
 }
 
 // ----------------------------------
@@ -106,6 +120,11 @@ K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
   delete set_initial_cloud_size_v_;
   delete set_initial_cloud_size_d_;
   delete set_cloud_center_;
+  delete set_make_beta_;
+  delete set_make_recoil_;
+  delete set_make_shakeoff_electrons_;
+  delete set_cloud_sail_velocity_v_;
+  delete set_cloud_sail_velocity_d_;
 }
 
 // ----------------------------------
@@ -156,6 +175,14 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
   if (command == set_make_shakeoff_electrons_) {
     action_ -> SetMakeShakeoffElectrons(set_make_shakeoff_electrons_ ->
                                         GetNewBoolValue(newValue));
+  }
+  if (command == set_cloud_sail_velocity_v_) {
+    action_ -> GetCloudSize() -> SetSailVelocity(set_cloud_sail_velocity_v_ ->
+                                                 GetNew3VectorValue(newValue));
+  }
+  if (command == set_cloud_sail_velocity_d_) {
+    action_ -> GetCloudSize() -> SetSailVelocity(set_cloud_sail_velocity_d_ ->
+                                                 GetNewDoubleValue(newValue));
   }
 }
 
