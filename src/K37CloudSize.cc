@@ -8,11 +8,13 @@
 
 K37CloudSize::K37CloudSize(G4ThreeVector cloud_center,
                            G4ThreeVector cloud_temperature,
-                           G4ThreeVector cloud_size_start)
+                           G4ThreeVector cloud_size_start,
+                           G4ThreeVector sail_velocity)
 : cloud_center_(cloud_center),
   initial_cloud_size_(cloud_size_start), temperature_(cloud_temperature),
-  cycleTime(2.9472*ms), expansion_before_polarized_(300*microsecond),
-  decay_time_(-10), initialize_complete_(false) {
+  sail_velocity_(sail_velocity), cycleTime(2.9472*ms),
+  expansion_before_polarized_(300*microsecond), decay_time_(-10),
+  initialize_complete_(false) {
 }
 
 K37CloudSize::~K37CloudSize() {
@@ -39,13 +41,16 @@ void K37CloudSize::makeEvent() {
     decay_time_ = cycleTime*G4UniformRand();
   }
 
+  // Thermal velocity of individual atom (random)
   G4ThreeVector velocity =
       G4ThreeVector(G4RandGauss::shoot(0, velocity_sigma_.x()),
                     G4RandGauss::shoot(0, velocity_sigma_.y()),
                     G4RandGauss::shoot(0, velocity_sigma_.z()));
+  // Overall (bulk) movement of the cloud
+
+  velocity += sail_velocity_;
 
   SetFinalPosition(initial_position, velocity, decay_time_);
-
   //  Outputs a text file with starting x, y, z, vx, vy, vz, time
   // std::ofstream ofs;
   // ofs.open("cloudData.dat", std::ofstream::out | std::ofstream::app);
@@ -78,16 +83,16 @@ void K37CloudSize::SetFinalPosition(G4ThreeVector initial_position,
                                     G4ThreeVector velocity, G4double time) {
   final_position_ = initial_position;
   final_position_ += velocity*time;
-  // G4cout << "Initial position: " << initial_position.x()/mm << " mm, "
-  //        << initial_position.y()/mm << " mm, " << initial_position.z()/mm
-  //        << " mm" << G4endl;
-  // G4cout << "Velocity: " << velocity.x()/(mm/ns) << " mm/ns, "
-  //        << velocity.y()/(mm/ns) << " mm/ns, " << velocity.z()/(mm/ns)
-  //        << " mm/ns" << G4endl;
-  // G4cout << "Time: " << time/ns << " ns " << G4endl;
-  // G4cout << "Final position: " << final_position_.x()/mm << " mm, "
-  //        << final_position_.y()/mm << " mm, " << final_position_.z()/mm
-  //        << " mm" << G4endl;
+//   G4cout << "Initial position: " << initial_position.x()/mm << " mm, "
+//          << initial_position.y()/mm << " mm, " << initial_position.z()/mm
+//          << " mm" << G4endl;
+//   G4cout << "Velocity: " << velocity.x()/(mm/ns) << " mm/ns, "
+//          << velocity.y()/(mm/ns) << " mm/ns, " << velocity.z()/(mm/ns)
+//          << " mm/ns" << G4endl;
+//   G4cout << "Time: " << time/ns << " ns " << G4endl;
+//   G4cout << "Final position: " << final_position_.x()/mm << " mm, "
+//          << final_position_.y()/mm << " mm, " << final_position_.z()/mm
+//          << " mm" << G4endl;
 }
 
 void K37CloudSize::SetTemperature(G4ThreeVector temp) {
@@ -118,4 +123,12 @@ void K37CloudSize::SetInitialCloudSize(G4double size) {
 void K37CloudSize::Initialize() {
   SetupSigma(temperature_);
   initialize_complete_ = true;
+}
+
+void K37CloudSize::SetSailVelocity(G4ThreeVector vel) {
+  sail_velocity_ = vel;
+}
+
+void K37CloudSize::SetSailVelocity(G4double vel) {
+  SetSailVelocity(G4ThreeVector(vel, vel, vel));
 }

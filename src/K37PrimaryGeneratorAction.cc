@@ -53,10 +53,11 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
   charge_state_ratio_[7] = 0.0;
   NormalizeChargeStateRatio();
 
-  cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),
+  cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),  // center
                            G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
-                                         0.0014*kelvin),
-                           G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm));
+                                         0.0014*kelvin),          // temperature
+                           G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm),    // width
+                           G4ThreeVector(0.0 *mm/ns, 0.0*mm/ns, 0.0*mm/ns));
   particleGun = new G4SingleParticleSource();
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;

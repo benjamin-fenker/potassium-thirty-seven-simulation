@@ -8,7 +8,7 @@
 GeantAggregator::GeantAggregator() {}
 
 void GeantAggregator::EndRun() {
-  TArrayD *parameters = new TArrayD(21);
+  TArrayD *parameters = new TArrayD(23);
   parameters -> AddAt(primary_generator_action_ -> GetPolarization()       , 0);
   parameters -> AddAt(primary_generator_action_ -> GetAlignment()          , 1);
   parameters -> AddAt(electric_field_setup_ ->
@@ -53,6 +53,12 @@ void GeantAggregator::EndRun() {
   if (list_str == "emlivermore") list_code = 8;
   if (list_str == "K37") list_code = 9;
   parameters -> AddAt(list_code, 19);
+  parameters -> AddAt(primary_generator_action_ -> GetCloudSize() ->
+                      GetSailVelocity().x()/(mm/ns), 20);
+  parameters -> AddAt(primary_generator_action_ -> GetCloudSize() ->
+                      GetSailVelocity().y()/(mm/ns), 21);
+  parameters -> AddAt(primary_generator_action_ -> GetCloudSize() ->
+                      GetSailVelocity().z()/(mm/ns), 22);
   TFile *file = Aggregator::GetRootFile();
   file -> WriteObject(parameters, "RunParameters");
   Aggregator::EndRun();

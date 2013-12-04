@@ -11,6 +11,7 @@
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
+#include "G4UnitsTable.hh"
 #include "globals.hh"
 
 #include "K37CloudSize.hh"
@@ -40,6 +41,8 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   G4UIcmdWithABool *set_make_beta_;
   G4UIcmdWithABool *set_make_recoil_;
   G4UIcmdWithABool *set_make_shakeoff_electrons_;
+  G4UIcmdWith3VectorAndUnit *set_cloud_sail_velocity_v_;
+  G4UIcmdWithADoubleAndUnit *set_cloud_sail_velocity_d_;
 };
 
 //----------------------------------
