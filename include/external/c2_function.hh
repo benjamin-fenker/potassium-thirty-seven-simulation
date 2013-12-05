@@ -64,7 +64,7 @@
 #include <typeinfo>
 #include <sstream>
 
-#define NOT_USED(x) ( (void)(x) )
+#define NOT_USED(x) ( x=x )
 
 /// \brief the exception class for c2_function operations.
 class c2_exception : public std::exception {

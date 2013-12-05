@@ -24,6 +24,12 @@ G4bool K37ElectronMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
   K37ElectronMCPHit *new_hit = new K37ElectronMCPHit();
   G4Track *track = step -> GetTrack();
 
+  // Kill electrons once they hit this detector to avoid large number of bounces
+  //  G4cout << track -> GetParticleDefinition() -> GetParticleName() << G4endl;
+  if (track -> GetParticleDefinition() -> GetParticleType() == "e-") {
+    track -> SetTrackStatus(fStopAndKill);
+  }
+
   new_hit -> SetEnergy(step -> GetTotalEnergyDeposit());
   new_hit -> SetTime(track -> GetLocalTime());
   new_hit ->

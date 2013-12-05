@@ -11,12 +11,14 @@
 
 #include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
-#include "globals.hh"
 #include "K37_Data.hh"
+#include "K37ElectricFieldSetup.hh"
 #include "K37PhysicsList.hh"
 #include "K37RunMessenger.hh"
-#include "external/PhysicsList.hh"
+#include "PhysicsList.hh"
 #include "TDC_Channel.hh"
+#include "globals.hh"
+
 
 using AGG::Aggregator;
 using K37_ABC::K37_Data;
@@ -117,8 +119,9 @@ class K37RunAction : public G4UserRunAction {
 
  private:
   void RegisterChannel(K37_Data* channel);
-  G4int NbofEvents;
 
+  G4int NbofEvents;
+  
   G4int    accepted;
   G4int    accepted_bs;
   G4int    bs;

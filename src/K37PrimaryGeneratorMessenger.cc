@@ -9,6 +9,8 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
                                   K37PrimaryGeneratorAction* Gun)
   :action_(Gun) {
   new G4UnitDefinition("millimeter/nanosecond", "mm/ns", "Velocity", mm/ns);
+  new G4UnitDefinition("millimeter/microsecond", "mm/us", "Velocity",
+                       mm/microsecond);
 
   gunDir = new G4UIdirectory("/K37/gun/");
   gunDir->SetGuidance("PrimaryGenerator control");

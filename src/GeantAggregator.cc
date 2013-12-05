@@ -61,6 +61,7 @@ void GeantAggregator::EndRun() {
                       GetSailVelocity().z()/(mm/ns), 22);
   TFile *file = Aggregator::GetRootFile();
   file -> WriteObject(parameters, "RunParameters");
+  //  G4cout << "Wrote RunParameters" << G4endl;
   Aggregator::EndRun();
 }
 

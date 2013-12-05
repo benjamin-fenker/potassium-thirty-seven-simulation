@@ -31,16 +31,22 @@
 //  Constructors:
 
 K37ElectricFieldSetup::K37ElectricFieldSetup()
-  :fChordFinder(0), fStepper(0), fIntgrDriver(0), fFieldMessenger(0) {
+    :fChordFinder(0), fStepper(0), fIntgrDriver(0),
+     fFieldMessenger(0), use_uniform_field_(true) {
   fElFieldValue = G4ThreeVector(0.0, 350.0*volt/cm, 0.0);
-  fEMfield = new G4UniformElectricField(fElFieldValue);
+
+  if (use_uniform_field_) {
+    fEMfield = new G4UniformElectricField(fElFieldValue);
+  } else {
+    fEMfield = new TabulatedField3D("filename.dat", 0.0);
+  }
 
   //  G4cout << "Making field!" << G4endl;
   fFieldMessenger = new K37FieldMessenger(this);
-  fEquation = new G4EqMagElectricField(fEMfield);
+
   fMinStep     = 0.010*mm;  // minimal step of 10 microns
   fStepperType = 5;         // ClassicalRK4 -- the default stepper
-
+  fEquation = new G4EqMagElectricField(fEMfield);
   fFieldManager = GetGlobalFieldManager();
   UpdateField();
 }
@@ -67,8 +73,8 @@ K37ElectricFieldSetup::K37ElectricFieldSetup(G4ThreeVector pFV)
 K37ElectricFieldSetup::~K37ElectricFieldSetup() {
   if (fChordFinder)   delete fChordFinder;
   if (fStepper)       delete fStepper;
-  if (fEquation)      delete fEquation;
-  if (fEMfield)       delete fEMfield;
+  if (fEquation) delete fEquation;
+  if (fEMfield) delete fEMfield;
   if (fFieldMessenger)   delete fFieldMessenger;
 }
 
@@ -201,6 +207,24 @@ void K37ElectricFieldSetup::SetFieldValue(G4ThreeVector fieldVector) {
     UpdateField();
     // fieldMgr->SetDetectorField(fEMfield);
   }
+}
+
+void K37ElectricFieldSetup::SetFieldFile(G4String file_name) {
+
+  FILE *f_file;
+  f_file = fopen(file_name, "r");
+
+  // If file isn't there, do nothing.
+  if (f_file == NULL) {
+    G4cout << "Error opening " << file_name << G4endl;
+    return;
+  }
+
+  if (fEMfield) delete fEMfield;
+  fEMfield = new TabulatedField3D(file_name, 0);
+  if (fEquation) delete fEquation;
+  fEquation = new G4EqMagElectricField(fEMfield);
+  UpdateField();
 }
 
 G4ThreeVector K37ElectricFieldSetup::GetConstantFieldValue() {

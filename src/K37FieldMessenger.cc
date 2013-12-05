@@ -64,6 +64,11 @@ K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
   print_field_cmd = new G4UIcmdWithoutParameter("/K37/field/print", this);
   print_field_cmd -> SetGuidance("Print the current electric field");
   print_field_cmd -> AvailableForStates(G4State_Idle);
+
+  set_field_file_cmd_ = new G4UIcmdWithAString("/K37/field/SetFieldFile", this);
+  set_field_file_cmd_ -> SetGuidance("Specify data file for electric field");
+  set_field_file_cmd_ -> SetParameterName("filename", false);
+  set_field_file_cmd_ -> AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 //------------------------------------------------
@@ -100,6 +105,9 @@ void K37FieldMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
     G4cout << "X: " << G4BestUnit(field.x(), "Electric field") << G4endl;
     G4cout << "Y: " << G4BestUnit(field.y(), "Electric field") << G4endl;
     G4cout << "Z: " << G4BestUnit(field.z(), "Electric field") << G4endl;
+  }
+  if (command == set_field_file_cmd_) {
+    fEFieldSetup -> SetFieldFile(newValue);
   }
 }
 
