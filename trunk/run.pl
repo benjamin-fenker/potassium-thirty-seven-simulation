@@ -37,13 +37,13 @@ sub statusBar
    $elapsedTime = $elapsedTime/60.0;
    if($percentComplete == 0)
    {
-      printf("|%-50s|%5.1f%% Complete | %7.2f min.", $theBars,
-            $percentComplete, $elapsedTime);
+      printf("|%-50s|%5.1f%% Complete | %7.2f min. | on call %5d", $theBars,
+            $percentComplete, $elapsedTime, $currentValue);
    }
    else
    {
-      printf("\r|%-50s|%5.1f%% Complete | %7.2f min.", $theBars,
-            $percentComplete, $elapsedTime);
+      printf("\r|%-50s|%5.1f%% Complete | %7.2f min. | on call %5d", $theBars,
+            $percentComplete, $elapsedTime, $currentValue);
    }
    if(($currentValue + 1) == $maxValue)
    {
@@ -62,7 +62,6 @@ sub repeatRun {
     my $i = 0;
     while ($i < $iters) {
         if ($id_num == 0) {
-            print "Thread $id_num on call $i\n";
             statusBar($i, $iters);
         }
         `./K37 $macro_name`;
