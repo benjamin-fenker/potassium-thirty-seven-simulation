@@ -143,6 +143,7 @@ void K37PrimaryGeneratorAction::setBetaVertex() {
 void K37PrimaryGeneratorAction::SetPhotoionizationVertices(G4Event *ev) {
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4double e_kinetic_energy = 0.8 * eV;
+  //  G4double e_kinetic_energy = 0.0000001 * eV;
   // G4ThreeVector momentum = GetMomentumIsotropic(e_kinetic_energy,
   //                                               electron_mass_c2);
   G4ThreeVector e_momentum = G4RandomDirection();
@@ -240,7 +241,7 @@ void K37PrimaryGeneratorAction::SetSOelectronVertices(G4Event *ev,
     // Ar binding energy is 15.7 eV and SOE have around this energy
     // The 5.0 eV width is a total guess
     while (kinetic_energy < 0.0) {
-      kinetic_energy = CLHEP::RandGauss::shoot(15.7*eV, 5.0*eV);
+      kinetic_energy = CLHEP::RandGauss::shoot(100.0*eV, 5.0*eV);
     }
     G4ThreeVector momentum =
         GetMomentumIsotropic(kinetic_energy, electron_mass_c2);

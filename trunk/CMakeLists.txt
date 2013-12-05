@@ -71,8 +71,10 @@ target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
 #
 set(K37_SCRIPTS
   vis.mac
+  novis.mac
   IOconfiguration.mac
   run.pl
+  field.dat
   )
 
 foreach(_script ${K37_SCRIPTS})

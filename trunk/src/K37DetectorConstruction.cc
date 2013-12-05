@@ -209,7 +209,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
 
   // Use same solid for both detectors :-)
   scintillator_tubs_ = new G4Tubs("scint_sol", Scint_rmin, Scint_rmax,
-                                  (Scint_dz/2.)*mm, Scint_startPhi,
+                                  (Scint_dz/2.), Scint_startPhi,
                                   Scint_deltaPhi);
   // Use same vis attributes for both detectors :-)
   G4VisAttributes *scintillator_vis = new G4VisAttributes(G4Colour(0.0, 0.0,
@@ -312,7 +312,7 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   //                        pos_of_center, numStrips, stripWidth
   lower_strip_detector_sens_ -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
   SDman->AddNewDetector(lower_strip_detector_sens_);
-  upper_strip_detector_log_->SetSensitiveDetector(lower_strip_detector_sens_);
+  lower_strip_detector_log_->SetSensitiveDetector(lower_strip_detector_sens_);
 
   // ------------------------------ dedx mount
   G4double strip_detector_frame_X  = 44.4*mm;
@@ -805,7 +805,7 @@ void K37DetectorConstruction::ConstructHoops() {
 
   G4SubtractionSolid* cut_hoop_3through6_withHole1_sol =
     new G4SubtractionSolid("cut_hoop_3through6_withHole1_sol",
-                           cut_hoop_3through6_box_sol, mountingHole_sol,
+                            cut_hoop_3through6_box_sol, mountingHole_sol,
                            0, G4ThreeVector(85.0*mm, 40.0*mm, 0));
   G4SubtractionSolid* cut_hoop_3through6_withHole2_sol =
     new G4SubtractionSolid("cut_hoop_3through6_withHole2_sol",

@@ -169,6 +169,7 @@ K37RunAction::~K37RunAction() {
 //----------------------------------
 
 void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
+  // Finish setup of electric field
   NbofEvents = 0;
 
   accepted = 0;
@@ -200,7 +201,6 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
   G4RunManager::GetRunManager()->SetRandomNumberStore(true);
-
 
   ///////////////////////// My new stuff //////////////////
   // Create analysis manager

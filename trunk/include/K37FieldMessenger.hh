@@ -4,6 +4,7 @@
 #define K37FieldMessenger_h 1
 
 #include "globals.hh"
+#include "G4UIcmdWithAString.hh"
 #include "G4UImessenger.hh"
 
 class K37ElectricFieldSetup;
@@ -33,6 +34,8 @@ class K37FieldMessenger: public G4UImessenger {
   G4UIcmdWithoutParameter*   UpdateCmd;
   G4UIcmdWith3VectorAndUnit* changeFieldCmd;
   G4UIcmdWithoutParameter*   print_field_cmd;
+  G4UIcmdWithAString*  set_field_file_cmd_;
+  
 };
 
 #endif
