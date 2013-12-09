@@ -40,6 +40,6 @@
 /gui/addButton viewer "Update viewer (interaction or end-of-file)" "/vis/viewer/update"
 /gui/addButton viewer "Flush viewer (= refresh + update)" "/vis/viewer/flush"
 /gui/addButton viewer "Update scene" "/vis/scene/notifyHandlers"
-#
-# To limit the output flow in the "dump" widget :
-/N03/event/printModulo 100
+
+# add a button to the gui 
+/gui/addIcon "Run beam on" user_icon "/run/beamOn 10" run.png

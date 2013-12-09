@@ -586,10 +586,11 @@ void K37DetectorConstruction::ConstructChamber() {
   // convience function G4VisAttributes::Invisble becuse it produces
   // a non const pointer that can later be delete avoiding a memory
   // leak.
-  chamber_logVisAttributes = new G4VisAttributes(false);
-  // chamber_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5,
-  //                                                         0.5, 0.8));
-  // chamber_logVisAttributes-> SetForceSolid(true);
+  //chamber_logVisAttributes = new G4VisAttributes(false);
+  chamber_logVisAttributes = new G4VisAttributes(
+        G4Colour(255/255., 170/255., 0, 0.1));
+
+  chamber_logVisAttributes-> SetForceSolid(true);
   chamber_log_ -> SetVisAttributes(chamber_logVisAttributes);
 
   // ------------------------------ Optical Pumping Rentrant Flanges
