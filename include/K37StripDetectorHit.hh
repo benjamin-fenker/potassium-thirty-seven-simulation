@@ -33,11 +33,12 @@ class K37StripDetectorHit : public G4VHit {
 
  private:
   // Total energy deposited during this hit to all the strips
-  G4double edep;
   G4ThreeVector pos1;           // Position of pre-step point
   G4ThreeVector pos2;           // Position of post-step point
+  G4double edep;
   G4double time;                // Global Time
   G4double good;                //
+  G4int particle_pdg;
   G4bool primary;
   G4bool SoftwareVeto;
   static std::map<G4String, G4AttDef> fAttDefs;
@@ -52,54 +53,29 @@ class K37StripDetectorHit : public G4VHit {
   map<G4int, G4double> getXStripsEdep();
   map<G4int, G4double> getYStripsEdep();
 
-  inline void SetEdep(G4double de) {
-    edep = de;
-  }
-  inline G4double GetEdep() {
-    return edep;
-  }
-
-  inline void SetPos1(G4ThreeVector xyz) {
-    pos1 = xyz;
-  }
-  inline void SetPos2(G4ThreeVector xyz) {
-    pos2 = xyz;
-  }
-
-  inline G4ThreeVector GetPos1() {
-    return pos1;
-  }
-  inline G4ThreeVector GetPos2() {
-    return pos2;
-  }
-
-  inline void SetPrimary(G4bool prim) {
-    primary = prim;
-  }
-  inline G4bool GetPrimary() {
-    return primary;
-  }
-
-  inline void SetBound(G4double go) {
-    good = go;
-  }
-  inline G4double GetBound() {
-    return good;
-  }
-
-  inline void SetTime(G4double tim) {
-    time = tim;
-  }
-  inline G4double GetTime() {
-    return time;
-  }
-
-  inline void SetSoftwareVeto(G4bool sof) {
-    SoftwareVeto = sof;
-  }
-  inline G4double GetSoftwareVeto() {
-    return SoftwareVeto;
-  }
+  inline void SetPos1(G4ThreeVector xyz) {pos1 = xyz;}
+  inline G4ThreeVector GetPos1() {return pos1;}
+  // ----------------------------------------------
+  inline void SetPos2(G4ThreeVector xyz) {pos2 = xyz;}
+  inline G4ThreeVector GetPos2() {return pos2;}
+  // ----------------------------------------------
+  inline void SetEdep(G4double de) {edep = de;}
+  inline G4double GetEdep() {return edep;}
+  // ----------------------------------------------
+  inline void SetBound(G4double go) {good = go;}
+  inline G4double GetBound() {return good;}
+  // ----------------------------------------------
+  inline void SetTime(G4double tim) {time = tim;}
+  inline G4double GetTime() {return time;}
+  // ----------------------------------------------
+  inline void SetParticlePDG(G4int pdg_) {particle_pdg = pdg_;}
+  inline G4int GetParticlePDG() {return particle_pdg;}
+  // ----------------------------------------------
+  inline void SetPrimary(G4bool prim) {primary = prim;}
+  inline G4bool GetPrimary() {return primary;}
+  // ----------------------------------------------
+  inline void SetSoftwareVeto(G4bool sof) { SoftwareVeto = sof; }
+  inline G4double GetSoftwareVeto() { return SoftwareVeto; }
 
   void addXEdepPair(G4int strip, G4double edep);
   void addYEdepPair(G4int strip, G4double edep);

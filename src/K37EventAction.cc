@@ -36,8 +36,30 @@ using std::setw;
 using std::left;
 
 K37EventAction::K37EventAction(K37RunAction* run)
-    :v1190_factor_ns(0.09765625), runAct(run), stripHandler(0) {
-  stripHandler = new K37ContainerForStripInformation();
+    :v1190_factor_ns(0.09765625),
+    runAct(run),
+    stripHandler(new K37ContainerForStripInformation()),
+    energyUpperScint_Total(0),
+    energyUpperScint_AllElse(0),
+    energyUpperScint_Positron(0),
+    energyUpperScint_Electron(0),
+    energyUpperScint_Gamma(0),
+    energyLowerScint_Total(0),
+    energyLowerScint_AllElse(0),
+    energyLowerScint_Positron(0),
+    energyLowerScint_Electron(0),
+    energyLowerScint_Gamma(0),
+    energyUpperSilicon_Total(0),
+    energyUpperSilicon_AllElse(0),
+    energyUpperSilicon_Positron(0),
+    energyUpperSilicon_Electron(0),
+    energyUpperSilicon_Gamma(0),
+    energyLowerSilicon_Total(0),
+    energyLowerSilicon_AllElse(0),
+    energyLowerSilicon_Positron(0),
+    energyLowerSilicon_Electron(0),
+    energyLowerSilicon_Gamma(0)
+{
 
   spot.clear();
   start.clear();
@@ -165,12 +187,30 @@ void K37EventAction::BeginOfEventAction(const G4Event* ev) {
 }
 
 void K37EventAction::EndOfEventAction(const G4Event* evt) {
-  G4double energy_upper_scintillator = 0;
-  G4double energy_upper_scintillator_secondaries = 0;
-  G4double energy_upper_scintillator_primaries = 0;
-  G4double energy_lower_scintillator = 0;
-  G4double energy_lower_scintillator_secondaries = 0;
-  G4double energy_lower_scintillator_primaries = 0;
+
+  energyUpperScint_Total = 0;
+  energyUpperScint_AllElse  = 0;
+  energyUpperScint_Positron = 0;
+  energyUpperScint_Electron = 0;
+  energyUpperScint_Gamma    = 0;
+
+  energyLowerScint_Total = 0;
+  energyLowerScint_AllElse = 0;
+  energyLowerScint_Positron = 0;
+  energyLowerScint_Electron = 0;
+  energyLowerScint_Gamma = 0;
+
+  energyUpperSilicon_Total = 0;
+  energyUpperSilicon_AllElse  = 0;
+  energyUpperSilicon_Positron = 0;
+  energyUpperSilicon_Electron = 0;
+  energyUpperSilicon_Gamma    = 0;
+
+  energyLowerSilicon_Total = 0;
+  energyLowerSilicon_AllElse = 0;
+  energyLowerSilicon_Positron = 0;
+  energyLowerSilicon_Electron = 0;
+  energyLowerSilicon_Gamma = 0;
 
   G4double time_upper_scintillator = 0.0;
   G4double time_lower_scintillator = 0.0;
@@ -238,23 +278,23 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   // Get the energy deposited in the upper scintillator
   // ***************************************************************************
-  if (upper_scintillator_hit_collection) {
+  if (upper_scintillator_hit_collection)
+  {
     int n_hit = upper_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
-    for (int i = 0; i < n_hit; i++) {
+    for (int i = 0; i < n_hit; i++)
+    {
       // Get the hit
       hit = (*upper_scintillator_hit_collection)[i];
-      energy_upper_scintillator += hit->GetEdep();
-      if (hit->GetPrimary()) {
-        energy_upper_scintillator_primaries += hit -> GetEdep();
-      } else {
-        energy_upper_scintillator_secondaries += hit -> GetEdep();
-      }
-      if (i == 0) {                     // First hit - get particle
+
+      SortUpperScint(hit->GetParticlePDG(), hit->GetEdep());
+
+      if (i == 0)
+      {                     // First hit - get particle
         upper_scintillator_pdg = hit -> GetParticlePDG();
       }
     }
-    if (energy_upper_scintillator>0) {
+    if (energyUpperScint_Total>0) {
       isThereEnergySili = true;
     }
   }
@@ -262,22 +302,21 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   // Get all the energy deposited in the lower scintillator
   // ***************************************************************************
-  if (lower_scintillator_hit_collection) {
+  if (lower_scintillator_hit_collection)
+  {
     int n_hit = lower_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
-    for (int i = 0; i < n_hit; i++) {
+    for (int i = 0; i < n_hit; i++)
+    {
       hit = (*lower_scintillator_hit_collection)[i];
-      energy_lower_scintillator += hit -> GetEdep();
-      if (hit -> GetPrimary()) {
-        energy_lower_scintillator_primaries += hit -> GetEdep();
-      } else {
-        energy_lower_scintillator_secondaries += hit -> GetEdep();
-      }
-      if (i == 0) {                     // First hit - get particle
+      SortLowerScint(hit->GetParticlePDG(), hit->GetEdep());
+
+      if (i == 0)
+      {                     // First hit - get particle
         lower_scintillator_pdg = hit -> GetParticlePDG();
       }
     }
-    if (energy_lower_scintillator>0) {
+    if (energyLowerScint_Total>0) {
       isThereEnergySili2 = true;
     }
   }
@@ -286,6 +325,20 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // Get all the energy deposited in the upper strip detector
   // ***************************************************************************
   if (upper_sd_hit_collection) {                // Strip detector plus Z
+
+     int n_hit = upper_sd_hit_collection->entries();
+     K37StripDetectorHit *hit;
+     for (int i = 0; i < n_hit; ++i)
+     {
+        //DELETE
+     //G4cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<G4endl;
+     //G4cout<<"@@@@@@@@@@@ WE ARE HERE! WE ARE HERE! @@@@@@@@@@@@@@@"<<G4endl;
+     //G4cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<G4endl;
+        hit = (*upper_sd_hit_collection)[i];
+
+        SortUpperSilicon(hit->GetParticlePDG(), hit->GetEdep());
+     }
+
     sd_energy_plusZ_X = GetEDepVectorX(upper_sd_hit_collection);
     sd_energy_plusZ_Y = GetEDepVectorY(upper_sd_hit_collection);
     for (int i = 0; i < 40; i++) {
@@ -302,6 +355,16 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // Get all the energy deposited in the lower strip detector
   // ***************************************************************************
   if (lower_sd_hit_collection) {  // Strip Detector Minus Z
+
+     int n_hit = lower_sd_hit_collection->entries();
+     K37StripDetectorHit *hit;
+     for (int i = 0; i < n_hit; ++i)
+     {
+        hit = (*lower_sd_hit_collection)[i];
+
+        SortLowerSilicon(hit->GetParticlePDG(), hit->GetEdep());
+     }
+
     sd_energy_minsZ_X = GetEDepVectorX(lower_sd_hit_collection);
     sd_energy_minsZ_Y = GetEDepVectorY(lower_sd_hit_collection);
     for (int i = 0; i < 40; i++) {
@@ -315,13 +378,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   }
 
   K37ScintillatorHit *first_hit = 0;
-  if (energy_upper_scintillator > upper_scintillator_threshold_) {
+  if (energyUpperScint_Total > upper_scintillator_threshold_) {
     first_hit = (*upper_scintillator_hit_collection)[0];
     time_upper_scintillator = first_hit -> GetTime();
   } else {
     time_upper_scintillator = 0.0;
   }
-  if (energy_lower_scintillator > lower_scintillator_threshold_) {
+  if (energyLowerScint_Total > lower_scintillator_threshold_) {
     first_hit = (*lower_scintillator_hit_collection)[0];
     time_lower_scintillator = first_hit -> GetTime();
   } else {
@@ -377,12 +440,12 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
   }
 
-  if (EventPassesTrigger(energy_upper_scintillator, energy_lower_scintillator,
+  if (EventPassesTrigger(energyUpperScint_Total, energyLowerScint_Total,
                          electron_mcp_energy)) {
     // G4cout << "Event passes my trigger with energy "
-    //        << G4BestUnit(energy_upper_scintillator, "Energy") << " / "
+    //        << G4BestUnit(energyUpperScint_Total, "Energy") << " / "
     //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"
-    //        << G4BestUnit(energy_lower_scintillator, "Energy") << " / "
+    //        << G4BestUnit(energyLowerScint_Total, "Energy") << " / "
     //        << G4BestUnit(energyDedx2, "Energy") << G4endl;
 
     // G4double trigTime = pow(10.0, 10);
@@ -396,10 +459,34 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     accepted++;
     runAct->SetAccepted();
 
-    (*active_channels_)["QDC_UpperPMT"] ->
-        InsertData(energy_upper_scintillator/keV);
-    (*active_channels_)["QDC_LowerPMT"] ->
-        InsertData(energy_lower_scintillator/keV);
+    //(*active_channels_)["QDC_UpperPMT"] -> InsertData(energyUpperScint_Total/keV);
+    //(*active_channels_)["QDC_LowerPMT"] ->
+    //InsertData(energyLowerScint_Total/keV);
+    (*active_channels_)["QDC_UpperPMT"   ] -> InsertData(energyUpperScint_Total/keV   );
+    (*active_channels_)["QDC_UpperPMT_AE"] -> InsertData(energyUpperScint_AllElse/keV );
+    (*active_channels_)["QDC_UpperPMT_P" ] -> InsertData(energyUpperScint_Positron/keV);
+    (*active_channels_)["QDC_UpperPMT_E" ] -> InsertData(energyUpperScint_Electron/keV);
+    (*active_channels_)["QDC_UpperPMT_G" ] -> InsertData(energyUpperScint_Gamma/keV   );
+
+    (*active_channels_)["QDC_LowerPMT"   ] -> InsertData(energyLowerScint_Total/keV   );
+    (*active_channels_)["QDC_LowerPMT_AE"] -> InsertData(energyLowerScint_AllElse/keV );
+    (*active_channels_)["QDC_LowerPMT_P" ] -> InsertData(energyLowerScint_Positron/keV);
+    (*active_channels_)["QDC_LowerPMT_E" ] -> InsertData(energyLowerScint_Electron/keV);
+    (*active_channels_)["QDC_LowerPMT_G" ] -> InsertData(energyLowerScint_Gamma/keV   );
+
+    (*active_channels_)["QDC_UpperSilicon"   ] -> InsertData(energyUpperSilicon_Total/keV   );
+    (*active_channels_)["QDC_UpperSilicon_AE"] -> InsertData(energyUpperSilicon_AllElse/keV );
+    (*active_channels_)["QDC_UpperSilicon_P" ] -> InsertData(energyUpperSilicon_Positron/keV);
+    (*active_channels_)["QDC_UpperSilicon_E" ] -> InsertData(energyUpperSilicon_Electron/keV);
+    (*active_channels_)["QDC_UpperSilicon_G" ] -> InsertData(energyUpperSilicon_Gamma/keV   );
+
+    (*active_channels_)["QDC_LowerSilicon"   ] -> InsertData(energyLowerSilicon_Total/keV   );
+    (*active_channels_)["QDC_LowerSilicon_AE"] -> InsertData(energyLowerSilicon_AllElse/keV );
+    (*active_channels_)["QDC_LowerSilicon_P" ] -> InsertData(energyLowerSilicon_Positron/keV);
+    (*active_channels_)["QDC_LowerSilicon_E" ] -> InsertData(energyLowerSilicon_Electron/keV);
+    (*active_channels_)["QDC_LowerSilicon_G" ] -> InsertData(energyLowerSilicon_Gamma/keV   );
+
+
     (*active_channels_)["TDC_SCINT_TOP"] ->
         InsertData(time_upper_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_SCINT_BOTTOM"] ->
@@ -446,14 +533,14 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       stripHandler->PassThePlusZDetectors();
 
       runAct -> incrementPlusZ_vc(GetRelativisticFactor(emass,
-               energy_upper_scintillator));
+               energyUpperScint_Total));
     }  // End energy in plusZ
 
     if (isThereEnergyDedx2 == true) {
       stripHandler->PassTheMinusZDetectors();
 
       runAct -> incrementMinusZ_vc(GetRelativisticFactor(emass,
-               energy_lower_scintillator));
+               energyLowerScint_Total));
     }  // End energy in minusZ
 
     // Add a new row here to add a new row for only accpeted events where
@@ -633,4 +720,144 @@ void K37EventAction::LookAtEvent(const G4Event *event) {
   G4int j;
   G4cin >> j;
   G4cout << j << G4endl;
+}
+
+void K37EventAction::SortUpperScint(const G4int &pdgCode_,
+      const G4double &energyHit_)
+{
+
+   energyUpperScint_Total += energyHit_;
+
+   switch(pdgCode_)
+   {
+      case 11: //Electron
+         {
+            energyUpperScint_Electron += energyHit_;
+            //G4cout<<"Electron: "<<energyUpperScint_Electron<<G4endl;
+            break;
+         }
+      case -11: //Positrons negative for anti-matter
+         {
+            energyUpperScint_Positron += energyHit_;
+            //G4cout<<"Positron: "<<energyUpperScint_Positron<<G4endl;
+            break;
+         }
+      case 22: //Gamma 
+         {
+            energyUpperScint_Gamma += energyHit_;
+            //G4cout<<"Gamma: "<<energyUpperScint_Gamma<<G4endl;
+            break;
+         }
+      default: //Everything else
+         {
+            energyUpperScint_AllElse += energyHit_;
+            //G4cout<<"Delta: "<<energyUpperScint_AllElse<<G4endl;
+            break;
+         }
+   }
+}
+
+void K37EventAction::SortLowerScint(const G4int &pdgCode_,
+      const G4double &energyHit_)
+{
+
+   energyLowerScint_Total += energyHit_;
+
+   switch(pdgCode_)
+   {
+      case 11: //Electron
+         {
+            energyLowerScint_Electron += energyHit_;
+            //G4cout<<"L Electron: "<<energyLowerScint_Electron<<G4endl;
+            break;
+         }
+      case -11: //Positrons negative for anti-matter
+         {
+            energyLowerScint_Positron += energyHit_;
+            //G4cout<<"L Positron: "<<energyLowerScint_Positron<<G4endl;
+            break;
+         }
+      case 22: //Gamma 
+         {
+            energyLowerScint_Gamma += energyHit_;
+            //G4cout<<"L Gamma: "<<energyLowerScint_Gamma<<G4endl;
+            break;
+         }
+      default: //Everything else
+         {
+            energyLowerScint_AllElse += energyHit_;
+            //G4cout<<"L Delta: "<<energyLowerScint_AllElse<<G4endl;
+            break;
+         }
+   }
+}
+
+void K37EventAction::SortUpperSilicon(const G4int &pdgCode_,
+      const G4double &energyHit_)
+{
+
+   energyUpperSilicon_Total += energyHit_;
+
+   switch(pdgCode_)
+   {
+      case 11: //Electron
+         {
+            energyUpperSilicon_Electron += energyHit_;
+            //G4cout<<"U Electron: "<<energyUpperSilicon_Electron<<G4endl;
+            break;
+         }
+      case -11: //Positrons negative for anti-matter
+         {
+            energyUpperSilicon_Positron += energyHit_;
+            //G4cout<<"U Positron: "<<energyUpperSilicon_Positron<<G4endl;
+            break;
+         }
+      case 22: //Gamma 
+         {
+            energyUpperSilicon_Gamma += energyHit_;
+            //G4cout<<"U Gamma: "<<energyUpperSilicon_Gamma<<G4endl;
+            break;
+         }
+      default: //Everything else
+         {
+            energyUpperSilicon_AllElse += energyHit_;
+            //G4cout<<"U All Else: "<<energyUpperSilicon_AllElse<<G4endl;
+            break;
+         }
+   }
+}
+
+void K37EventAction::SortLowerSilicon(const G4int &pdgCode_,
+      const G4double &energyHit_)
+{
+
+   energyLowerSilicon_Total += energyHit_;
+
+   switch(pdgCode_)
+   {
+      case 11: //Electron
+         {
+            energyLowerSilicon_Electron += energyHit_;
+            //G4cout<<"L Electron: "<<energyLowerSilicon_Electron<<G4endl;
+            break;
+         }
+      case -11: //Positrons negative for anti-matter
+         {
+            energyLowerSilicon_Positron += energyHit_;
+            //G4cout<<"L Positron: "<<energyLowerSilicon_Positron<<G4endl;
+            break;
+         }
+      case 22: //Gamma 
+         {
+            energyLowerSilicon_Gamma += energyHit_;
+            //G4cout<<"L Gamma: "<<energyLowerSilicon_Gamma<<G4endl;
+            break;
+         }
+      default: //Everything else
+         {
+            energyLowerSilicon_AllElse += energyHit_;
+            //G4cout<<"L All Else: "<<energyLowerSilicon_AllElse<<G4endl;
+            break;
+         }
+   }
 }

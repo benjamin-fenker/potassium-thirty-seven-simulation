@@ -75,8 +75,28 @@ K37RunAction::K37RunAction()
   runMessenger = new K37RunMessenger(this);
 
   // Detectors
-  qdc_upper_pmt_ = new Generic_Channel("QDC_UpperPMT", 1, "/D");
-  qdc_lower_pmt_ = new Generic_Channel("QDC_LowerPMT", 2, "/D");
+  qdc_upper_pmt    = new Generic_Channel("QDC_UpperPMT"   , -1, "/D");
+  qdc_lower_pmt    = new Generic_Channel("QDC_LowerPMT"   , -1, "/D");
+  qdc_upper_pmt_ae = new Generic_Channel("QDC_UpperPMT_AE", -1, "/D");
+  qdc_lower_pmt_ae = new Generic_Channel("QDC_LowerPMT_AE", -1, "/D");
+  qdc_upper_pmt_p  = new Generic_Channel("QDC_UpperPMT_P" , -1, "/D");
+  qdc_lower_pmt_p  = new Generic_Channel("QDC_LowerPMT_P" , -1, "/D");
+  qdc_upper_pmt_e  = new Generic_Channel("QDC_UpperPMT_E" , -1, "/D");
+  qdc_lower_pmt_e  = new Generic_Channel("QDC_LowerPMT_E" , -1, "/D");
+  qdc_upper_pmt_g  = new Generic_Channel("QDC_UpperPMT_G" , -1, "/D");
+  qdc_lower_pmt_g  = new Generic_Channel("QDC_LowerPMT_G" , -1, "/D");
+
+  qdc_upper_dssd    = new Generic_Channel("QDC_UpperSilicon"   , -1, "/D");
+  qdc_lower_dssd    = new Generic_Channel("QDC_LowerSilicon"   , -1, "/D");
+  qdc_upper_dssd_ae = new Generic_Channel("QDC_UpperSilicon_AE", -1, "/D");
+  qdc_lower_dssd_ae = new Generic_Channel("QDC_LowerSilicon_AE", -1, "/D");
+  qdc_upper_dssd_p  = new Generic_Channel("QDC_UpperSilicon_P" , -1, "/D");
+  qdc_lower_dssd_p  = new Generic_Channel("QDC_LowerSilicon_P" , -1, "/D");
+  qdc_upper_dssd_e  = new Generic_Channel("QDC_UpperSilicon_E" , -1, "/D");
+  qdc_lower_dssd_e  = new Generic_Channel("QDC_LowerSilicon_E" , -1, "/D");
+  qdc_upper_dssd_g  = new Generic_Channel("QDC_UpperSilicon_G" , -1, "/D");
+  qdc_lower_dssd_g  = new Generic_Channel("QDC_LowerSilicon_G" , -1, "/D");
+
   dl_x_pos_      = new TDC_Channel("DL_X_Pos"    , 3, "/v", false);
   dl_z_pos_      = new TDC_Channel("DL_Z_Pos"    , 4, "/v", false);
   char name[200];
@@ -132,8 +152,29 @@ K37RunAction::K37RunAction()
 
 K37RunAction::~K37RunAction() {
   delete runMessenger;
-  delete qdc_upper_pmt_;
-  delete qdc_lower_pmt_;
+
+  delete qdc_upper_pmt;
+  delete qdc_lower_pmt;
+  delete qdc_upper_pmt_ae;
+  delete qdc_lower_pmt_ae;
+  delete qdc_upper_pmt_p;
+  delete qdc_lower_pmt_p;
+  delete qdc_upper_pmt_e;
+  delete qdc_lower_pmt_e;
+  delete qdc_upper_pmt_g;
+  delete qdc_lower_pmt_g;
+
+  delete qdc_upper_dssd;
+  delete qdc_lower_dssd;
+  delete qdc_upper_dssd_ae;
+  delete qdc_lower_dssd_ae;
+  delete qdc_upper_dssd_p;
+  delete qdc_lower_dssd_p;
+  delete qdc_upper_dssd_e;
+  delete qdc_lower_dssd_e;
+  delete qdc_upper_dssd_g;
+  delete qdc_lower_dssd_g;
+
   delete dl_x_pos_;
   delete dl_z_pos_;
   for (G4int i = 0; i < 40; i++) {
@@ -222,8 +263,26 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   // get from the analyzer.
   // the_aggregator_ = new Aggregator();
 
-  RegisterChannel(qdc_upper_pmt_);
-  RegisterChannel(qdc_lower_pmt_);
+  RegisterChannel(qdc_upper_pmt);
+  RegisterChannel(qdc_lower_pmt);
+  RegisterChannel(qdc_upper_pmt_ae);
+  RegisterChannel(qdc_lower_pmt_ae);
+  RegisterChannel(qdc_upper_pmt_p);
+  RegisterChannel(qdc_lower_pmt_p);
+  RegisterChannel(qdc_upper_pmt_e);
+  RegisterChannel(qdc_lower_pmt_e);
+  RegisterChannel(qdc_upper_pmt_g);
+  RegisterChannel(qdc_lower_pmt_g);
+  RegisterChannel(qdc_upper_dssd);
+  RegisterChannel(qdc_lower_dssd);
+  RegisterChannel(qdc_upper_dssd_ae);
+  RegisterChannel(qdc_lower_dssd_ae);
+  RegisterChannel(qdc_upper_dssd_p);
+  RegisterChannel(qdc_lower_dssd_p);
+  RegisterChannel(qdc_upper_dssd_e);
+  RegisterChannel(qdc_lower_dssd_e);
+  RegisterChannel(qdc_upper_dssd_g);
+  RegisterChannel(qdc_lower_dssd_g);
   if (detector_construction_ -> GetMakeRecoilMCP()) {
     RegisterChannel(dl_x_pos_);
     RegisterChannel(dl_z_pos_);

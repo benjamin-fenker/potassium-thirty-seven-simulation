@@ -128,6 +128,8 @@ G4bool K37StripDetectorSD::ProcessHits(G4Step*aStep, G4TouchableHistory*) {
     newHit->SetSoftwareVeto(false);
   }
   // **************END SPENCER'S STUFF
+  newHit -> SetParticlePDG(theTrack ->
+                           GetParticleDefinition() -> GetPDGEncoding());
   dedx1Collection->insert(newHit);  // Add the hit to the hits collection
   return true;
 }
