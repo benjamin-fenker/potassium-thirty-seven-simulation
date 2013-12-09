@@ -36,6 +36,18 @@ class K37EventAction : public G4UserEventAction {
   explicit K37EventAction(K37RunAction* ra);
   ~K37EventAction();
 
+  //-------------------------------------------------------------------
+  //These functions sort the incoming energy by the particle data group 
+  //code for the particle that left the energy.
+  void SortUpperScint(const G4int &pdgCode_, const G4double &energyHit_);
+  void SortLowerScint(const G4int &pdgCode_, const G4double &energyHit_);
+  //-------------------------------------------------------------------
+  //These functions sort the incoming energy by the particle data group 
+  //code for the particle that left the energy.
+  void SortUpperSilicon(const G4int &pdgCode_, const G4double &energyHit_);
+  void SortLowerSilicon(const G4int &pdgCode_, const G4double &energyHit_);
+  //-------------------------------------------------------------------
+
   void BeginOfEventAction(const G4Event*);
   void EndOfEventAction(const G4Event*);
   void BackscatterFlag() {bs_flag = 1;}
@@ -198,6 +210,32 @@ class K37EventAction : public G4UserEventAction {
   //  G4double svn_version_number;
   K37PrimaryGeneratorAction *primary_generator_;
   K37DetectorConstruction *detector_construction_;
+
+  //-------------------------------------------------------------------
+  G4double energyUpperScint_Total;
+  G4double energyUpperScint_AllElse;
+  G4double energyUpperScint_Positron;
+  G4double energyUpperScint_Electron;
+  G4double energyUpperScint_Gamma;
+
+  G4double energyLowerScint_Total;
+  G4double energyLowerScint_AllElse;
+  G4double energyLowerScint_Positron;
+  G4double energyLowerScint_Electron;
+  G4double energyLowerScint_Gamma;
+
+  G4double energyUpperSilicon_Total;
+  G4double energyUpperSilicon_AllElse;
+  G4double energyUpperSilicon_Positron;
+  G4double energyUpperSilicon_Electron;
+  G4double energyUpperSilicon_Gamma;
+
+  G4double energyLowerSilicon_Total;
+  G4double energyLowerSilicon_AllElse;
+  G4double energyLowerSilicon_Positron;
+  G4double energyLowerSilicon_Electron;
+  G4double energyLowerSilicon_Gamma;
+  //-------------------------------------------------------------------
 };
 
 #endif

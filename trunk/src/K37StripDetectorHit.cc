@@ -24,22 +24,25 @@ K37StripDetectorHit::~K37StripDetectorHit() {
 
 K37StripDetectorHit::K37StripDetectorHit(const K37StripDetectorHit &right)
   : G4VHit() {
-  edep = right.edep;
   pos1 = right.pos1;
   pos2 = right.pos2;
-  good = right.good;
+  edep = right.edep;
   time = right.time;
+  good = right.good;
+  particle_pdg = right.particle_pdg;
   primary = right.primary;
   SoftwareVeto = right.SoftwareVeto;
 }
 
 const K37StripDetectorHit& K37StripDetectorHit::operator=(
                                             const K37StripDetectorHit &right) {
-  edep = right.edep;
   pos1 = right.pos1;
   pos2 = right.pos2;
-  good = right.good;
+  edep = right.edep;
   time = right.time;
+  good = right.good;
+  particle_pdg = right.particle_pdg;
+  primary = right.primary;
   SoftwareVeto = right.SoftwareVeto;
   return *this;
 }
