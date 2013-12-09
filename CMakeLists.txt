@@ -72,6 +72,7 @@ target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
 set(K37_SCRIPTS
   vis.mac
   novis.mac
+  gui.mac
   IOconfiguration.mac
   run.pl
   field.dat
