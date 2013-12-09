@@ -573,7 +573,9 @@ void K37DetectorConstruction::ConstructChamber() {
 
   chamber_log_ = new G4LogicalVolume(chamber_box_, ChamberMaterial,
                                      "chamber_log_", 0, 0, 0);
-  chamber_phys_ = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0),
+  G4RotationMatrix *y180 = new G4RotationMatrix(G4ThreeVector(0.0, 1.0, 0.0),
+  180.*deg);
+  chamber_phys_ = new G4PVPlacement(y180, G4ThreeVector(0.0, 0.0, 0.0),
                                     chamber_log_, "chamber_phys", world_log_,
                                     false, 0);
 
