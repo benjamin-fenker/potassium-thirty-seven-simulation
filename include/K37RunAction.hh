@@ -12,6 +12,7 @@
 #include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
 #include "K37_Data.hh"
+#include "K37DetectorConstruction.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37PhysicsList.hh"
 #include "K37RunMessenger.hh"
@@ -85,14 +86,14 @@ class K37RunAction : public G4UserRunAction {
   void PrintEnergyLossTable(G4String);
   void PrintResultsToScreen();
   void PrintResultsToRunstat();
-  void SetRecordAnnihilationPosition(G4bool _recordAnnihilationPosition) {
-    recordAnnihilationPosition = _recordAnnihilationPosition;
-  };
-  G4bool GetRecordAnnihilationPosition() {return recordAnnihilationPosition;}
-  void SetRecordVolumeNames(G4bool _recordVolumeNames) {
-    recordVolumeNames= _recordVolumeNames;
-  };
-  G4bool GetRecordVolumeNames() {return recordVolumeNames;}
+  // void SetRecordAnnihilationPosition(G4bool _recordAnnihilationPosition) {
+  //   recordAnnihilationPosition = _recordAnnihilationPosition;
+  // };
+  // G4bool GetRecordAnnihilationPosition() {return recordAnnihilationPosition;}
+  // void SetRecordVolumeNames(G4bool _recordVolumeNames) {
+  //   recordVolumeNames= _recordVolumeNames;
+  // };
+  // G4bool GetRecordVolumeNames() {return recordVolumeNames;}
   void setFileName(G4String newName) {outFileName = newName;}
   void SetAggregator(GeantAggregator *the_aggregator) {
     the_aggregator_ = the_aggregator;
@@ -116,12 +117,15 @@ class K37RunAction : public G4UserRunAction {
   G4bool RecordStripDetectorData() {return record_strip_detector_data_;}
   void SetPhysicsList(PhysicsList *list) {physics_list_ = list;}
   PhysicsList* GetPhysicsList() {return physics_list_;}
+  void SetDetectorConstruction(K37DetectorConstruction *dc) {
+    detector_construction_ = dc;
+  }
 
  private:
   void RegisterChannel(K37_Data* channel);
 
   G4int NbofEvents;
-  
+
   G4int    accepted;
   G4int    accepted_bs;
   G4int    bs;
@@ -169,9 +173,9 @@ class K37RunAction : public G4UserRunAction {
 
   K37RunMessenger* runMessenger;
   PhysicsList *physics_list_;
-
-  G4bool recordAnnihilationPosition;
-  G4bool recordVolumeNames;
+  K37DetectorConstruction *detector_construction_;
+  //  G4bool recordAnnihilationPosition;
+  //  G4bool recordVolumeNames;
   G4bool recordEventInformation;
   G4bool record_strip_detector_data_;
 

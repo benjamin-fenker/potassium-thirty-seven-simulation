@@ -35,7 +35,6 @@ class K37FieldMessenger: public G4UImessenger {
   G4UIcmdWith3VectorAndUnit* changeFieldCmd;
   G4UIcmdWithoutParameter*   print_field_cmd;
   G4UIcmdWithAString*  set_field_file_cmd_;
-  
 };
 
 #endif

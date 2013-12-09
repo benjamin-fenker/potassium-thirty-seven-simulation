@@ -26,9 +26,9 @@ G4bool fillEvGenData = true;
 
 K37RunAction::K37RunAction()
     :runMessenger(0), record_strip_detector_data_(true) {
-  recordAnnihilationPosition = false;
+  // recordAnnihilationPosition = false;
   // recordAnnihilationPosition = true;
-  recordVolumeNames = false;
+  //  recordVolumeNames = false;
   // recordVolumeNames = true;
   recordEventInformation = true;
   // recordEventInformation = false;
@@ -224,8 +224,13 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
 
   RegisterChannel(qdc_upper_pmt_);
   RegisterChannel(qdc_lower_pmt_);
-  RegisterChannel(dl_x_pos_);
-  RegisterChannel(dl_z_pos_);
+  if (detector_construction_ -> GetMakeRecoilMCP()) {
+    RegisterChannel(dl_x_pos_);
+    RegisterChannel(dl_z_pos_);
+    RegisterChannel(tdc_ion_mcp_);
+    RegisterChannel(recoil_mcp_particle_);
+    RegisterChannel(num_hits_r_mcp_);
+  }
   if (record_strip_detector_data_) {
     for (G4int i = 0; i < 40; i++) {
       RegisterChannel(strip_detector_upper_x_[i]);
@@ -236,8 +241,11 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   }
   RegisterChannel(tdc_scint_top_);
   RegisterChannel(tdc_scint_bottom_);
-  RegisterChannel(tdc_ion_mcp_);
-  RegisterChannel(tdc_electron_mcp_);
+  if (detector_construction_ -> GetMakeElectronMCP()) {
+    RegisterChannel(tdc_electron_mcp_);
+    RegisterChannel(num_hits_e_mcp_);
+    RegisterChannel(electron_mcp_particle_);
+  }
   RegisterChannel(tdc_photo_diode_);
   RegisterChannel(electron_kinetic_energy_generated_);
   RegisterChannel(electron_mu_generated_);
@@ -246,16 +254,14 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(tdc_long_electron_);
   RegisterChannel(tdc_nimio32_trigger_);
   RegisterChannel(tdc_tdc_stop_);
-  RegisterChannel(recoil_mcp_particle_);
+
   RegisterChannel(tnim_op_beam_);
   RegisterChannel(ttlbit_sigmaplus_);
   RegisterChannel(recoil_charge_state_);
   RegisterChannel(ttlbit_op_beam_);
   RegisterChannel(upper_pmt_particle_);
   RegisterChannel(lower_pmt_particle_);
-  RegisterChannel(num_hits_r_mcp_);
-  RegisterChannel(num_hits_e_mcp_);
-  RegisterChannel(electron_mcp_particle_);
+
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();

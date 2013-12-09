@@ -57,15 +57,15 @@ K37DetectorConstruction::K37DetectorConstruction()
       MirrorMaterial(0), FullEnergyDetectorMaterial(0), DeDxDetectorMaterial(0),
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
-      Hoop7Material(0), MCPMaterial(0), MM_CollimatorCut_sol(0),
-      shouldTheMirrorBeWFEDMCut(false), changeZtoX(0), changeZto45(0),
-      changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0), changeZtoNeg62(0),
-      changeZtoNeg118(0), changeYtoBeamAxis(0), changeYtoBeamAxisForLPP1(0),
-      changeYtoBeamAxisForLPP2(0), changeYtoBeamAxisForLPP3(0),
-      changeYtoBeamAxisForLPP4(0), rotationForOpticalPumpingBeams1(0),
-      rotationForOpticalPumpingBeams2(0), RFDRotation(0), FFRFRotation(0),
-      MirrorRotation(0), MirrorCutRotation(0), MMRotation(0), hoopRotation(0),
-      dedxFrame_logVisAttributes(0),
+      Hoop7Material(0), MCPMaterial(0), electron_mcp_radius_(20.0*mm),
+      MM_CollimatorCut_sol(0), shouldTheMirrorBeWFEDMCut(false), changeZtoX(0),
+      changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
+      changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),
+      changeYtoBeamAxisForLPP1(0), changeYtoBeamAxisForLPP2(0),
+      changeYtoBeamAxisForLPP3(0), changeYtoBeamAxisForLPP4(0),
+      rotationForOpticalPumpingBeams1(0), rotationForOpticalPumpingBeams2(0),
+      RFDRotation(0), FFRFRotation(0), MirrorRotation(0), MirrorCutRotation(0),
+      MMRotation(0), hoopRotation(0), dedxFrame_logVisAttributes(0),
       chamber_logVisAttributes(0), OPRF_logVisAttributes(0),
       RFD_logVisAttributes(0), beryllium_logVisAttributes(0),
       FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
@@ -90,69 +90,66 @@ K37DetectorConstruction::K37DetectorConstruction()
     makeElectronMCP = true;
     makeCoils = true;
     make_r_mcp_ = true;
+    make_sd_holders_ = true;
 }
 
 K37DetectorConstruction::~K37DetectorConstruction() {
-    delete detectorMessenger;
-    delete MM_CollimatorCut_sol;
-    delete changeZtoX;
-    delete changeZto45;
-    delete changeZtoNeg45;
-    delete changeZto35;
-    delete changeZtoNeg35;
-    delete changeZtoNeg62;
-    delete changeZtoNeg118;
-    delete changeYtoBeamAxis;
-    delete changeYtoBeamAxisForLPP1;
-    delete changeYtoBeamAxisForLPP2;
-    delete changeYtoBeamAxisForLPP3;
-    delete changeYtoBeamAxisForLPP4;
-    delete rotationForOpticalPumpingBeams1;
-    delete rotationForOpticalPumpingBeams2;
-    delete RFDRotation;
-    delete FFRFRotation;
-    delete MirrorRotation;
-    delete MirrorCutRotation;
-    delete MMRotation;
-    delete hoopRotation;
-    delete world_log_;
-    delete world_phys_;
-    delete scintillator_tubs_;
-    delete upper_scintillator_log_;
-    delete lower_scintillator_log_;
-    delete strip_detector_box_;
-    delete upper_strip_detector_log_;
-    delete lower_strip_detector_log_;
-    delete chamber_box_;
-    delete chamber_log_;
-    delete electron_mcp_tub_;
-    delete electron_mcp_log_;
-    delete recoil_mcp_tub_;
-    delete recoil_mcp_log_;
-    delete dedxFrame_logVisAttributes;
-    delete chamber_logVisAttributes;
-    delete OPRF_logVisAttributes;
-    delete RFD_logVisAttributes;
-    delete beryllium_logVisAttributes;
-    delete FFRF_logVisAttributes;
-    delete mirror_logVisAttributes;
-    delete MM_logVisAttributes;
-    delete cut_ESP_logVisAttributes;
-    delete hoop7_logVisAttributes;
-    delete SOED_logVisAttributes;
-    delete coils_logVisAttributes;
-    delete rmcp_logVisAttributes_;
+  if (detectorMessenger) delete detectorMessenger;
+  if (MM_CollimatorCut_sol) delete MM_CollimatorCut_sol;
+  if (changeZtoX) delete changeZtoX;
+  if (changeZto45) delete changeZto45;
+  if (changeZtoNeg45) delete changeZtoNeg45;
+  if (changeZto35) delete changeZto35;
+  if (changeZtoNeg35) delete changeZtoNeg35;
+  if (changeZtoNeg62) delete changeZtoNeg62;
+  if (changeZtoNeg118) delete changeZtoNeg118;
+  if (changeYtoBeamAxis) delete changeYtoBeamAxis;
+  if (changeYtoBeamAxisForLPP1) delete changeYtoBeamAxisForLPP1;
+  if (changeYtoBeamAxisForLPP2) delete changeYtoBeamAxisForLPP2;
+  if (changeYtoBeamAxisForLPP3) delete changeYtoBeamAxisForLPP3;
+  if (changeYtoBeamAxisForLPP4) delete changeYtoBeamAxisForLPP4;
+  if (rotationForOpticalPumpingBeams1) delete rotationForOpticalPumpingBeams1;
+  if (rotationForOpticalPumpingBeams2) delete rotationForOpticalPumpingBeams2;
+  if (RFDRotation) delete RFDRotation;
+  if (FFRFRotation)delete FFRFRotation;
+  if (MirrorRotation) delete MirrorRotation;
+  if (MirrorCutRotation) delete MirrorCutRotation;
+  if (MMRotation) delete MMRotation;
+  if (hoopRotation) delete hoopRotation;
+  if (world_log_) delete world_log_;
+  if (world_phys_) delete world_phys_;
+  if (scintillator_tubs_) delete scintillator_tubs_;
+  if (upper_scintillator_log_) delete upper_scintillator_log_;
+  if (lower_scintillator_log_) delete lower_scintillator_log_;
+  if (strip_detector_box_) delete strip_detector_box_;
+  if (upper_strip_detector_log_) delete upper_strip_detector_log_;
+  if (lower_strip_detector_log_) delete lower_strip_detector_log_;
+  if (chamber_box_) delete chamber_box_;
+  if (chamber_log_) delete chamber_log_;
+  if (electron_mcp_tub_) delete electron_mcp_tub_;
+  if (electron_mcp_log_) delete electron_mcp_log_;
+  if (recoil_mcp_tub_) delete recoil_mcp_tub_;
+  if (recoil_mcp_log_) delete recoil_mcp_log_;
+  if (dedxFrame_logVisAttributes) delete dedxFrame_logVisAttributes;
+  if (chamber_logVisAttributes) delete chamber_logVisAttributes;
+  if (OPRF_logVisAttributes) delete OPRF_logVisAttributes;
+  if (RFD_logVisAttributes) delete RFD_logVisAttributes;
+  if (beryllium_logVisAttributes) delete beryllium_logVisAttributes;
+  if (FFRF_logVisAttributes) delete FFRF_logVisAttributes;
+  if (mirror_logVisAttributes) delete mirror_logVisAttributes;
+  if (MM_logVisAttributes) delete MM_logVisAttributes;
+  if (cut_ESP_logVisAttributes) delete cut_ESP_logVisAttributes;
+  if (hoop7_logVisAttributes) delete hoop7_logVisAttributes;
+  if (SOED_logVisAttributes) delete SOED_logVisAttributes;
+  if (coils_logVisAttributes) delete coils_logVisAttributes;
+  if (rmcp_logVisAttributes_) delete rmcp_logVisAttributes_;
 }
 
 G4VPhysicalVolume* K37DetectorConstruction::Construct() {
     return this->ConstructK37Experiment();
 }
 G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
-  // Clean old geometry, if any
   G4GeometryManager::GetInstance()->OpenGeometry();
-  G4PhysicalVolumeStore::GetInstance()->Clean();
-  G4LogicalVolumeStore::GetInstance()->Clean();
-  G4SolidStore::GetInstance()->Clean();
     // ------------------------------------------ Sensitive Detector / filters
 
     /*------------------------------------------------------------------------
@@ -236,21 +233,21 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
 
   // Set up sensitive detectors
   G4String fullenergy1SDname = "/mydet/scintillatorPlusZ";
-  if (upper_scintillator_sens_) {
-    G4cout << "Deleting upper scintillator..." << G4endl;
-    delete upper_scintillator_sens_;
+
+  if (!upper_scintillator_sens_) {
+    upper_scintillator_sens_ = new K37ScintillatorSD(fullenergy1SDname);
+    SDman->AddNewDetector(upper_scintillator_sens_);
   }
-  upper_scintillator_sens_ = new K37ScintillatorSD(fullenergy1SDname);
-  SDman->AddNewDetector(upper_scintillator_sens_);
+
   upper_scintillator_log_ -> SetSensitiveDetector(upper_scintillator_sens_);
 
   G4String fullenergy2SDname = "/mydet/scintillatorMinusZ";
-  if (lower_scintillator_sens_) {
-    G4cout << "Deleting lower scintillator..." << G4endl;
-    delete lower_scintillator_sens_;
+
+  if (!lower_scintillator_sens_) {
+    lower_scintillator_sens_ = new K37ScintillatorSD(fullenergy2SDname);
+    SDman->AddNewDetector(lower_scintillator_sens_);
   }
-  lower_scintillator_sens_ = new K37ScintillatorSD(fullenergy2SDname);
-  SDman->AddNewDetector(lower_scintillator_sens_);
+
   lower_scintillator_log_ -> SetSensitiveDetector(lower_scintillator_sens_);
 }
 
@@ -293,49 +290,49 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
 
 
   G4String dedx1SDname = "/mydet/dsssdPlusZ";
-  if (upper_strip_detector_sens_) {
-    G4cout << "Deleting upper strip detector..." << G4endl;
-    delete upper_strip_detector_sens_;
+
+  if (!upper_strip_detector_sens_) {
+    upper_strip_detector_sens_ = new K37StripDetectorSD(dedx1SDname);
+    //                        pos_of_center, numStrips, stripWidth
+    upper_strip_detector_sens_ -> SetupParameters(dedx_PlusZ_pos, 40, 1.0*mm);
+    SDman->AddNewDetector(upper_strip_detector_sens_);
   }
-  upper_strip_detector_sens_ = new K37StripDetectorSD(dedx1SDname);
-  //                        pos_of_center, numStrips, stripWidth
-  upper_strip_detector_sens_ -> SetupParameters(dedx_PlusZ_pos, 40, 1.0*mm);
-  SDman->AddNewDetector(upper_strip_detector_sens_);
   upper_strip_detector_log_->SetSensitiveDetector(upper_strip_detector_sens_);
 
   G4String dedx2SDname = "/mydet/dsssdMinusZ";
-  if (lower_strip_detector_sens_) {
-    G4cout << "Deleting lower strip detector..." << G4endl;
-    delete lower_strip_detector_sens_;
+
+  if (!lower_strip_detector_sens_) {
+    lower_strip_detector_sens_ = new K37StripDetectorSD(dedx2SDname);
+    //                        pos_of_center, numStrips, stripWidth
+    lower_strip_detector_sens_ -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
+    SDman->AddNewDetector(lower_strip_detector_sens_);
   }
-  lower_strip_detector_sens_ = new K37StripDetectorSD(dedx2SDname);
-  //                        pos_of_center, numStrips, stripWidth
-  lower_strip_detector_sens_ -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
-  SDman->AddNewDetector(lower_strip_detector_sens_);
   lower_strip_detector_log_->SetSensitiveDetector(lower_strip_detector_sens_);
 
   // ------------------------------ dedx mount
-  G4double strip_detector_frame_X  = 44.4*mm;
+  if (make_sd_holders_) {
+    G4double strip_detector_frame_X  = 44.4*mm;
 
-  G4VSolid * dedx_holder_sol = new G4Box("dedx_holder_sol",
-                                         strip_detector_frame_X/2.0,
-                                         strip_detector_frame_X/2.0,
-                                         1.5*mm);
-  G4VSolid * dedx_holder_cut_sol = new G4Box("dedx_holder_cut_sol",
-                                             Dedx_x/2.0, Dedx_y/2.0, 1.7*mm);
-  G4SubtractionSolid* dedxFrame_sol =
-    new G4SubtractionSolid("dedxFrame_sol", dedx_holder_sol,
-                           dedx_holder_cut_sol);
-  G4LogicalVolume* dedxFrame_log =
-    new G4LogicalVolume(dedxFrame_sol, SiliconDetectorFrameMaterial,
-                        "dedxFrame_log", 0, 0, 0);
-  dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
-  dedxFrame_logVisAttributes-> SetForceSolid(true);
-  dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 98.5*mm), dedxFrame_log,
-                    "dedxFrame_plusZ_phys", world_log_, false, 0);
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -98.5*mm), dedxFrame_log,
-                    "dedxFrame_minusZ_phys", world_log_, false, 0);
+    G4VSolid * dedx_holder_sol = new G4Box("dedx_holder_sol",
+                                           strip_detector_frame_X/2.0,
+                                           strip_detector_frame_X/2.0,
+                                           1.5*mm);
+    G4VSolid * dedx_holder_cut_sol = new G4Box("dedx_holder_cut_sol",
+                                               Dedx_x/2.0, Dedx_y/2.0, 1.7*mm);
+    G4SubtractionSolid* dedxFrame_sol =
+        new G4SubtractionSolid("dedxFrame_sol", dedx_holder_sol,
+                               dedx_holder_cut_sol);
+    G4LogicalVolume* dedxFrame_log =
+        new G4LogicalVolume(dedxFrame_sol, SiliconDetectorFrameMaterial,
+                            "dedxFrame_log", 0, 0, 0);
+    dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+    dedxFrame_logVisAttributes-> SetForceSolid(true);
+    dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 98.5*mm), dedxFrame_log,
+                      "dedxFrame_plusZ_phys", world_log_, false, 0);
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -98.5*mm), dedxFrame_log,
+                      "dedxFrame_minusZ_phys", world_log_, false, 0);
+  }
 }  // End construct stip detectors
 
 void K37DetectorConstruction::ConstructChamber() {
@@ -1086,14 +1083,14 @@ void K37DetectorConstruction::ConstructHoops() {
 }  // End construct hoops
 
 void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
-  G4double SOED_rmax = 40./2.*mm;
+  //  G4double SOED_rmax = 40./2.*mm;
   G4double SOED_rmin = 0     *mm;
   G4double SOED_dz   = 10./2.*mm;
   G4double SOED_Sphi = 0.    *deg;
   G4double SOED_Dphi = 360.  *deg;
   G4double SOED_z_pos = -82.0 *mm;     // 82 mm
-  electron_mcp_tub_ = new G4Tubs("SOED_sol", SOED_rmin, SOED_rmax,  SOED_dz,
-                                 SOED_Sphi, SOED_Dphi);
+  electron_mcp_tub_ = new G4Tubs("SOED_sol", SOED_rmin, electron_mcp_radius_,
+                                 SOED_dz, SOED_Sphi, SOED_Dphi);
   electron_mcp_log_ = new G4LogicalVolume(electron_mcp_tub_, MCPMaterial,
                                           "SOED_log", 0, 0, 0);
   electron_mcp_phys_ = new G4PVPlacement(changeZtoX,
@@ -1104,14 +1101,12 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   SOED_logVisAttributes-> SetForceSolid(true);
   electron_mcp_log_ -> SetVisAttributes(SOED_logVisAttributes);
 
-  if (electron_mcp_sens_) {
-    G4cout << "Deleting electron MCP..." << G4endl;
-    delete electron_mcp_sens_;
-    G4cout << "done" << G4endl;
-  }
+
   // Set up sensitive detector
-  electron_mcp_sens_ = new K37ElectronMCPSD("/mydet/electron_mcp");
-  sd_man -> AddNewDetector(electron_mcp_sens_);
+  if (!electron_mcp_sens_) {
+    electron_mcp_sens_ = new K37ElectronMCPSD("/mydet/electron_mcp");
+    sd_man -> AddNewDetector(electron_mcp_sens_);
+  }
   electron_mcp_log_ -> SetSensitiveDetector(electron_mcp_sens_);
 }  // End construct EMCP
 
@@ -1138,13 +1133,11 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
   recoil_mcp_log_ -> SetVisAttributes(rmcp_logVisAttributes_);
 
   // Set up sensitive detector
-  if (recoil_mcp_sens_) {
-    G4cout << "Deleting recoil MCP..." << G4endl;
-    delete recoil_mcp_sens_;
-    G4cout << "done" << G4endl;
+  if (!recoil_mcp_sens_) {
+    recoil_mcp_sens_ = new K37RecoilMCPSD("/mydet/recoil_mcp");
+    sd_man -> AddNewDetector(recoil_mcp_sens_);
   }
-  recoil_mcp_sens_ = new K37RecoilMCPSD("/mydet/recoil_mcp");
-  sd_man -> AddNewDetector(recoil_mcp_sens_);
+
   recoil_mcp_log_ -> SetSensitiveDetector(recoil_mcp_sens_);
 }
 

@@ -29,13 +29,13 @@ class K37RunMessenger: public G4UImessenger {
  private:
   K37RunAction* runAction;
   G4UIdirectory* RunDirectory;
-  G4UIcmdWithAnInteger* SaveFilesCommand;
+  //  G4UIcmdWithAnInteger* SaveFilesCommand;
   G4UIcmdWithAString* printEnergyLossTable;
   G4UIcmdWithAString* setFileName;
   G4UIcmdWithAString* set_configuration_file_;
   G4UIcmdWithAString* set_output_directory_;
-  G4UIcmdWithABool* printAnnihilation;
-  G4UIcmdWithABool* printTheVolumeNames;
+  //  G4UIcmdWithABool* printAnnihilation;
+  //  G4UIcmdWithABool* printTheVolumeNames;
   G4UIcmdWithABool* setFillEvGenData;
   G4UIcmdWithABool* setFillAllSDData;
   G4UIcmdWithADoubleAndUnit *set_default_cut_cmd_;

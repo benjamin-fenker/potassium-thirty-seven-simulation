@@ -121,12 +121,14 @@ int main(int argc, char** argv) {
   run_action -> SetActiveChannels(&active_channels);
   run_action -> SetAggregator(the_aggregator);
   run_action -> SetPhysicsList(physics);
+  run_action -> SetDetectorConstruction(detector);
   runManager -> SetUserAction(run_action);
 
   K37EventAction* event_action = new K37EventAction(run_action);
   event_action -> SetAggregator(the_aggregator);
   event_action -> SetActiveChannels(&active_channels);
   event_action -> SetPrimaryGenerator(gen_action);
+  event_action -> SetDetectorConstruction(detector);
   runManager   -> SetUserAction(event_action);
   the_aggregator -> SetEventAction(event_action);
 

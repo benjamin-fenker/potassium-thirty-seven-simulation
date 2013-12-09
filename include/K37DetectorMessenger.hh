@@ -4,14 +4,15 @@
 #define K37DetectorMessenger_h 1
 
 #include "globals.hh"
+#include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UImessenger.hh"
 
 class K37DetectorConstruction;
-class G4UIdirectory;
-class G4UIcmdWithAString;
-class G4UIcmdWithABool;
-class G4UIcmdWithoutParameter;
 
+class G4UIcmdWithABool;
+class G4UIcmdWithAString;
+class G4UIcmdWithoutParameter;
+class G4UIdirectory;
 //-----------------------------
 
 class K37DetectorMessenger: public G4UImessenger {
@@ -35,6 +36,9 @@ class K37DetectorMessenger: public G4UImessenger {
   G4UIcmdWithABool *make_electron_mcp_cmd_;
   G4UIcmdWithABool *make_coils_cmd_;
   G4UIcmdWithABool *make_recoil_mcp_cmd_;
+  G4UIcmdWithABool *make_sd_holders_cmd_;
+  G4UIcmdWithADoubleAndUnit *set_electron_mcp_radius_cmd_;
+  G4UIcmdWithoutParameter* get_electron_mcp_radius_cmd_;
 };
 
 //-----------------------------

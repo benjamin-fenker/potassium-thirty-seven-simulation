@@ -51,6 +51,13 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void SetMakeElectronMCP(G4bool f) {makeElectronMCP = f;}
   void SetMakeCoils(G4bool f) {makeCoils = f;}
   void SetMakeRecoilMCP(G4bool f) {make_r_mcp_ = f;}
+  void SetMakeSDholders(G4bool f) {make_sd_holders_ = f;}
+
+  G4bool GetMakeElectronMCP() {return makeElectronMCP;}
+  G4bool GetMakeRecoilMCP() {return make_r_mcp_;}
+
+  void SetElectronMCPradius(G4double d) {electron_mcp_radius_= d;}
+  G4double GetElectronMCPradius() {return electron_mcp_radius_;}
 
  private:
   G4VPhysicalVolume* ConstructK37Experiment();
@@ -126,7 +133,10 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4Material* MirrorMountMaterial;
   G4Material* CoilsMaterial;
   G4Material* Hoop7Material;
+
   G4Material*   MCPMaterial;
+  G4double electron_mcp_radius_;
+
   G4Trd * MM_CollimatorCut_sol;
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
   // = true or straight cut = false
@@ -168,7 +178,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   // Bools to turn off or on various aspects of the apparatus to simulate their
   // individual effects
   G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
-  G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_;
+  G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_, make_sd_holders_;
 };
 
 #endif

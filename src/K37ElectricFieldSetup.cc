@@ -210,7 +210,6 @@ void K37ElectricFieldSetup::SetFieldValue(G4ThreeVector fieldVector) {
 }
 
 void K37ElectricFieldSetup::SetFieldFile(G4String file_name) {
-
   FILE *f_file;
   f_file = fopen(file_name, "r");
 
