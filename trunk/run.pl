@@ -97,8 +97,10 @@ sub runOnce {
     my $physics = $_[26];
     my $stepLimit = $_[27];
     my @sailV = @_[28..30];
+    my @geometry = @_[31..37];
     my $events_per_run = min($events, 1000);
     my $iters = ceil($events / $events_per_run);
+
     if ($id_num == 0) {
         print "$events_per_run per call\n";
         print "$iters calls\n";
@@ -108,6 +110,13 @@ sub runOnce {
     open(MACRO, ">runFiles/runParallel$id_num.mac") || die;
     print MACRO "/testem/phys/addPhysics $physics\n";
     print MACRO "/K37/RunControls/setDefaultCut $threshold um\n";
+    print MACRO "/K37/geometry/setMakeChamber $geometry[0]\n";
+    print MACRO "/K37/geometry/setMakeMirrors $geometry[1]\n";
+    print MACRO "/K37/geometry/setMakeHoops $geometry[2]\n";
+    print MACRO "/K37/geometry/setMakeCoil $geometry[3]\n";
+    print MACRO "/K37/geometry/setMakeElectronMCP $geometry[4]\n";
+    print MACRO "/K37/geometry/setMakeRecoilMCP $geometry[5]\n";
+    print MACRO "/K37/geometry/setMakeSDholders $geometry[6]\n";
     print MACRO "/run/initialize\n";
     print MACRO "/K37/EventControls/ThresholdElectronMCP $threshold[0] keV\n";
     print MACRO
@@ -160,6 +169,7 @@ my $strips = "true";
 my $prodThres = 10;
 my $physList = "local";
 my $stepLimit = "Minimal";
+my @makeGeometry = ("true", "true", "true", "true", "true", "true", "true");
 
 if (open (PARAMSin, "runFiles/params.txt")) {
     chomp($threshold[0] = <PARAMSin>);
@@ -285,6 +295,24 @@ while($choice != 0) {
     }
 }
 
+print "Enter 0 to construct all geometry elements or 1 for only some\n";
+chomp($choice = <STDIN>);
+if ($choice != 0) {
+    print "[1] = Chamber\n";
+    print "[2] = Mirrors\n";
+    print "[3] = Electrostatic hoops\n";
+    print "[4] = (Anti)-Helmholtz coils\n";
+    print "[5] = Electron MCP\n";
+    print "[6] = Recoil MCP\n";
+    print "[7] = DSSSD frames\n";
+    print "Enter the numbers of the elements you wish to REMOVE\n";
+    my $noDrawS = <STDIN>;
+    my @noDrawV = split(' ', $noDrawS);
+    foreach (@noDrawV) {
+        $makeGeometry[$_-1] = "false";
+        print "$_\n";
+    }
+}
 $choice = -1;
 my $ovw = "n";
 while ($choice  != 0) {
@@ -345,7 +373,7 @@ print "$thread_events per thread\n";
 my @allParams = (@threshold, $e_field, $polarization, $alignment,
                  $recoil_charge, @center, @size, @temperature, $directory,
                  $file_name, @particle, $secondaries, $strips, $prodThres,
-                 $physList, $stepLimit, @sailV);
+                 $physList, $stepLimit, @sailV, @makeGeometry);
 unshift(@allParams, 0, $thread_events);     #  Add to the front of allParams
 
 my @jobs;

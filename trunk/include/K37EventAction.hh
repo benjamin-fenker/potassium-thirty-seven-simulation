@@ -16,6 +16,7 @@
 
 #include "Aggregator.hh"
 #include "Generic_Channel.hh"
+#include "K37DetectorConstruction.hh"
 #include "K37EventMessenger.hh"
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37StripDetectorHit.hh"
@@ -66,6 +67,9 @@ class K37EventAction : public G4UserEventAction {
     primary_generator_ = primary_generator;
   }
   K37PrimaryGeneratorAction* GetPrimaryGenerator() {return primary_generator_;}
+  void SetDetectorConstruction(K37DetectorConstruction *dc) {
+    detector_construction_ = dc;
+  }
 
  private:
   // V1190 TDC Clock beats every 97.65625 ns; output from analyzer is in
@@ -193,6 +197,7 @@ class K37EventAction : public G4UserEventAction {
 
   //  G4double svn_version_number;
   K37PrimaryGeneratorAction *primary_generator_;
+  K37DetectorConstruction *detector_construction_;
 };
 
 #endif

@@ -38,8 +38,6 @@ class K37ElectricFieldSetup {
   G4FieldManager*         GetGlobalFieldManager();
 
  private:
-
-
   G4FieldManager*         fFieldManager;
   G4ChordFinder*          fChordFinder;
   G4EqMagElectricField*   fEquation;
