@@ -1,0 +1,2 @@
+#!/bin/bash
+grep -r $1 $PWD | grep -v .svn 
