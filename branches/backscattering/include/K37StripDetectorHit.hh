@@ -11,11 +11,14 @@
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
 
+#include "BackscatterHit.hh"
+
 using std::map;
 
 class G4AttDef;
 
-class K37StripDetectorHit : public G4VHit {
+//class K37StripDetectorHit : public G4VHit {
+class K37StripDetectorHit : public G4VHit, public BackscatterHit {
  public:
   K37StripDetectorHit();
   ~K37StripDetectorHit();

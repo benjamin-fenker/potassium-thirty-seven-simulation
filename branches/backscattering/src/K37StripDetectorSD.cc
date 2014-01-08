@@ -131,6 +131,40 @@ G4bool K37StripDetectorSD::ProcessHits(G4Step*aStep, G4TouchableHistory*) {
   newHit -> SetParticlePDG(theTrack ->
                            GetParticleDefinition() -> GetPDGEncoding());
   dedx1Collection->insert(newHit);  // Add the hit to the hits collection
+
+  // Adding angle-of incidence
+  newHit -> SetParentID(theTrack -> GetParentID());
+  if (aStep -> GetPreStepPoint() -> GetStepStatus() == fGeomBoundary) {
+    newHit -> SetBoundaryStatus(1);     // Entering
+  } else if (aStep -> GetPostStepPoint() -> GetStepStatus() == fGeomBoundary) {
+    newHit -> SetBoundaryStatus(-1);    // Exiting
+  } else {
+    newHit -> SetBoundaryStatus(0);     // Neither
+  }
+  newHit -> SetTheta(theTrack -> GetMomentumDirection().theta());
+
+
+  G4ThreeVector direction = theTrack -> GetMomentumDirection();
+  // G4cout << "Impinging with phi = " << direction.phi()/deg << " degrees"
+  //        << G4endl;
+  if (aStep -> GetPreStepPoint() -> GetStepStatus() == fGeomBoundary) {
+    G4cout << "ENTERING VOLUME!" << G4endl;
+    G4cout << "Impinging with x = " << direction.x() << " y = " << direction.y()
+           << " z = " << direction.z() << G4endl;
+    G4cout << "\t theta = " << direction.theta()/deg << " phi = "
+           << direction.phi()/deg
+           << G4endl;
+  }
+  if (aStep -> GetPostStepPoint() -> GetStepStatus() == fGeomBoundary) {
+    G4cout << "LEAVING VOLUME!" << G4endl;
+    G4cout << "Leaving with x = " << direction.x() << " y = " << direction.y()
+           << " z = " << direction.z() << G4endl;
+    G4cout << "\t theta = " << direction.theta()/deg << " phi = "
+           << direction.phi()/deg
+           << G4endl;
+  }
+  int j;
+  G4cin >> j;
   return true;
 }
 

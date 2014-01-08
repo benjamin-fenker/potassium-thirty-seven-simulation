@@ -5,12 +5,15 @@
 /vis/viewer/set/autoRefresh false
 /testem/phys/addPhysics local
 /K37/RunControls/setDefaultCut 10 um
-/K37/geometry/setMakeHoops true
-/K37/geometry/setMakeChamber true
-/K37/geometry/setMakeMirrors true
-/K37/geometry/setMakeCoil true
-/K37/geometry/setMakeSDholders true
+/K37/geometry/setMakeHoops false
+/K37/geometry/setMakeChamber false
+/K37/geometry/setMakeMirrors false
+/K37/geometry/setMakeCoil false
+/K37/geometry/setMakeSDholders false
 /K37/geometry/setElectronMCPradius 20.0 mm
+/K37/gun/setMakeRecoil false
+/K37/gun/setMakeShakeoffElectrons false
+/K37/Stacking/setTrackSecondaries false
 /run/initialize
 /vis/drawVolume
 #/vis/viewer/set/viewpointThetaPhi 90. 0.
@@ -19,7 +22,7 @@
 #/vis/scene/add/axes 0 0 0 1 m
 /vis/viewer/set/viewpointThetaPhi 90. 180.
 /vis/viewer/set/viewpointThetaPhi 70. 20.
-/vis/viewer/zoom 2.1
+#/vis/viewer/zoom 2.1
 
 #Tell Geant what sort of Tracks to use
 /tracking/verbose 0
