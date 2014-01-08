@@ -20,7 +20,7 @@ class BackscatterHit {
 
   void SetBoundaryStatus(G4int bs) {boundary_status_ = bs;}
   void SetParentID(G4int pi) {parent_id_ = pi;}
-  void SetTheta(G4int theta) {theta_ = theta;}
+  void SetTheta(G4double theta) {theta_ = theta;}
 
   G4int GetBoundaryStatus() {return boundary_status_;}
   G4int GetParentID() {return parent_id_;}

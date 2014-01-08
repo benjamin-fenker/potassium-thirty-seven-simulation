@@ -10,11 +10,22 @@
 /K37/geometry/setMakeMirrors false
 /K37/geometry/setMakeCoil false
 /K37/geometry/setMakeSDholders false
+/K37/geometry/setMakeElectronMCP false
+/K37/geometry/setMakeRecoilMCP false
 /K37/geometry/setElectronMCPradius 20.0 mm
 /K37/gun/setMakeRecoil false
 /K37/gun/setMakeShakeoffElectrons false
 /K37/Stacking/setTrackSecondaries false
+
+
 /run/initialize
+/K37/field/setFieldY 0
+/K37/gun/setTemperatureV 0 0 0 K
+/K37/gun/setCloudSizeV 0 0 0 mm
+/K37/gun/setCloudCenter 0 0 0 mm
+/K37/gun/setSailVelocity 0 0 0 mm/us
+
+
 /vis/drawVolume
 #/vis/viewer/set/viewpointThetaPhi 90. 0.
 #/vis/viewer/zoom 2.
@@ -46,3 +57,4 @@
 # /vis/ogl/set/printSize 800 800
 #/vis/ogl/printEPS
 
+#/run/beamOn 200

@@ -130,7 +130,7 @@ G4bool K37StripDetectorSD::ProcessHits(G4Step*aStep, G4TouchableHistory*) {
   // **************END SPENCER'S STUFF
   newHit -> SetParticlePDG(theTrack ->
                            GetParticleDefinition() -> GetPDGEncoding());
-  dedx1Collection->insert(newHit);  // Add the hit to the hits collection
+
 
   // Adding angle-of incidence
   newHit -> SetParentID(theTrack -> GetParentID());
@@ -145,30 +145,34 @@ G4bool K37StripDetectorSD::ProcessHits(G4Step*aStep, G4TouchableHistory*) {
 
 
   G4ThreeVector direction = theTrack -> GetMomentumDirection();
-  // G4cout << "Impinging with phi = " << direction.phi()/deg << " degrees"
+  // G4cout << "Impinging with theta = " << direction.theta()/deg << " degrees"
   //        << G4endl;
-  if (aStep -> GetPreStepPoint() -> GetStepStatus() == fGeomBoundary) {
-    G4cout << "ENTERING VOLUME!" << G4endl;
-    G4cout << "Impinging with x = " << direction.x() << " y = " << direction.y()
-           << " z = " << direction.z() << G4endl;
-    G4cout << "\t theta = " << direction.theta()/deg << " phi = "
-           << direction.phi()/deg
-           << G4endl;
-  }
-  if (aStep -> GetPostStepPoint() -> GetStepStatus() == fGeomBoundary) {
-    G4cout << "LEAVING VOLUME!" << G4endl;
-    G4cout << "Leaving with x = " << direction.x() << " y = " << direction.y()
-           << " z = " << direction.z() << G4endl;
-    G4cout << "\t theta = " << direction.theta()/deg << " phi = "
-           << direction.phi()/deg
-           << G4endl;
-  }
-  int j;
-  G4cin >> j;
+  // if (aStep -> GetPreStepPoint() -> GetStepStatus() == fGeomBoundary) {
+  //   G4cout << "ENTERING VOLUME!" << G4endl;
+  //   G4cout << "Impinging with x = " << direction.x() << " y = " << direction.y()
+  //          << " z = " << direction.z() << G4endl;
+  //   G4cout << "\t theta = " << direction.theta()/deg << " phi = "
+  //          << direction.phi()/deg
+  //          << G4endl;
+  // }
+  // if (aStep -> GetPostStepPoint() -> GetStepStatus() == fGeomBoundary) {
+  //   G4cout << "LEAVING VOLUME!" << G4endl;
+  //   G4cout << "Leaving with x = " << direction.x() << " y = " << direction.y()
+  //          << " z = " << direction.z() << G4endl;
+  //   G4cout << "\t theta = " << direction.theta()/deg << " phi = "
+  //          << direction.phi()/deg
+  //          << G4endl;
+  // }
+  // int j;
+  // G4cin >> j;
+
+  dedx1Collection->insert(newHit);  // Add the hit to the hits collection
+  // G4cout << "Now the HC has " << dedx1Collection -> entries() << " entries" << G4endl;
   return true;
 }
 
 // void K37StripDetectorSD::EndOfEvent(G4HCofThisEvent*HCE) {
+//   HC
 // }
 
 void K37StripDetectorSD::clear() {

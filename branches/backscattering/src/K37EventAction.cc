@@ -187,7 +187,7 @@ void K37EventAction::BeginOfEventAction(const G4Event* ev) {
 }
 
 void K37EventAction::EndOfEventAction(const G4Event* evt) {
-
+  //  G4cout << "K37EventAction::EndOfEventAction(const G4Event* evt)" << G4endl;
   energyUpperScint_Total = 0;
   energyUpperScint_AllElse  = 0;
   energyUpperScint_Positron = 0;
@@ -240,7 +240,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   G4double electron_mcp_energy = 0.0;
   G4int electron_pdg = 0;
 
-  if (fullenergy1CollID < 0 || dedx1CollID < 0) return;
+  //  if (fullenergy1CollID < 0 || dedx1CollID < 0) return;
 
   G4HCofThisEvent * hit_collection = evt->GetHCofThisEvent();
   K37StripDetectorHitsCollection* upper_sd_hit_collection = 0;
@@ -252,6 +252,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // G4THitsCollection<K37RecoilMCPHit> *recoil_mcp_hit_collection = 0;
 
   if (hit_collection) {
+    //    G4cout << "Got hit collection" << G4endl;
+    
     upper_scintillator_hit_collection =
       static_cast<K37ScintillatorHitsCollection*>(hit_collection ->
                                                   GetHC(fullenergy1CollID));
@@ -270,8 +272,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     electron_mcp_hit_collection =
         static_cast<K37ElectronMCPHitsCollection*>(hit_collection ->
                                            GetHC(electron_mcp_collection_id));
-  }
-  G4bool electron_mcp_constructed =
+}
+G4bool electron_mcp_constructed =
       detector_construction_ -> GetMakeElectronMCP();
   G4bool recoil_mcp_constructed = detector_construction_ -> GetMakeRecoilMCP();
 
@@ -324,9 +326,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   // Get all the energy deposited in the upper strip detector
   // ***************************************************************************
+  int num_silicon_hits = 0;
   if (upper_sd_hit_collection) {                // Strip detector plus Z
 
      int n_hit = upper_sd_hit_collection->entries();
+     num_silicon_hits += n_hit;
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
      {
@@ -337,6 +341,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         hit = (*upper_sd_hit_collection)[i];
 
         SortUpperSilicon(hit->GetParticlePDG(), hit->GetEdep());
+
+        (*active_channels_)["UpperSiliconParentID"] ->
+            InsertData(static_cast<double>(hit -> GetParentID()));
+        (*active_channels_)["UpperSiliconBoundary"] ->
+            InsertData(static_cast<double>(hit -> GetBoundaryStatus()));
+        (*active_channels_)["UpperSiliconTheta"] ->
+            InsertData(hit -> GetTheta()/deg);
      }
 
     sd_energy_plusZ_X = GetEDepVectorX(upper_sd_hit_collection);
@@ -354,15 +365,30 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   // Get all the energy deposited in the lower strip detector
   // ***************************************************************************
+
   if (lower_sd_hit_collection) {  // Strip Detector Minus Z
 
      int n_hit = lower_sd_hit_collection->entries();
+     num_silicon_hits += n_hit;
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
      {
         hit = (*lower_sd_hit_collection)[i];
 
         SortLowerSilicon(hit->GetParticlePDG(), hit->GetEdep());
+
+        (*active_channels_)["LowerSiliconParentID"] ->
+            InsertData(static_cast<double>(hit -> GetParentID()));
+        (*active_channels_)["LowerSiliconBoundary"] ->
+            InsertData(static_cast<double>(hit -> GetBoundaryStatus()));
+        (*active_channels_)["LowerSiliconTheta"] ->
+            InsertData(hit -> GetTheta()/deg);
+        if (hit -> GetTheta()/deg < 130.0 && i == 0) {
+          G4cout << "Theta = " << hit -> GetTheta()/deg << " Code: "
+                 << hit -> GetBoundaryStatus() << " PID: " << hit -> GetParentID()
+                 << "#: " << evt -> GetEventID() << G4endl;;
+          G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+        }
      }
 
     sd_energy_minsZ_X = GetEDepVectorX(lower_sd_hit_collection);
@@ -441,7 +467,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   }
 
   if (EventPassesTrigger(energyUpperScint_Total, energyLowerScint_Total,
-                         electron_mcp_energy)) {
+                         electron_mcp_energy) || num_silicon_hits > 0) {
     // G4cout << "Event passes my trigger with energy "
     //        << G4BestUnit(energyUpperScint_Total, "Energy") << " / "
     //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"
@@ -576,6 +602,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     (*active_channels_)["TTLBit_SigmaPlus"] -> InsertData(op_bit);
 
     the_aggregator_ -> EndEvent();
+    // if (num_silicon_hits > 0) {
+    //   G4cout << "Ending event" << endl;
+    //   int j;
+    //   G4cin >> j;
+    // }
   }
   // PrintEvent(evt);
   //  G4cout << "------------------------------" << G4endl;

@@ -85,6 +85,16 @@ K37RunAction::K37RunAction()
   qdc_lower_pmt_e  = new Generic_Channel("QDC_LowerPMT_E" , -1, "/D");
   qdc_upper_pmt_g  = new Generic_Channel("QDC_UpperPMT_G" , -1, "/D");
   qdc_lower_pmt_g  = new Generic_Channel("QDC_LowerPMT_G" , -1, "/D");
+  upper_dssd_parentID_ = new TDC_Channel("UpperSiliconParentID", -1,
+                                         "/v", false);
+  lower_dssd_parentID_ = new TDC_Channel("LowerSiliconParentID", -1,
+                                         "/v", false);
+  upper_dssd_boundary_status_= new TDC_Channel("UpperSiliconBoundary",
+                                               -1, "/v", false);
+  lower_dssd_boundary_status_= new TDC_Channel("LowerSiliconBoundary",
+                                               -1, "/v", false);
+  upper_dssd_theta_ = new TDC_Channel("UpperSiliconTheta", -1, "/v", false);
+  lower_dssd_theta_ = new TDC_Channel("LowerSiliconTheta", -1, "/v", false);
 
   qdc_upper_dssd    = new Generic_Channel("QDC_UpperSilicon"   , -1, "/D");
   qdc_lower_dssd    = new Generic_Channel("QDC_LowerSilicon"   , -1, "/D");
@@ -96,6 +106,7 @@ K37RunAction::K37RunAction()
   qdc_lower_dssd_e  = new Generic_Channel("QDC_LowerSilicon_E" , -1, "/D");
   qdc_upper_dssd_g  = new Generic_Channel("QDC_UpperSilicon_G" , -1, "/D");
   qdc_lower_dssd_g  = new Generic_Channel("QDC_LowerSilicon_G" , -1, "/D");
+
 
   dl_x_pos_      = new TDC_Channel("DL_X_Pos"    , 3, "/v", false);
   dl_z_pos_      = new TDC_Channel("DL_Z_Pos"    , 4, "/v", false);
@@ -205,6 +216,12 @@ K37RunAction::~K37RunAction() {
   delete num_hits_r_mcp_;
   delete num_hits_e_mcp_;
   delete electron_mcp_particle_;
+  delete upper_dssd_parentID_;
+  delete upper_dssd_boundary_status_;
+  delete upper_dssd_theta_;
+  delete lower_dssd_parentID_;
+  delete lower_dssd_boundary_status_;
+  delete lower_dssd_theta_;
 }
 
 //----------------------------------
@@ -320,6 +337,12 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(ttlbit_op_beam_);
   RegisterChannel(upper_pmt_particle_);
   RegisterChannel(lower_pmt_particle_);
+  RegisterChannel(upper_dssd_parentID_);
+  RegisterChannel(upper_dssd_boundary_status_);
+  RegisterChannel(upper_dssd_theta_);
+  RegisterChannel(lower_dssd_parentID_);
+  RegisterChannel(lower_dssd_boundary_status_);
+  RegisterChannel(lower_dssd_theta_);
 
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");

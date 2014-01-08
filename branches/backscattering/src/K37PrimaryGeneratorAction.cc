@@ -135,8 +135,9 @@ G4double K37PrimaryGeneratorAction::getVelocity(G4double kineticEnergy,
 void K37PrimaryGeneratorAction::setBetaVertex() {
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4PrimaryParticle* particle =
-    new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
-                          evGenerator->eMomentumY(), evGenerator->eMomentumZ());
+    // new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
+    //                       evGenerator->eMomentumY(), evGenerator->eMomentumZ());
+      new G4PrimaryParticle(positron, 0.0, 0.0, 1.0, 1.0*MeV);
   vertex->SetPrimary(particle);
 }
 
