@@ -5,8 +5,3 @@
 BackscatterHit::BackscatterHit() {}
 BackscatterHit::~BackscatterHit() {}
 
-// void BackscatterHit::Draw() {
-// }
-
-// void BackscatterHit::Print() {
-// }

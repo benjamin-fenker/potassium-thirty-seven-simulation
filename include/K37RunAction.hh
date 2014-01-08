@@ -197,7 +197,9 @@ class K37RunAction : public G4UserRunAction {
   Generic_Channel *qdc_lower_pmt_e;
   Generic_Channel *qdc_upper_pmt_g;
   Generic_Channel *qdc_lower_pmt_g;
-
+  TDC_Channel *upper_dssd_parentID_;
+  TDC_Channel *upper_dssd_boundary_status_;
+  TDC_Channel *upper_dssd_theta_;
   //-------------------------------------------------------------------
   Generic_Channel *qdc_upper_dssd;
   Generic_Channel *qdc_lower_dssd;
@@ -209,6 +211,9 @@ class K37RunAction : public G4UserRunAction {
   Generic_Channel *qdc_lower_dssd_e;
   Generic_Channel *qdc_upper_dssd_g;
   Generic_Channel *qdc_lower_dssd_g;
+  TDC_Channel *lower_dssd_parentID_;
+  TDC_Channel *lower_dssd_boundary_status_;
+  TDC_Channel *lower_dssd_theta_;
 
   //-------------------------------------------------------------------
 

@@ -1218,7 +1218,7 @@ void K37DetectorConstruction::DefineMaterials() {
 
   G4Material* vacuum = new G4Material("Vac ", z = 1., a = 1.01*g/mole,
                                    density = universe_mean_density, kStateGas,
-                                   2.73*kelvin, 3.e-18*pascal);
+                                   2.73*kelvin, 3.e-100*pascal);
 
   G4Material* SiliconCarbide = new G4Material("SiliconCarbide",
                                               density = 3.21*g/cm3, nel = 2);
@@ -1322,7 +1322,8 @@ void K37DetectorConstruction::DefineMaterials() {
   // Set default materials
   MirrorMaterial = SiliconCarbide;
   world_material_ = vacuum;
-  FullEnergyDetectorMaterial= Scintillator;
+  //  FullEnergyDetectorMaterial= Scintillator;
+  FullEnergyDetectorMaterial = vacuum;
   DeDxDetectorMaterial = SiliconMat;
   SiliconDetectorFrameMaterial = Kapton;
   ChamberMaterial = StainlessSteel;
