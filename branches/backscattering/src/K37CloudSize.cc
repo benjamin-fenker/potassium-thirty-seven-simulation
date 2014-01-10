@@ -37,6 +37,7 @@ void K37CloudSize::makeEvent() {
   // expanidng for at least 300 us (expansion_before_polarized_) before they
   // will be classified as "polarized" and counted.
   decay_time_ = -10;
+  decay_time_ = cycleTime;
   while (decay_time_ < expansion_before_polarized_) {
     decay_time_ = cycleTime*G4UniformRand();
   }
@@ -51,13 +52,13 @@ void K37CloudSize::makeEvent() {
   velocity += sail_velocity_;
 
   SetFinalPosition(initial_position, velocity, decay_time_);
-  //  Outputs a text file with starting x, y, z, vx, vy, vz, time
-  // std::ofstream ofs;
-  // ofs.open("cloudData.dat", std::ofstream::out | std::ofstream::app);
-  // ofs << initial_position.x()/mm << "\t" << initial_position.y()/mm << "\t"
-  //     << initial_position.z()/mm << "\t"
-  //     << velocity.x()/(mm/ns) << "\t" << velocity.y()/(mm/ns) << "\t"
-  //     << velocity.z()/(mm/ns) << "\t" << decay_time_/ns  << G4endl;
+   // Outputs a text file with starting x, y, z, vx, vy, vz, time
+  std::ofstream ofs;
+   ofs.open("cloudData_vonly.dat", std::ofstream::out | std::ofstream::app);
+   ofs << final_position_.x()/mm << "\t" << final_position_.y()/mm << "\t"
+       << final_position_.z()/mm << "\t"
+       << velocity.x()/(mm/ns) << "\t" << velocity.y()/(mm/ns) << "\t"
+       << velocity.z()/(mm/ns) << "\t" << decay_time_/ns  << G4endl;
 }
 
 void K37CloudSize::SetupSigma(G4ThreeVector temperature) {
