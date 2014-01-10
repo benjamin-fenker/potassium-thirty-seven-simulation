@@ -12,7 +12,7 @@ K37CloudSize::K37CloudSize(G4ThreeVector cloud_center,
                            G4ThreeVector sail_velocity)
 : cloud_center_(cloud_center),
   initial_cloud_size_(cloud_size_start), temperature_(cloud_temperature),
-  sail_velocity_(sail_velocity), cycleTime(2.9472*ms),
+  sail_velocity_(sail_velocity), cycleTime(1.9648*ms),
   expansion_before_polarized_(300*microsecond), decay_time_(-10),
   initialize_complete_(false) {
 }
