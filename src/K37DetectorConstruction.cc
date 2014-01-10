@@ -254,10 +254,11 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
 void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   G4double Dedx_x = 40.0*mm;
   G4double Dedx_y = 40.0*mm;
-  G4double Dedx_z = 0.3*mm;
+  //  G4double Dedx_z = 0.3*mm;
+  G4double Dedx_z = 48.0*mm;
 
-  G4double Dedx_zPosition = 98.5*mm;
-
+  //  G4double Dedx_zPosition = 98.5*mm;
+  G4double Dedx_zPosition = 50.0*mm;
   // Same solid for both detectors :-)
   strip_detector_box_ = new G4Box("dedx_sol", (Dedx_x/2.),
                                   (Dedx_y/2.), (Dedx_z/2.));
