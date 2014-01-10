@@ -46,6 +46,7 @@ class K37CloudSize {
   G4double cycleTime;
   G4double expansion_before_polarized_;
   G4double decay_time_;
+  G4double half_life_;
   void SetupSigma(G4ThreeVector temperature);
   G4double CalcSigma(G4double temperature);
   void SetFinalPosition(G4ThreeVector initial_position, G4ThreeVector velocity,
