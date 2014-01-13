@@ -5,6 +5,7 @@
 
 #include "globals.hh"
 #include "G4ios.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
@@ -30,6 +31,7 @@ class K37EventMessenger: public G4UImessenger {
   G4UIcmdWithADoubleAndUnit *set_upper_scintillator_threshold_cmd_;
   G4UIcmdWithADoubleAndUnit *set_lower_scintillator_threshold_cmd_;
   G4UIcmdWithADoubleAndUnit *set_electron_mcp_threshold_cmd_;
+  G4UIcmdWithABool *set_count_backscatters_cmd_;
 };
 
 #endif

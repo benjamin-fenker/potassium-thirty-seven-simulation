@@ -24,6 +24,11 @@ K37EventMessenger::K37EventMessenger(K37EventAction *event_action)
   set_electron_mcp_threshold_cmd_ -> SetParameterName("Threshold", false);
   set_electron_mcp_threshold_cmd_ -> SetDefaultValue(2.0 * keV);
   set_electron_mcp_threshold_cmd_ -> SetUnitCategory("Energy");
+
+  set_count_backscatters_cmd_ =
+      new G4UIcmdWithABool("/K37/EventControls/setCountBackscatters", this);
+  set_count_backscatters_cmd_ -> SetParameterName("choice", true);
+  set_count_backscatters_cmd_ -> SetDefaultValue(true);
 }
 
 K37EventMessenger::~K37EventMessenger() {
@@ -31,6 +36,7 @@ K37EventMessenger::~K37EventMessenger() {
   delete set_upper_scintillator_threshold_cmd_;
   delete set_lower_scintillator_threshold_cmd_;
   delete set_electron_mcp_threshold_cmd_;
+  delete set_count_backscatters_cmd_;
 }
 
 void K37EventMessenger::SetNewValue(G4UIcommand *command, G4String new_values) {
@@ -46,7 +52,11 @@ void K37EventMessenger::SetNewValue(G4UIcommand *command, G4String new_values) {
     event_action_ ->
         SetElectronMCPthreshold(set_electron_mcp_threshold_cmd_ ->
                                 GetNewDoubleValue(new_values));
+  } else if (command == set_count_backscatters_cmd_) {
+    event_action_ ->
+        SetCountBackscatters(set_count_backscatters_cmd_ ->
+                             GetNewBoolValue(new_values));
   } else {
-    G4cout << "Unknown command in event messenger" << G4endl;
-  }
+   G4cout << "Unknown command in event messenger" << G4endl;
+ }
 }
