@@ -39,6 +39,7 @@ K37EventAction::K37EventAction(K37RunAction* run)
     :v1190_factor_ns(0.09765625),
     runAct(run),
     stripHandler(new K37ContainerForStripInformation()),
+     count_backscatters_(false),
     energyUpperScint_Total(0),
     energyUpperScint_AllElse(0),
     energyUpperScint_Positron(0),
@@ -58,7 +59,7 @@ K37EventAction::K37EventAction(K37RunAction* run)
     energyLowerSilicon_AllElse(0),
     energyLowerSilicon_Positron(0),
     energyLowerSilicon_Electron(0),
-    energyLowerSilicon_Gamma(0)
+     energyLowerSilicon_Gamma(0)
 {
 
   spot.clear();
@@ -375,6 +376,19 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         pow(10.0, -3)*keV) {
       G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
     }
+  }
+
+  if (sd_energy_total_minsZ_X > 5*eV && sd_energy_total_plusZ_X > 5*eV &&
+      count_backscatters_) {
+    //    G4cout << "Probable backscatter..." << G4endl;
+    ofstream ofs;
+    ofs.open("backscatter.txt", std::ofstream::app);
+    ofs << sd_energy_total_plusZ_X/keV << "\t"
+        << (*upper_sd_hit_collection)[0] -> GetParticlePDG() << "\t"
+        << sd_energy_total_minsZ_X/keV << "\t"
+        << (*lower_sd_hit_collection)[0] -> GetParticlePDG() << G4endl;
+    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+    ofs.close();
   }
 
   K37ScintillatorHit *first_hit = 0;

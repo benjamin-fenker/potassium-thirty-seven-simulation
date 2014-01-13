@@ -82,7 +82,7 @@ class K37EventAction : public G4UserEventAction {
   void SetDetectorConstruction(K37DetectorConstruction *dc) {
     detector_construction_ = dc;
   }
-
+  void SetCountBackscatters(G4bool cbs) {count_backscatters_ = cbs;}
  private:
   // V1190 TDC Clock beats every 97.65625 ns; output from analyzer is in
   // number of ticks.  See manual pg 13 for details.  I want to output the
@@ -161,6 +161,7 @@ class K37EventAction : public G4UserEventAction {
   G4int accepted;
   G4int interesting;
   G4int bs_flag;
+  G4bool count_backscatters_;
 
   G4bool isThereEnergySiliPrimary;
   G4bool isThereEnergySiliSecondary;
