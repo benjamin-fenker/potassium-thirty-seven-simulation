@@ -63,7 +63,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetMakeBeta(G4bool flag) {make_beta_ = flag;}
   void SetMakeRecoil(G4bool flag) {make_recoil_ = flag;}
   void SetMakeShakeoffElectrons(G4bool flag) {make_shakeoff_electrons_ = flag;}
-
+  K37EventGenerator* GetEventGenerator() {return evGenerator;}
  private:
   G4double      distanceToTrap;
 

@@ -53,10 +53,24 @@ K37EventGenerator::K37EventGenerator()
   v_over_c_running = 0.0;
   running_num = 0.0;
   running_denom = 0.0;
+  min_cos_theta_ = 0.0;                 // Default is no bias
 }
 
 K37EventGenerator::~K37EventGenerator() {
   // G4cout << "BF LOOK HERE: total v/c = " << v_over_c_running << G4endl;
   // G4cout << "num = " << running_num << " denom: " << running_denom << G4endl;
   delete FF;
+}
+
+void K37EventGenerator::SetMinCosTheta(G4double mct) {
+  if (mct < 0) {
+    G4cout << "Warning! Minimum cos(theta) should be positive!" << G4endl;
+    G4cout << "No action taken." << G4endl;
+    return;
+  }
+  min_cos_theta_ = mct;
+}
+
+void K37EventGenerator::SetConeHalfAngle(G4double angle) {
+  SetMinCosTheta(cos(angle));
 }

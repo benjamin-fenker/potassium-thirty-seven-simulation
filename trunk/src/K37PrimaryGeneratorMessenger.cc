@@ -107,6 +107,24 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   set_cloud_sail_velocity_d_ -> SetGuidance("Enter the cloud's sail velocity");
   set_cloud_sail_velocity_d_ -> SetParameterName("velocity", false);
   set_cloud_sail_velocity_d_ -> SetUnitCategory("Velocity");
+
+  set_minimum_cos_theta_cmd_ = new G4UIcmdWithADouble("/K37/gun/setMinCosTheta",
+                                                  this);
+  set_minimum_cos_theta_cmd_ -> SetGuidance("Enter cos(theta) for gun's cone");
+  set_minimum_cos_theta_cmd_ -> SetParameterName("cosTheta", true);
+  // 98.5 DSSSD distance and (40 x 40) DSSSD dimensions subten
+  // cos(theta) = 0.85 and 0.75 is a safety factor.
+  set_minimum_cos_theta_cmd_ -> SetDefaultValue(0.75);
+
+  set_cone_half_angle_cmd_ =
+      new G4UIcmdWithADoubleAndUnit("/K37/gun/setConeHalfAngle", this);
+  set_cone_half_angle_cmd_ -> SetGuidance("Enter half-angle for emitted betas");
+  set_cone_half_angle_cmd_ -> SetParameterName("theta/2", true);
+  set_cone_half_angle_cmd_ -> SetDefaultValue(acos(0.75)*rad);
+  set_cone_half_angle_cmd_ -> SetDefaultUnit("radian");
+
+  // rad = 1.00 internally
+
 }
 
 // ----------------------------------
@@ -127,6 +145,7 @@ K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
   delete set_make_shakeoff_electrons_;
   delete set_cloud_sail_velocity_v_;
   delete set_cloud_sail_velocity_d_;
+  delete set_minimum_cos_theta_cmd_;
 }
 
 // ----------------------------------
@@ -185,6 +204,15 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
   if (command == set_cloud_sail_velocity_d_) {
     action_ -> GetCloudSize() -> SetSailVelocity(set_cloud_sail_velocity_d_ ->
                                                  GetNewDoubleValue(newValue));
+  }
+  if (command == set_minimum_cos_theta_cmd_) {
+    action_ -> GetEventGenerator() -> SetMinCosTheta(set_minimum_cos_theta_cmd_ ->
+                                             GetNewDoubleValue(newValue));
+  }
+  if (command == set_cone_half_angle_cmd_) {
+    action_ -> GetEventGenerator() ->
+        SetConeHalfAngle(set_cone_half_angle_cmd_ ->
+                         GetNewDoubleValue(newValue));
   }
 }
 
