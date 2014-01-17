@@ -47,6 +47,9 @@ class K37EventGenerator {
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
   // of event generator for testing purposes
+  // Used to only simulate events in a cone around the detectors.
+  // Angular distributions are accurate within this cone
+  G4double min_cos_theta_;
 
  public:
   G4double running_num;
@@ -79,6 +82,8 @@ class K37EventGenerator {
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
   }
+  void SetMinCosTheta(G4double mct);
+  void SetConeHalfAngle(G4double angle);
 };
 
 #endif

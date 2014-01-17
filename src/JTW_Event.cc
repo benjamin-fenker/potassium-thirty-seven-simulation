@@ -17,13 +17,11 @@ void JTW_Event::MakeEvent() {
 void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
                           G4double recoil_charge) {
   // Set cuts on production for testing the EV Generator
-  G4double minCosTheta = 0.0;
   G4double minElectronT = 0.0*electron.MaxT;  // MeV --> beta_min = 0.995
   // radius 20 mm 98.5 mm from trap center
   // electron.Theta = M_PI/2.0;
   electron.T = -10.0;
-  while ((electron.T < minElectronT) ||
-        (fabs(cos(electron.Theta)) < minCosTheta)) {
+  while (electron.T < minElectronT) {
     while (true) {
       testOmega = 3.*G4UniformRand();
       // testOmega = 30.0*G4UniformRand(); // What's the right value here!?
@@ -41,11 +39,12 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
 
           G4double mu;    // cos(electron.Theta)
           // Picks mu from -1 to 1 uniformly
-          mu = 1.0 - 2.0*G4UniformRand();
+          //          mu = 1.0 - 2.0*G4UniformRand();
           // Picks mu uniformly from abs(mu) = minCosTheta to 1
-          // mu = 1.0 - (1.0-minCosTheta)*G4UniformRand();
+          mu = 1.0 - (1.0-min_cos_theta_)*G4UniformRand();
+          if (G4UniformRand() > 0.5) mu *= -1.0;
           // mu = 1.0;
-          // if (G4UniformRand() > 0.5) mu *= -1.0;
+
           electron.Theta = acos(mu);
           electron.Phi = 2.0*M_PI*G4UniformRand();
 
@@ -171,6 +170,7 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
     (*active_channels_)["MU_GEN_ELE"] -> InsertData(cos(electron.Theta));
     (*active_channels_)["MU_GEN_RECOIL"] -> InsertData(cos(daughter.Theta));
     (*active_channels_)["ION_CHARGE"] -> InsertData(recoil_charge);
+    //    the_aggregator_ -> EndEvent()
   }
 }     // End makeEvent
 
