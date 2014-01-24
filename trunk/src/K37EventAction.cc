@@ -1,5 +1,5 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
-
+#include <time.h>
 #include <math.h>
 
 #include <algorithm>
@@ -34,6 +34,8 @@ using std::pow;
 using std::ofstream;
 using std::setw;
 using std::left;
+
+clock_t t;
 
 K37EventAction::K37EventAction(K37RunAction* run)
     :v1190_factor_ns(0.09765625),
@@ -133,7 +135,14 @@ K37EventAction::~K37EventAction() {
 
 void K37EventAction::BeginOfEventAction(const G4Event* ev) {
   if (ev -> GetEventID() % 1000 == 0) {
-    G4cout << "Event " << ev -> GetEventID() << G4endl;
+    G4cout << "Event " << ev -> GetEventID();
+    if (ev -> GetEventID() == 0) {
+      t = clock();
+    } else {
+      t = clock() - t;
+      G4cout << "\t\t(" << ((float)t/CLOCKS_PER_SEC) << " s)";
+    }
+    G4cout << endl;
   }
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
@@ -281,7 +290,9 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   if (upper_scintillator_hit_collection)
   {
+    //    G4cout << "Got the upper scintillator";
     int n_hit = upper_scintillator_hit_collection->entries();
+    //    G4cout << "\t n_hit = " << n_hit << G4endl;
     K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++)
     {
@@ -298,6 +309,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (energyUpperScint_Total>0) {
       isThereEnergySili = true;
     }
+
+    if (energyUpperScint_Total > upper_scintillator_threshold_ && n_hit > 0) {
+      //      G4cout << "Doing something dangerous..." << G4endl;
+      K37ScintillatorHit *first_hit = (*upper_scintillator_hit_collection)[0];
+      //      G4cout << "Phew!" << G4endl;
+      time_upper_scintillator = first_hit -> GetTime();
+    }
   }
 
   // ***************************************************************************
@@ -305,6 +323,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   if (lower_scintillator_hit_collection)
   {
+    //    G4cout << "Got the lower scintillator" << G4endl;
     int n_hit = lower_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++)
@@ -320,13 +339,17 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (energyLowerScint_Total>0) {
       isThereEnergySili2 = true;
     }
+    if (energyLowerScint_Total > lower_scintillator_threshold_ && n_hit > 0) {
+      K37ScintillatorHit *first_hit = (*lower_scintillator_hit_collection)[0];
+      time_lower_scintillator = first_hit -> GetTime();
+    }
   }
 
   // ***************************************************************************
   // Get all the energy deposited in the upper strip detector
   // ***************************************************************************
   if (upper_sd_hit_collection) {                // Strip detector plus Z
-
+    //    G4cout << "Got the upper strip detector" << G4endl;
      int n_hit = upper_sd_hit_collection->entries();
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
@@ -356,7 +379,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // Get all the energy deposited in the lower strip detector
   // ***************************************************************************
   if (lower_sd_hit_collection) {  // Strip Detector Minus Z
-
+    //    G4cout << "Got the lower strip detector" << G4endl;
      int n_hit = lower_sd_hit_collection->entries();
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
@@ -389,20 +412,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         << (*lower_sd_hit_collection)[0] -> GetParticlePDG() << G4endl;
     G4EventManager::GetEventManager()->KeepTheCurrentEvent();
     ofs.close();
-  }
-
-  K37ScintillatorHit *first_hit = 0;
-  if (energyUpperScint_Total > upper_scintillator_threshold_) {
-    first_hit = (*upper_scintillator_hit_collection)[0];
-    time_upper_scintillator = first_hit -> GetTime();
-  } else {
-    time_upper_scintillator = 0.0;
-  }
-  if (energyLowerScint_Total > lower_scintillator_threshold_) {
-    first_hit = (*lower_scintillator_hit_collection)[0];
-    time_lower_scintillator = first_hit -> GetTime();
-  } else {
-    time_lower_scintillator = 0.0;
   }
 
   // ***************************************************************************
