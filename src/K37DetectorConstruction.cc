@@ -700,7 +700,7 @@ void K37DetectorConstruction::ConstructMirrors() {
   MirrorRotation = new CLHEP::HepRotation();
   MirrorRotation->rotateX(9.5*deg);
 
-  G4VSolid * mirror_sol = new G4Tubs("mirror", 0.0*mm, 30.48*mm, 0.25*mm,
+  G4VSolid * mirror_sol = new G4Tubs("mirror", 0.0*mm, 30.48*mm, (0.25/2.)*mm,
                                      0.0*deg , 360.0*deg);
 
   mirror_log = new G4LogicalVolume(mirror_sol, MirrorMaterial,
