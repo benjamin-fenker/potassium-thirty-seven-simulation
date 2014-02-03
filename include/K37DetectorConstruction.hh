@@ -33,9 +33,13 @@ class HepRotation;
 struct GeometryElement {
   G4double inner_radius;
   G4double outer_radius;
-  G4double length;
   G4double rotation_angle;
   G4ThreeVector center_position;
+
+  // Three cartesian dimensions
+  G4double length;
+  G4double width;
+  G4double depth;
 
   G4double cutout_side_length;
   G4double cutout_radius;
@@ -193,6 +197,10 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
 
   GeometryElement mirror;
   GeometryElement mirror_mount;
+  GeometryElement sd_frame;
+  GeometryElement sd_inactive;
+  GeometryElement sd_mounting_screw_head;
+  GeometryElement scintillator;
 };
 
 #endif

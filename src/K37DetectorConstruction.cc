@@ -103,6 +103,53 @@ K37DetectorConstruction::K37DetectorConstruction()
   mirror_mount.cutout_radius = 2.441/2.0 * inch;
   mirror_mount.cutout_depth = 0.040 * inch;
 
+  // The SD frame is defined in the file BB1.pdf (the 3.0 mm thickness
+  // is measured by hand I think)
+  sd_frame.length = 55.0*mm;            // ???
+  sd_frame.width  = 55.0*mm;            // ???
+  sd_frame.depth  = 3.0*mm;
+  sd_frame.cutout_side_length = 44.4*mm; // Enough for the entire chip
+  sd_frame.cutout_depth = 1.05*sd_frame.depth; // All the way through
+  sd_frame.center_position = G4ThreeVector(0.0, 0.0, 98.5*mm);
+
+  // There is non-active area of silicon that should be included in
+  // the simulation.  See BB1.pdf
+  sd_inactive.length = 44.4*mm;
+  sd_inactive.width  = 44.4*mm;
+  sd_inactive.depth  = 0.3*mm;
+  // Cutout will be EXACTLY the active Si
+  sd_inactive.center_position = sd_frame.center_position;
+
+  // The SD is mounted to the flange by 4x 2-56 screws.  The socket
+  // cap heads stick up out ouf the SD frame and the scintillator
+  // rests against these screws.  This creates a small gap between the
+  // silicon and scintillator.   See BB1.pdf for palcement
+  sd_mounting_screw_head.inner_radius = 0.0*mm;
+  sd_mounting_screw_head.outer_radius = (0.137/2.0) * inch;
+  sd_mounting_screw_head.length = 0.082 * inch;
+
+  // There are 4 of them with different x,y coordinates but the same
+  // z-coordinate.  Define just that z-coordinate now
+  G4double zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += (sd_mounting_screw_head.length/2.0);
+  G4double off_center = 25.0*mm;        // x,y dimensions away from
+                                        // the axis
+  sd_mounting_screw_head.center_position =
+      G4ThreeVector(off_center, off_center, zpos);
+  // ***********************************************************
+
+  scintillator.inner_radius = 0.0;
+  scintillator.outer_radius = (90.0/2.0) * mm;
+  scintillator.length = 3.5 * cm;
+  zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += sd_mounting_screw_head.length;
+  zpos += (scintillator.length/2.0);
+  scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
+  G4cout << "New scintillator position (center): "
+         << G4BestUnit(zpos, "Length") << G4cout;
+
   this-> DefineMaterials();
   detectorMessenger = new K37DetectorMessenger(this);
   changeZtoX = new CLHEP::HepRotation();
@@ -214,12 +261,12 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
 
 
 void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
-  G4double Scint_rmax             = 45*mm;  // 90/2
-  G4double Scint_rmin             = 0.*mm;
-  G4double Scint_dz               = 35*mm;
-  G4double Scint_startPhi = 0.*deg;
-  G4double Scint_deltaPhi = 360.*deg;
-  G4double Scint_zPosition= 117.5*mm;
+  // G4double Scint_rmax             = 45*mm;  // 90/2
+  // G4double Scint_rmin             = 0.*mm;
+  // G4double Scint_dz               = 35*mm;
+  // G4double Scint_startPhi = 0.*deg;
+  // G4double Scint_deltaPhi = 360.*deg;
+  // G4double Scint_zPosition= 117.5*mm;
 
   // if (scintillator_tubs_) delete scintillator_tubs_;
   // if (upper_scintillator_log_) delete upper_scintillator_log_;
@@ -228,9 +275,10 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   // if (lower_scintillator_phys_) delete lower_scintillator_phys_;
 
   // Use same solid for both detectors :-)
-  scintillator_tubs_ = new G4Tubs("scint_sol", Scint_rmin, Scint_rmax,
-                                  (Scint_dz/2.), Scint_startPhi,
-                                  Scint_deltaPhi);
+  scintillator_tubs_ = new G4Tubs("scint_sol", scintillator.inner_radius,
+                                  scintillator.outer_radius,
+                                  scintillator.length/2.0, 0.0, 2.0*M_PI);
+
   // Use same vis attributes for both detectors :-)
   G4VisAttributes *scintillator_vis = new G4VisAttributes(G4Colour(0.0, 0.0,
                                                                    1.0, 1.0));
@@ -240,7 +288,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
                                                  FullEnergyDetectorMaterial,
                                                  "scint_plusZ_log", 0, 0, 0);
   upper_scintillator_phys_ =
-      new G4PVPlacement(0, G4ThreeVector(0., 0., Scint_zPosition),
+      new G4PVPlacement(0, scintillator.center_position,
                         upper_scintillator_log_, "scint_plusZ_phys", world_log_,
                         false, 0);
   upper_scintillator_log_ -> SetVisAttributes(scintillator_vis);
@@ -249,7 +297,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
                                                 FullEnergyDetectorMaterial,
                                                 "scint_minusZ_log", 0, 0, 0);
   lower_scintillator_phys_ =
-      new G4PVPlacement(0, G4ThreeVector(0., 0., -Scint_zPosition),
+      new G4PVPlacement(0, -1.0 * scintillator.center_position,
                        lower_scintillator_log_, "scint_minusZ_phys", world_log_,
                         false, 0);
   lower_scintillator_log_ -> SetVisAttributes(scintillator_vis);
@@ -334,14 +382,14 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
 
   // ------------------------------ dedx mount
   if (make_sd_holders_) {
-    G4double strip_detector_frame_X  = 44.4*mm;
-
     G4VSolid * dedx_holder_sol = new G4Box("dedx_holder_sol",
-                                           strip_detector_frame_X/2.0,
-                                           strip_detector_frame_X/2.0,
-                                           1.5*mm);
+                                           sd_frame.length/2.0,
+                                           sd_frame.width/2.0,
+                                           sd_frame.depth/2.0);
     G4VSolid * dedx_holder_cut_sol = new G4Box("dedx_holder_cut_sol",
-                                               Dedx_x/2.0, Dedx_y/2.0, 1.7*mm);
+                                               sd_frame.cutout_side_length/2.0,
+                                               sd_frame.cutout_side_length/2.0,
+                                               sd_frame.cutout_depth/2.0);
     G4SubtractionSolid* dedxFrame_sol =
         new G4SubtractionSolid("dedxFrame_sol", dedx_holder_sol,
                                dedx_holder_cut_sol);
@@ -351,11 +399,82 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
     dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
     dedxFrame_logVisAttributes-> SetForceSolid(true);
     dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
-    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 98.5*mm), dedxFrame_log,
+    new G4PVPlacement(0,  1.0*sd_frame.center_position, dedxFrame_log,
                       "dedxFrame_plusZ_phys", world_log_, false, 0);
-    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -98.5*mm), dedxFrame_log,
+    new G4PVPlacement(0, -1.0*sd_frame.center_position, dedxFrame_log,
                       "dedxFrame_minusZ_phys", world_log_, false, 0);
+    // Add the inactive Si inside the frame
+    G4Box *sd_inactive_box = new G4Box("sd_inactive_box",
+                                       sd_inactive.length/2.0,
+                                       sd_inactive.width/2.0,
+                                       sd_inactive.depth/2.0);
+    G4SubtractionSolid *sd_inactive_sub =
+        new G4SubtractionSolid("sd_inactive_sub",
+                               sd_inactive_box,
+                               strip_detector_box_);
+    G4LogicalVolume *sd_inactive_log = new G4LogicalVolume(sd_inactive_sub,
+                                                           DeDxDetectorMaterial,
+                                                           "sd_inactive_log");
+    G4VisAttributes *sd_inactive_vis 
+        = new G4VisAttributes(G4Colour(0.5, 0.5, 0.0));
+    sd_inactive_vis -> SetForceSolid(true);
+    sd_inactive_log -> SetVisAttributes(sd_inactive_vis);
+    new G4PVPlacement(0,  1.0*sd_inactive.center_position, sd_inactive_log,
+                      "sd_inactive_plusZphys", world_log_, false, 0);
+    new G4PVPlacement(0, -1.0*sd_inactive.center_position, sd_inactive_log,
+                      "sd_inactive_minsZphys", world_log_, false, 0);
+    // Add the heads of the mounting screws that the scintillator
+    // rests against
+    G4Tubs *mounting_screw_head = new G4Tubs("mounting_screw_head_tub",
+                                             sd_mounting_screw_head.inner_radius,
+                                             sd_mounting_screw_head.outer_radius,
+                                             sd_mounting_screw_head.length/2.0, 0, 2*M_PI);
+    G4LogicalVolume *mounting_screw_head_log =
+        new G4LogicalVolume(mounting_screw_head, ChamberMaterial,
+                            "mounting_screw_head_log");
+    G4VisAttributes *mounting_screw_head_vis =
+        new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
+    mounting_screw_head_vis -> SetForceSolid(true);
+    mounting_screw_head_log -> SetVisAttributes(mounting_screw_head_vis);
+    // Place them!
+    G4double xpos, ypos, zpos;
+    xpos = sd_mounting_screw_head.center_position.x();
+    ypos = sd_mounting_screw_head.center_position.y();
+    zpos = sd_mounting_screw_head.center_position.z();
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead1",
+                      world_log_, false, 0);
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead2",
+                      world_log_, false, 0);
+    ypos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead3",
+                      world_log_, false, 0);
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead4",
+                      world_log_, false, 0);
+    zpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead5",
+                      world_log_, false, 0);
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead6",
+                      world_log_, false, 0);
+    ypos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead7",
+                      world_log_, false, 0);
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHead8",
+                      world_log_, false, 0);
   }
+
+  
 }  // End construct stip detectors
 
 void K37DetectorConstruction::ConstructChamber() {
@@ -783,8 +902,8 @@ void K37DetectorConstruction::ConstructMirrors() {
   G4VisAttributes* MM_logVisAttributes =
       new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
 
-  //  MM_logVisAttributes-> SetForceSolid(true);
-  MM_logVisAttributes-> SetForceWireframe(true);
+  MM_logVisAttributes-> SetForceSolid(true);
+  //  MM_logVisAttributes-> SetForceWireframe(true);
   mirror_mount_log -> SetVisAttributes(MM_logVisAttributes);
 
   new G4PVPlacement(0, mirror_mount.center_position,
