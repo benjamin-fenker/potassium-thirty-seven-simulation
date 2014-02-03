@@ -1,5 +1,5 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
-#include <time.h>
+
 #include <math.h>
 
 #include <algorithm>
@@ -34,8 +34,6 @@ using std::pow;
 using std::ofstream;
 using std::setw;
 using std::left;
-
-clock_t t;
 
 K37EventAction::K37EventAction(K37RunAction* run)
     :v1190_factor_ns(0.09765625),
@@ -134,15 +132,9 @@ K37EventAction::~K37EventAction() {
 }
 
 void K37EventAction::BeginOfEventAction(const G4Event* ev) {
-  if (ev -> GetEventID() % 1000 == 0) {
-    G4cout << "Event " << ev -> GetEventID();
-    if (ev -> GetEventID() == 0) {
-      t = clock();
-    } else {
-      t = clock() - t;
-      G4cout << "\t\t(" << ((float)t/CLOCKS_PER_SEC) << " s)";
-    }
-    G4cout << endl;
+  if (ev -> GetEventID() == 0) G4cout << endl;
+  if (ev -> GetEventID() % 50000 == 0) {
+    G4cout << "\r" << "Event " << ev -> GetEventID() << G4endl;
   }
 
   G4SDManager * SDman = G4SDManager::GetSDMpointer();
@@ -290,9 +282,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   if (upper_scintillator_hit_collection)
   {
-    //    G4cout << "Got the upper scintillator";
     int n_hit = upper_scintillator_hit_collection->entries();
-    //    G4cout << "\t n_hit = " << n_hit << G4endl;
     K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++)
     {
@@ -323,7 +313,6 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // ***************************************************************************
   if (lower_scintillator_hit_collection)
   {
-    //    G4cout << "Got the lower scintillator" << G4endl;
     int n_hit = lower_scintillator_hit_collection->entries();
     K37ScintillatorHit *hit;
     for (int i = 0; i < n_hit; i++)
@@ -349,7 +338,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // Get all the energy deposited in the upper strip detector
   // ***************************************************************************
   if (upper_sd_hit_collection) {                // Strip detector plus Z
-    //    G4cout << "Got the upper strip detector" << G4endl;
+
      int n_hit = upper_sd_hit_collection->entries();
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
@@ -372,6 +361,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (fabs(sd_energy_total_plusZ_X - sd_energy_total_plusZ_Y) >
         pow(10.0, -3)*keV) {
       G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
+      G4EventManager::GetEventManager()->KeepTheCurrentEvent();
     }
   }  // End strip detector plus z
 
@@ -379,7 +369,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // Get all the energy deposited in the lower strip detector
   // ***************************************************************************
   if (lower_sd_hit_collection) {  // Strip Detector Minus Z
-    //    G4cout << "Got the lower strip detector" << G4endl;
+
      int n_hit = lower_sd_hit_collection->entries();
      K37StripDetectorHit *hit;
      for (int i = 0; i < n_hit; ++i)
@@ -648,6 +638,7 @@ vector<G4double> K37EventAction::GetEDepVector(
       Edep = (*collection)[i]->getYStripsEdep();
     } else {
       G4cerr << "ERROR.  ASKING FOR DIMENSION 3 FROM STRIP DETECTOR" << G4endl;
+      G4EventManager::GetEventManager()->KeepTheCurrentEvent();
     }
 
     map<G4int, G4double>::iterator it;

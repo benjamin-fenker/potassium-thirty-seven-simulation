@@ -4,13 +4,15 @@
 #define K37DetectorConstruction_h 1
 
 #include <CLHEP/Vector/Rotation.h>
-
+#include <CLHEP/Units/SystemOfUnits.h>
 #include "G4Box.hh"
 #include "G4SDManager.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4Tubs.hh"
+#include "G4UnitsTable.hh"
 #include "G4UserLimits.hh"
 #include "G4VUserDetectorConstruction.hh"
+
 #include "globals.hh"
 
 #include "K37ElectronMCPSD.hh"
@@ -27,6 +29,18 @@ class G4LogicalVolume;
 class K37DetectorMessenger;
 class K37ElectricFieldSetup;
 class HepRotation;
+
+struct GeometryElement {
+  G4double inner_radius;
+  G4double outer_radius;
+  G4double length;
+  G4double rotation_angle;
+  G4ThreeVector center_position;
+
+  G4double cutout_side_length;
+  G4double cutout_radius;
+  G4double cutout_depth;
+};
 
 class K37DetectorConstruction : public G4VUserDetectorConstruction {
  public:
@@ -137,7 +151,6 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4Material*   MCPMaterial;
   G4double electron_mcp_radius_;
 
-  G4Trd * MM_CollimatorCut_sol;
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
   // = true or straight cut = false
   CLHEP::HepRotation* changeZtoX;
@@ -156,9 +169,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   CLHEP::HepRotation* rotationForOpticalPumpingBeams2;
   CLHEP::HepRotation* RFDRotation;
   CLHEP::HepRotation* FFRFRotation;
-  CLHEP::HepRotation* MirrorRotation;
   CLHEP::HepRotation* MirrorCutRotation;
-  CLHEP::HepRotation* MMRotation;
   CLHEP::HepRotation* hoopRotation;
 
   G4VisAttributes * dedxFrame_logVisAttributes;
@@ -179,6 +190,9 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   // individual effects
   G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
   G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_, make_sd_holders_;
+
+  GeometryElement mirror;
+  GeometryElement mirror_mount;
 };
 
 #endif
