@@ -58,14 +58,14 @@ K37DetectorConstruction::K37DetectorConstruction()
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), electron_mcp_radius_(20.0*mm),
-      MM_CollimatorCut_sol(0), shouldTheMirrorBeWFEDMCut(false), changeZtoX(0),
+      shouldTheMirrorBeWFEDMCut(false), changeZtoX(0),
       changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
       changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),
       changeYtoBeamAxisForLPP1(0), changeYtoBeamAxisForLPP2(0),
       changeYtoBeamAxisForLPP3(0), changeYtoBeamAxisForLPP4(0),
       rotationForOpticalPumpingBeams1(0), rotationForOpticalPumpingBeams2(0),
-      RFDRotation(0), FFRFRotation(0), MirrorRotation(0), MirrorCutRotation(0),
-      MMRotation(0), hoopRotation(0), dedxFrame_logVisAttributes(0),
+      RFDRotation(0), FFRFRotation(0), MirrorCutRotation(0),
+      hoopRotation(0), dedxFrame_logVisAttributes(0),
       chamber_logVisAttributes(0), OPRF_logVisAttributes(0),
       RFD_logVisAttributes(0), beryllium_logVisAttributes(0),
       FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
@@ -76,6 +76,32 @@ K37DetectorConstruction::K37DetectorConstruction()
   // Default values
   world_size_ = 2.0 * m;
 
+  // Define the inch
+  static const G4double inch = 2.54*cm;
+
+  // Mirror dimensions from meeting website on 30-Jan-2014
+  // Placement from detectorDrawing.pdf
+  mirror.inner_radius = 0.0*inch;
+  mirror.outer_radius = 1.2*inch;
+  mirror.length = 0.25 * mm;
+  mirror.rotation_angle = 9.5*deg;
+  // The FRONT of the mirror is 85 mm away so the center is slightly beyond that
+  G4double z = (85.0*mm) + ((mirror.length/2.0)/cos(mirror.rotation_angle));
+  mirror.center_position = G4ThreeVector(0.0, 0.0, z);
+  //  G4cout << "Mirror z-placement: " << G4BestUnit(z, "Length") << G4endl;
+
+  // Mirror mount dimensions from collimator_back.pdf & collimator_front.pdf
+  mirror_mount.inner_radius = 0.0*inch;
+  mirror_mount.outer_radius = (2.913/2.0) * inch;
+  // Take the fat side of one slice and add to it the thin side of the other
+  // slice
+  G4double lip =
+      (0.519*inch) - (2.0*mirror_mount.outer_radius)*tan(mirror.rotation_angle);
+  mirror_mount.length = (0.519*inch) + lip;
+  mirror_mount.center_position = mirror.center_position;
+  mirror_mount.cutout_side_length = 1.220 * inch;
+  mirror_mount.cutout_radius = 2.441/2.0 * inch;
+  mirror_mount.cutout_depth = 0.040 * inch;
 
   this-> DefineMaterials();
   detectorMessenger = new K37DetectorMessenger(this);
@@ -95,7 +121,6 @@ K37DetectorConstruction::K37DetectorConstruction()
 
 K37DetectorConstruction::~K37DetectorConstruction() {
   if (detectorMessenger) delete detectorMessenger;
-  if (MM_CollimatorCut_sol) delete MM_CollimatorCut_sol;
   if (changeZtoX) delete changeZtoX;
   if (changeZto45) delete changeZto45;
   if (changeZtoNeg45) delete changeZtoNeg45;
@@ -112,9 +137,7 @@ K37DetectorConstruction::~K37DetectorConstruction() {
   if (rotationForOpticalPumpingBeams2) delete rotationForOpticalPumpingBeams2;
   if (RFDRotation) delete RFDRotation;
   if (FFRFRotation)delete FFRFRotation;
-  if (MirrorRotation) delete MirrorRotation;
   if (MirrorCutRotation) delete MirrorCutRotation;
-  if (MMRotation) delete MMRotation;
   if (hoopRotation) delete hoopRotation;
   if (world_log_) delete world_log_;
   if (world_phys_) delete world_phys_;
@@ -694,69 +717,83 @@ void K37DetectorConstruction::ConstructChamber() {
 }  // End construct chamber
 
 void K37DetectorConstruction::ConstructMirrors() {
-  G4double MirrorPositionZ = 85.05069*mm;
+  // SiC mirrors to reflect OP light
 
-  // G4RotationMatrix *MirrorRotation = new G4RotationMatrix();
-  MirrorRotation = new CLHEP::HepRotation();
-  MirrorRotation->rotateX(9.5*deg);
+  CLHEP::HepRotation *mirror_rotation = new CLHEP::HepRotation();
+  mirror_rotation -> rotateX(mirror.rotation_angle);
 
-  G4VSolid * mirror_sol = new G4Tubs("mirror", 0.0*mm, 30.48*mm, (0.25/2.)*mm,
-                                     0.0*deg , 360.0*deg);
+  G4VSolid * mirror_sol = new G4Tubs("mirror", mirror.inner_radius,
+                                     mirror.outer_radius, mirror.length/2.0,
+                                     0.0*deg, 360.0*deg);
 
   mirror_log = new G4LogicalVolume(mirror_sol, MirrorMaterial,
                                    "mirror_log", 0, 0, 0);
-  new G4PVPlacement(MirrorRotation, G4ThreeVector(0, 0, MirrorPositionZ),
+  new G4PVPlacement(mirror_rotation, mirror.center_position,
                     mirror_log, "mirror_plusZ_phys", world_log_, false, 0);
-  new G4PVPlacement(MirrorRotation,
-                    G4ThreeVector(0, 0, -MirrorPositionZ), mirror_log,
-                    "mirror_minusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(mirror_rotation, -1.0*mirror.center_position,
+                    mirror_log, "mirror_minusZ_phys", world_log_, false, 0);
   mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.9, 0.1, 0.1, 0.9));
   mirror_logVisAttributes-> SetForceSolid(true);
   mirror_log -> SetVisAttributes(mirror_logVisAttributes);
   // ------------------------------ Mirror Mount (MM)
-  G4VSolid * MM_beforCollimatorCut_sol =
-    new G4Tubs("MM_beforCollimatorCut_sol", 0.0*deg, 42.5*mm, 7.0*mm, 0.0*deg,
-               360.0*deg);
-  if (shouldTheMirrorBeWFEDMCut == true) {
-    MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 16.05*mm, 18.93*mm,
-                                     16.05*mm, 18.93*mm, 7.1*mm);
-  } else {
-    MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 18.93*mm, 18.93*mm,
-                                     18.93*mm, 18.93*mm, 7.1*mm);
-  }
+  G4VSolid *mirror_mount_tub =
+      new G4Tubs("mirror_mount_tub", mirror_mount.inner_radius,
+                 mirror_mount.outer_radius, mirror_mount.length/2.0, 0.0, 2.*M_PI);
 
-  G4SubtractionSolid* MM_beforeMirrorCut_sol =
-    new G4SubtractionSolid("MM_beforeMirrorCut_sol", MM_beforCollimatorCut_sol,
-                           MM_CollimatorCut_sol);
+  // make the box slightly bigger in the z-direction for safety
+  G4Box *collimator_box = new G4Box("collimator_box",
+                                    mirror_mount.cutout_side_length/2.0,
+                                    mirror_mount.cutout_side_length/2.0,
+                                    1.05*mirror_mount.length/2.0);
 
-  // G4RotationMatrix *MirrorCutRotation = new G4RotationMatrix();
-  MirrorCutRotation = new CLHEP::HepRotation();
-  MirrorCutRotation->rotateX(9.5*deg);
+  G4Tubs *mount_tubs = new G4Tubs("collimator_tubs",
+                                  0.0, mirror_mount.cutout_radius,
+                                  mirror_mount.cutout_depth/2.0, 0.0, 2*M_PI);
+  // G4VSolid * MM_beforCollimatorCut_sol =
+  //   new G4Tubs("MM_beforCollimatorCut_sol", 0.0*deg, 42.5*mm, 7.0*mm, 0.0*deg,
+  //              360.0*deg);
+  // if (shouldTheMirrorBeWFEDMCut == true) {
+  //   MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 16.05*mm, 18.93*mm,
+  //                                    16.05*mm, 18.93*mm, 7.1*mm);
+  // } else {
+  //   MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 18.93*mm, 18.93*mm,
+  //                                    18.93*mm, 18.93*mm, 7.1*mm);
+  // }
 
-  G4SubtractionSolid* MM_sol =
-    new G4SubtractionSolid("MM_sol", MM_beforeMirrorCut_sol, mirror_sol,
-                           MirrorCutRotation, G4ThreeVector(0, 0, 0.05069));
+  // G4SubtractionSolid* MM_beforeMirrorCut_sol =
+  //   new G4SubtractionSolid("MM_beforeMirrorCut_sol", MM_beforCollimatorCut_sol,
+  //                          MM_CollimatorCut_sol);
 
-  G4LogicalVolume *MM_log = new G4LogicalVolume(MM_sol,
-                                                MirrorMountMaterial,
-                                                "MM_log", 0, 0, 0);
+  // // G4RotationMatrix *MirrorCutRotation = new G4RotationMatrix();
+  // MirrorCutRotation = new CLHEP::HepRotation();
+  // MirrorCutRotation->rotateX(9.5*deg);
+
+  G4SubtractionSolid* mirror_mount_sub =
+      new G4SubtractionSolid("MM_sol", mirror_mount_tub, collimator_box);
+
+  G4SubtractionSolid* mirror_mount_final =
+      new G4SubtractionSolid("MM_final", mirror_mount_sub, mount_tubs,
+                             mirror_rotation, G4ThreeVector(0, 0, 0));
+
+  G4LogicalVolume *mirror_mount_log =
+      new G4LogicalVolume(mirror_mount_final, MirrorMountMaterial,
+                          "MM_log", 0, 0, 0);
 
   MM_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
-  // G4VisAttributes* MM_logVisAttributes =
-  //   new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
+  G4VisAttributes* MM_logVisAttributes =
+      new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
 
-  MM_logVisAttributes-> SetForceSolid(true);
-  // MM_logVisAttributes-> SetForceWireframe(true);
-  MM_log -> SetVisAttributes(MM_logVisAttributes);
+  //  MM_logVisAttributes-> SetForceSolid(true);
+  MM_logVisAttributes-> SetForceWireframe(true);
+  mirror_mount_log -> SetVisAttributes(MM_logVisAttributes);
 
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 85.0*mm), MM_log,
-                    "MM_plusZ_phys", world_log_, false, 0);
-  // G4RotationMatrix* MMRotation = new G4RotationMatrix();
-  MMRotation = new CLHEP::HepRotation();
+  new G4PVPlacement(0, mirror_mount.center_position,
+                    mirror_mount_log, "MM_plusZ_phys", world_log_, false, 0);
+
+  CLHEP::HepRotation *MMRotation = new CLHEP::HepRotation();
   MMRotation->rotateX(180.*deg);
-
-  new G4PVPlacement(MMRotation, G4ThreeVector(0.0, 0.0, -85.0*mm), MM_log,
-                    "MM_minusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(MMRotation, -1.0*mirror_mount.center_position,
+                     mirror_mount_log, "MM_minusZ_phys", world_log_, false, 0);
 }  // End ConstructMirrors
 
 void K37DetectorConstruction::ConstructHoops() {
