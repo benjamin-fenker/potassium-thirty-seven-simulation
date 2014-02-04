@@ -155,10 +155,10 @@ my @threshold = (0, 100, 100); #eMCP, lower scint, upper scint (keV)
 my $e_field  = 35000;         # V/m uniform
 my $polarization = 1.0;
 my $alignment = 1.0;
-my @temperature = (0.0029, 0.0029, 0.0014); # deg K
-my @size = (0.51, 0.51, 0.64);             # mm
-my @center = (1.07, 1.07, -2.05);          # mm
-my @sailV = (0.0, 0.0, 0.0);               # mm/us
+my @temperature = (0.0004, 0.0002, 0.0022); # deg K
+my @size = (0.67, 0.68, 0.71);             # mm
+my @center = (-2.21, 1.54, 1.11);          # mm
+my @sailV = (4.8e-5, -1.3e-5, -7.8e-5);    # mm/us
 my $recoil_charge = -2;                   # -2 = mixed 
 my @input;
 my $directory = `pwd`; chomp($directory);
