@@ -206,11 +206,15 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   GeometryElement sd_inactive;
   GeometryElement sd_mounting_screw_head;
   GeometryElement strip_detector;
+  GeometryElement teflon_front_face;
   GeometryElement scintillator;
   GeometryElement beryllium_window;
   GeometryElement reentrant_flange_front_face;
   GeometryElement reentrant_flange_descender;
   GeometryElement reentrant_flange_pipe;
+
+  std::map<G4String, G4Material*> trinat_materials_;
+
 };
 
 #endif
