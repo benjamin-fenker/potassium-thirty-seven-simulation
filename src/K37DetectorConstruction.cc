@@ -58,7 +58,7 @@ K37DetectorConstruction::K37DetectorConstruction()
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), electron_mcp_radius_(20.0*mm),
-      shouldTheMirrorBeWFEDMCut(false), check_all_for_overlaps_(false),
+      shouldTheMirrorBeWFEDMCut(false), check_all_for_overlaps_(true),
       changeZtoX(0),
       changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
       changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),
@@ -209,16 +209,33 @@ K37DetectorConstruction::K37DetectorConstruction()
       G4ThreeVector(off_center, off_center, zpos);
   // ***********************************************************
 
+  // Teflon front face and scintillator
+  // The teflon front face covers the entire front face of the
+  // scintillator. The covering is assumed to be completely uniform
+  // and flat mostly because modeling it as anything else would be
+  // impossible.  The thickness (90 um) comes from a perusing of the
+  // internet and could be off in reality by 10s of microns.  
   scintillator.inner_radius = 0.0;
   scintillator.outer_radius = (90.0/2.0) * mm;
-  scintillator.length = 3.5 * cm;
+
+  teflon_front_face.inner_radius = scintillator.inner_radius;
+  teflon_front_face.outer_radius = scintillator.outer_radius;
+  teflon_front_face.length = 90.0*um;
+  // teflon_front_face.length = 5.0*mm;
   zpos = sd_frame.center_position.z();
   zpos += (sd_frame.depth/2.0);
   zpos += sd_mounting_screw_head.length;
+  zpos += (teflon_front_face.length/2.0);
+  teflon_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  scintillator.length = 3.5 * cm;
+  zpos = teflon_front_face.center_position.z();
+  zpos += (0.5*teflon_front_face.length);
   G4cout << "   Scintillator front to chamber center: "
          << G4BestUnit(zpos, "Length") << G4endl;
-  zpos += (scintillator.length/2.0);
+  zpos += (0.5*scintillator.length);
   scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
   G4cout << "*******************************************************" << G4endl;
   // ***********************************************************
 
@@ -333,19 +350,6 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
 
 
 void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
-  // G4double Scint_rmax             = 45*mm;  // 90/2
-  // G4double Scint_rmin             = 0.*mm;
-  // G4double Scint_dz               = 35*mm;
-  // G4double Scint_startPhi = 0.*deg;
-  // G4double Scint_deltaPhi = 360.*deg;
-  // G4double Scint_zPosition= 117.5*mm;
-
-  // if (scintillator_tubs_) delete scintillator_tubs_;
-  // if (upper_scintillator_log_) delete upper_scintillator_log_;
-  // if (upper_scintillator_phys_) delete upper_scintillator_phys_;
-  // if (lower_scintillator_log_) delete lower_scintillator_log_;
-  // if (lower_scintillator_phys_) delete lower_scintillator_phys_;
-
   // Use same solid for both detectors :-)
   scintillator_tubs_ = new G4Tubs("scint_sol", scintillator.inner_radius,
                                   scintillator.outer_radius,
@@ -392,6 +396,28 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   }
 
   lower_scintillator_log_ -> SetSensitiveDetector(lower_scintillator_sens_);
+
+  // Teflon front face
+  G4Tubs *teflon_tubs = new G4Tubs("teflon_tubs",
+                                   teflon_front_face.inner_radius,
+                                   teflon_front_face.outer_radius,
+                                   teflon_front_face.length/2.0,
+                                   0.0, 2*M_PI*rad);
+
+  G4LogicalVolume *teflon_log =
+      new G4LogicalVolume(teflon_tubs,
+                          trinat_materials_.find("G4_TEFLON") -> second,
+                          "teflon_front_face", 0, 0, 0);
+  G4VisAttributes *teflon_vis = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
+  teflon_vis -> SetForceSolid(true);
+  teflon_log -> SetVisAttributes(teflon_vis);
+  lower_scintillator_phys_ =
+  new G4PVPlacement(0, teflon_front_face.center_position, teflon_log,
+                    "teflon_plus_z", world_log_, false, 0,
+                    check_all_for_overlaps_);
+  new G4PVPlacement(0, -1.0*teflon_front_face.center_position, teflon_log,
+                    "teflon_mins_z", world_log_, false, 0,
+                    check_all_for_overlaps_);
 }
 
 void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
@@ -1549,6 +1575,9 @@ void K37DetectorConstruction::DefineMaterials() {
   Macor -> AddElement(F, fractionmass = 4*perCent);
 
   G4Material *lead_glass = nist_manager -> FindOrBuildMaterial("G4_GLASS_LEAD");
+  G4Material *teflon = nist_manager -> FindOrBuildMaterial("G4_TEFLON");
+  trinat_materials_.insert(std::pair<G4String, G4Material*>(teflon -> GetName(),
+                                                            teflon));
   /* Pre-defined material:
      density = 6.22 g/cm3
      mean excitation energy = 526.4 eV
@@ -1561,7 +1590,7 @@ void K37DetectorConstruction::DefineMaterials() {
                    Titanium (Z = 22) - 0.008092
                    Arsenic  (Z = 33) - 0.002651
    */
-
+  
   // Set default materials
   MirrorMaterial = SiliconCarbide;
   world_material_ = vacuum;
