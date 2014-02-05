@@ -33,6 +33,9 @@ class HepRotation;
 struct GeometryElement {
   G4double inner_radius;
   G4double outer_radius;
+  G4double inner_radius2;
+  G4double outer_radius2;
+
   G4double rotation_angle;
   G4ThreeVector center_position;
 
@@ -156,6 +159,8 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4double electron_mcp_radius_;
 
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
+  G4bool check_all_for_overlaps_;
+
   // = true or straight cut = false
   CLHEP::HepRotation* changeZtoX;
   CLHEP::HepRotation* changeZto45;
@@ -200,7 +205,12 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   GeometryElement sd_frame;
   GeometryElement sd_inactive;
   GeometryElement sd_mounting_screw_head;
+  GeometryElement strip_detector;
   GeometryElement scintillator;
+  GeometryElement beryllium_window;
+  GeometryElement reentrant_flange_front_face;
+  GeometryElement reentrant_flange_descender;
+  GeometryElement reentrant_flange_pipe;
 };
 
 #endif
