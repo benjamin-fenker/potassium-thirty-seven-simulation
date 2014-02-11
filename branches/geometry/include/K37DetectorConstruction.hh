@@ -90,6 +90,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructElectronMCP(G4SDManager *sd_man);
   void ConstructRecoilMCP(G4SDManager *sd_man);
   void ConstructCoils();        // Not a sensitive detector
+  void ConstructAir();          // Not a sensitive detector
   void DefineMaterials();
 
   G4Material* world_material_;          // default is vacuum
@@ -144,6 +145,9 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   K37DetectorMessenger* detectorMessenger;  // pointer to the Messenger
   G4LogicalVolume * mirror_log;
   G4Material* MirrorMaterial;
+
+  G4LogicalVolume *air_log_plus_;
+  G4LogicalVolume *air_log_mins_;
 
   G4Material* FullEnergyDetectorMaterial;
   G4Material* DeDxDetectorMaterial;

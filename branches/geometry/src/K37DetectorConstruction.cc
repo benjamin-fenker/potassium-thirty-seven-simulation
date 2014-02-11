@@ -336,7 +336,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     G4VisAttributes *world_logVisAttributes = new G4VisAttributes(false);
     // world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
-
+    ConstructAir();
     if (makeScintillators) ConstructScintillators(SDman);
     if (makeStripDetectors) ConstructStripDetectors(SDman);
     if (makeChamber) ConstructChamber();
@@ -345,6 +345,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeElectronMCP) ConstructElectronMCP(SDman);
     if (makeCoils) ConstructCoils();
     if (make_r_mcp_) ConstructRecoilMCP(SDman);
+
     return world_phys_;
 }
 
@@ -359,23 +360,26 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   G4VisAttributes *scintillator_vis =
       new G4VisAttributes(G4Colour(0.11, 0.11, 0.44));
   scintillator_vis -> SetForceSolid(true);
+  G4ThreeVector pos = -1.0*(scintillator.center_position -
+                            reentrant_flange_pipe.center_position);
 
   upper_scintillator_log_ =  new G4LogicalVolume(scintillator_tubs_,
                                                  FullEnergyDetectorMaterial,
                                                  "scint_plusZ_log", 0, 0, 0);
+
   upper_scintillator_phys_ =
-      new G4PVPlacement(0, scintillator.center_position,
-                        upper_scintillator_log_, "scint_plusZ_phys", world_log_,
-                        false, 0, check_all_for_overlaps_);
+      new G4PVPlacement(0, pos,
+                        upper_scintillator_log_, "scint_plusZ_phys",
+                        air_log_plus_, false, 0, check_all_for_overlaps_);
   upper_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   lower_scintillator_log_ = new G4LogicalVolume(scintillator_tubs_,
                                                 FullEnergyDetectorMaterial,
                                                 "scint_minusZ_log", 0, 0, 0);
   lower_scintillator_phys_ =
-      new G4PVPlacement(0, -1.0 * scintillator.center_position,
-                       lower_scintillator_log_, "scint_minusZ_phys", world_log_,
-                        false, 0, check_all_for_overlaps_);
+      new G4PVPlacement(0, pos,
+                        lower_scintillator_log_, "scint_minusZ_phys",
+                        air_log_mins_, false, 0, check_all_for_overlaps_);
   lower_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   // Set up sensitive detectors
@@ -408,15 +412,19 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
       new G4LogicalVolume(teflon_tubs,
                           trinat_materials_.find("G4_TEFLON") -> second,
                           "teflon_front_face", 0, 0, 0);
+  // white
   G4VisAttributes *teflon_vis = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
   teflon_vis -> SetForceSolid(true);
   teflon_log -> SetVisAttributes(teflon_vis);
-  lower_scintillator_phys_ =
-  new G4PVPlacement(0, teflon_front_face.center_position, teflon_log,
-                    "teflon_plus_z", world_log_, false, 0,
+
+  pos = -1.0*(teflon_front_face.center_position -
+         reentrant_flange_pipe.center_position);
+  
+  new G4PVPlacement(0, pos, teflon_log,
+                    "teflon_plus_z", air_log_plus_, false, 0,
                     check_all_for_overlaps_);
-  new G4PVPlacement(0, -1.0*teflon_front_face.center_position, teflon_log,
-                    "teflon_mins_z", world_log_, false, 0,
+  new G4PVPlacement(0, pos, teflon_log,
+                    "teflon_mins_z", air_log_mins_, false, 0,
                     check_all_for_overlaps_);
 }
 
@@ -427,18 +435,20 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
                                   strip_detector.depth/2.0);
   // Same vis for both detectors :-)
   G4VisAttributes *strip_detector_vis =
-      new G4VisAttributes(G4Colour(0.96, 0.96, 0.96, 0.2));
+      new G4VisAttributes(G4Colour(0.96, 0.96, 0.0, 0.5)); // yellow
 
   strip_detector_vis -> SetForceSolid(true);
   upper_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
                                                   DeDxDetectorMaterial,
                                                   "dedx_plusZ_log", 0, 0, 0);
   upper_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
+  G4ThreeVector pos = reentrant_flange_pipe.center_position -
+      strip_detector.center_position;
   upper_strip_detector_phys_ = new G4PVPlacement(0,
-                                                 strip_detector.center_position,
+                                                 pos,
                                                  upper_strip_detector_log_,
                                                  "dedx_plusZ_phys",
-                                                 world_log_, false, 0,
+                                                 air_log_plus_, false, 0,
                                                  check_all_for_overlaps_);
 
   lower_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
@@ -447,9 +457,9 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
                                                   0, 0);
   lower_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
   lower_strip_detector_phys_ = new G4PVPlacement(0,
-                                                 -1.0*strip_detector.center_position,
+                                                 pos,
                                                  lower_strip_detector_log_,
-                                                 "dedx_minusZ_phys", world_log_,
+                                                 "dedx_minusZ_phys", air_log_mins_,
                                                  false, 0, check_all_for_overlaps_);
 
 
@@ -495,11 +505,12 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
         new G4VisAttributes(G4Colour(0.85, 0.65, 0.13));
     dedxFrame_logVisAttributes-> SetForceSolid(true);
     dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
-    new G4PVPlacement(0,  1.0*sd_frame.center_position, dedxFrame_log,
-                      "dedxFrame_plusZ_phys", world_log_, false, 0,
+    pos = reentrant_flange_pipe.center_position - sd_frame.center_position;
+    new G4PVPlacement(0, pos, dedxFrame_log,
+                      "dedxFrame_plusZ_phys", air_log_plus_, false, 0,
                       check_all_for_overlaps_);
-    new G4PVPlacement(0, -1.0*sd_frame.center_position, dedxFrame_log,
-                      "dedxFrame_minusZ_phys", world_log_, false, 0,
+    new G4PVPlacement(0, pos, dedxFrame_log,
+                      "dedxFrame_minusZ_phys", air_log_mins_, false, 0,
                       check_all_for_overlaps_);
     // Add the inactive Si inside the frame
     G4Box *sd_inactive_box = new G4Box("sd_inactive_box",
@@ -517,11 +528,12 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
         = new G4VisAttributes(G4Colour(0.5, 0.5, 0.0));
     sd_inactive_vis -> SetForceSolid(true);
     sd_inactive_log -> SetVisAttributes(sd_inactive_vis);
-    new G4PVPlacement(0,  1.0*sd_inactive.center_position, sd_inactive_log,
-                      "sd_inactive_plusZphys", world_log_, false, 0,
+    pos = reentrant_flange_pipe.center_position - sd_inactive.center_position;
+    new G4PVPlacement(0, pos, sd_inactive_log,
+                      "sd_inactive_plusZphys", air_log_plus_, false, 0,
                       check_all_for_overlaps_);
-    new G4PVPlacement(0, -1.0*sd_inactive.center_position, sd_inactive_log,
-                      "sd_inactive_minsZphys", world_log_, false, 0,
+    new G4PVPlacement(0, pos, sd_inactive_log,
+                      "sd_inactive_minsZphys", air_log_mins_, false, 0,
                       check_all_for_overlaps_);
     // Add the heads of the mounting screws that the scintillator
     // rests against
@@ -540,42 +552,87 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
     G4double xpos, ypos, zpos;
     xpos = sd_mounting_screw_head.center_position.x();
     ypos = sd_mounting_screw_head.center_position.y();
-    zpos = sd_mounting_screw_head.center_position.z();
+    zpos = reentrant_flange_pipe.center_position.z() -
+        sd_mounting_screw_head.center_position.z();
     new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead1",
-                      world_log_, false, 0, check_all_for_overlaps_);
+                      mounting_screw_head_log, "screwHeadP1",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM1",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
     xpos *= -1.0;
     new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead2",
-                      world_log_, false, 0, check_all_for_overlaps_);
+                      mounting_screw_head_log, "screwHeadP2",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM2",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
     ypos *= -1.0;
     new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead3",
-                      world_log_, false, 0, check_all_for_overlaps_);
+                      mounting_screw_head_log, "screwHeadP3",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM3",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
+
     xpos *= -1.0;
     new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead4",
-                      world_log_, false, 0, check_all_for_overlaps_);
-    zpos *= -1.0;
+                      mounting_screw_head_log, "screwHeadP4",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
     new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead5",
-                      world_log_, false, 0, check_all_for_overlaps_);
-    xpos *= -1.0;
-    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead6",
-                      world_log_, false, 0, check_all_for_overlaps_);
-    ypos *= -1.0;
-    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead7",
-                      world_log_, false, 0, check_all_for_overlaps_);
-    xpos *= -1.0;
-    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
-                      mounting_screw_head_log, "screwHead8",
-                      world_log_, false, 0, check_all_for_overlaps_);
+                      mounting_screw_head_log, "screwHeadM4",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
   }
 
   
 }  // End construct stip detectors
+
+void K37DetectorConstruction::ConstructAir() {
+  G4NistManager* nist_manager = G4NistManager::Instance();
+  // Air is needed to fill the space between the strip detector and
+  // scintillator.  I will be constructed first to fill the entire
+  G4Tubs *reentrant_pipe = new G4Tubs("air_in_pipe",
+                                      0.0,
+                                      reentrant_flange_pipe.inner_radius,
+                                      reentrant_flange_pipe.length/2.0,
+                                      0.0, 2*M_PI*rad);
+  G4Cons *reentrant_des = new G4Cons("air_in_descender",
+                                     0.0,
+                                     reentrant_flange_descender.inner_radius2,
+                                     0.0,
+                                     reentrant_flange_descender.inner_radius,
+                                     reentrant_flange_descender.length/2.0,
+                                     0.0, 2.0*M_PI*rad);
+  G4UnionSolid *reentrant_air =
+      new G4UnionSolid("air_in_reentrant", reentrant_pipe, reentrant_des, 0,
+                       G4ThreeVector(0.0, 0.0,
+                                     0.5*(reentrant_flange_pipe.length +
+                                          reentrant_flange_descender.length)));
+  air_log_plus_ =
+      new G4LogicalVolume(reentrant_air,
+                          nist_manager -> FindOrBuildMaterial("G4_AIR"),
+                          "air_in_reentrant_plus", 0, 0, 0);
+  air_log_mins_ =
+      new G4LogicalVolume(reentrant_air,
+                          nist_manager -> FindOrBuildMaterial("G4_AIR"),
+                          "air_in_reentrant_mins", 0, 0, 0);
+
+  G4VisAttributes *air_vis =// new G4VisAttributes(false); // invisible
+      new G4VisAttributes(G4Colour(0.53, 0.80, 0.98, 0.1)); // sky blue
+  air_vis -> SetForceSolid(true);
+  air_log_plus_ -> SetVisAttributes(air_vis);
+  air_log_mins_ -> SetVisAttributes(air_vis);
+  G4ThreeVector pos = reentrant_flange_pipe.center_position;// -
+  //      G4ThreeVector(0.0, 0.0, 0.5*reentrant_flange_descender.length);
+  CLHEP::HepRotation *zRot = new CLHEP::HepRotation;
+  zRot -> rotateY(180.0*deg);
+
+  new G4PVPlacement(zRot, pos, air_log_plus_, "air_plus_z", world_log_,
+                    false, 0, check_all_for_overlaps_);
+
+  new G4PVPlacement(0, -1.0*pos, air_log_mins_, "air_mins_z", world_log_,
+                    false, 0, check_all_for_overlaps_);
+}
 
 void K37DetectorConstruction::ConstructChamber() {
   G4double chamberBlock_x = 558.8*mm;
@@ -903,7 +960,7 @@ void K37DetectorConstruction::ConstructChamber() {
                                                        0, 0, 0);
 
   beryllium_logVisAttributes =
-      new G4VisAttributes(G4Colour(0.60, 0.80, 1.0, 0.8));
+      new G4VisAttributes(G4Colour(0.80, 0.36, 0.36, 0.8)); // pale red
   // G4VisAttributes* beryllium_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.1, 0.2, 0.7));
 
@@ -1576,6 +1633,7 @@ void K37DetectorConstruction::DefineMaterials() {
 
   G4Material *lead_glass = nist_manager -> FindOrBuildMaterial("G4_GLASS_LEAD");
   G4Material *teflon = nist_manager -> FindOrBuildMaterial("G4_TEFLON");
+  //  G4Material *air = nist_manager -> FindOrBuildMaterial("G4_AIR")
   trinat_materials_.insert(std::pair<G4String, G4Material*>(teflon -> GetName(),
                                                             teflon));
   /* Pre-defined material:
