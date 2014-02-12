@@ -80,30 +80,23 @@ K37DetectorConstruction::K37DetectorConstruction()
   // Define the inch
   static const G4double inch = 2.54*cm;
 
+  // *************** All default dimensions should be placed here **************
+  // *** Any derived dimnesions will be calcualted in a function below *********
+
   // Mirror dimensions from meeting website on 30-Jan-2014
   // Placement from detectorDrawing.pdf
-  mirror.inner_radius = 0.0*inch;
-  mirror.outer_radius = 1.2*inch;
-  mirror.length = 0.25 * mm;
-  mirror.rotation_angle = 9.5*deg;
-  // The FRONT of the mirror is 85 mm away so the center is slightly beyond that
-  G4double z = (85.0*mm) + ((mirror.length/2.0)/cos(mirror.rotation_angle));
-  mirror.center_position = G4ThreeVector(0.0, 0.0, z);
-
-  G4cout << "*******************************************************" << G4endl;
-  G4cout << "**************** Geometry Definitions: ****************" << G4endl;
-  G4cout << "   Mirror center to chamber center: "
-         << G4BestUnit(mirror.center_position.z(), "Length") << G4endl;
-
+  mirror.inner_radius = 0.0*inch;       // Its solid - duh
+  mirror.outer_radius = 1.2*inch;       // 30-Jan-2014 meeting
+  mirror.length = 0.25 * mm;            // 30-Jan-2014 meeting
+  mirror.rotation_angle = 9.5*deg;      // 30-Jan-2014 meeting
   // Mirror mount dimensions from collimator_back.pdf & collimator_front.pdf
-  mirror_mount.inner_radius = 0.0*inch;
-  mirror_mount.outer_radius = (2.913/2.0) * inch;
+  mirror_mount.inner_radius = 0.0*inch; // Solid to start
+  mirror_mount.outer_radius = (2.913/2.0) * inch; // collimator_{front,back}.pdf
   // Take the fat side of one slice and add to it the thin side of the other
   // slice
   G4double lip =
       (0.519*inch) - (2.0*mirror_mount.outer_radius)*tan(mirror.rotation_angle);
   mirror_mount.length = (0.519*inch) + lip;
-  mirror_mount.center_position = mirror.center_position;
   mirror_mount.cutout_side_length = 1.220 * inch;
   mirror_mount.cutout_radius = 2.441/2.0 * inch;
   mirror_mount.cutout_depth = 0.040 * inch;
@@ -123,42 +116,8 @@ K37DetectorConstruction::K37DetectorConstruction()
   reentrant_flange_pipe.inner_radius = (98.56*mm)/2.0;
   reentrant_flange_pipe.outer_radius = (101.60*mm)/2.0;
   reentrant_flange_pipe.length = 130.0*mm;
-
-  // Derived data
-  reentrant_flange_front_face.inner_radius2 =
-      reentrant_flange_front_face.inner_radius;
-
-  G4double outer_radius_change =
-      ((101.6*mm)/2.0) - reentrant_flange_front_face.outer_radius;
-  reentrant_flange_front_face.outer_radius2 =
-      reentrant_flange_front_face.outer_radius + (0.5*outer_radius_change);
-
   reentrant_flange_front_face.length = 10.00 * mm;
-  G4double zpos = mirror_mount.center_position.z() +
-      (0.5*mirror_mount.length) + (0.5*reentrant_flange_front_face.length);
-  reentrant_flange_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
 
-  // ***********************************************************
-  // The beryllium window is defined in reentrant_flange.pdf
-  //  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, 96.89*mm);
-  zpos = reentrant_flange_front_face.center_position.z() +
-      (0.5*reentrant_flange_front_face.length) - (0.5*beryllium_window.length);
-  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, zpos);
-
-  // Reentrant flange descender
-  reentrant_flange_descender.inner_radius =
-      reentrant_flange_front_face.outer_radius;
-  reentrant_flange_descender.outer_radius =
-      reentrant_flange_front_face.outer_radius2;
-  zpos = reentrant_flange_front_face.center_position.z() +
-      (0.5*reentrant_flange_front_face.length) +
-      (0.5*reentrant_flange_descender.length);
-  reentrant_flange_descender.center_position = G4ThreeVector(0.0, 0.0, zpos);
-
-  // Reentrant flange pipe
-  zpos = reentrant_flange_descender.center_position.z() +
-      (0.5*reentrant_flange_descender.length) + (0.5*reentrant_flange_pipe.length);
-  reentrant_flange_pipe.center_position = G4ThreeVector(0, 0, zpos);
 
   // The SD frame is defined in the file BB1.pdf (the 3.0 mm thickness
   // is measured by hand I think)
@@ -168,27 +127,16 @@ K37DetectorConstruction::K37DetectorConstruction()
   sd_frame.cutout_side_length = 44.4*mm; // Enough for the entire chip
   sd_frame.cutout_depth = 1.05*sd_frame.depth; // All the way through
   //  sd_frame.center_position = G4ThreeVector(0.0, 0.0, 98.5*mm);
-  sd_frame.center_position =
-      G4ThreeVector(0.0, 0.0, reentrant_flange_front_face.center_position.z() +
-                    (0.5*reentrant_flange_front_face.length) +
-                    (0.5*sd_frame.depth));
 
   strip_detector.length = 40.0*mm;
   strip_detector.width  = 40.0*mm;
   strip_detector.depth  = 0.3*mm;
-  strip_detector.center_position = sd_frame.center_position;
-  G4cout << "   Strip detector front to chamber center: "
-         << G4BestUnit(strip_detector.center_position.z() -
-                       (0.5*strip_detector.depth), "Length")
-         << G4endl;
 
   // There is non-active area of silicon that should be included in
   // the simulation.  See BB1.pdf
   sd_inactive.length = 44.4*mm;
   sd_inactive.width  = 44.4*mm;
   sd_inactive.depth  = 0.3*mm;
-  // Cutout will be EXACTLY the active Si
-  sd_inactive.center_position = sd_frame.center_position;
 
   // The SD is mounted to the flange by 4x 2-56 screws.  The socket
   // cap heads stick up out ouf the SD frame and the scintillator
@@ -198,15 +146,6 @@ K37DetectorConstruction::K37DetectorConstruction()
   sd_mounting_screw_head.outer_radius = (0.137/2.0) * inch;
   sd_mounting_screw_head.length = 0.082 * inch;
 
-  // There are 4 of them with different x,y coordinates but the same
-  // z-coordinate.  Define just that z-coordinate now
-  zpos = sd_frame.center_position.z();
-  zpos += (sd_frame.depth/2.0);
-  zpos += (sd_mounting_screw_head.length/2.0);
-  G4double off_center = 25.0*mm;        // x,y dimensions away from
-                                        // the axis
-  sd_mounting_screw_head.center_position =
-      G4ThreeVector(off_center, off_center, zpos);
   // ***********************************************************
 
   // Teflon front face and scintillator
@@ -218,25 +157,10 @@ K37DetectorConstruction::K37DetectorConstruction()
   scintillator.inner_radius = 0.0;
   scintillator.outer_radius = (90.0/2.0) * mm;
 
-  teflon_front_face.inner_radius = scintillator.inner_radius;
-  teflon_front_face.outer_radius = scintillator.outer_radius;
   teflon_front_face.length = 90.0*um;
   // teflon_front_face.length = 5.0*mm;
-  zpos = sd_frame.center_position.z();
-  zpos += (sd_frame.depth/2.0);
-  zpos += sd_mounting_screw_head.length;
-  zpos += (teflon_front_face.length/2.0);
-  teflon_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
 
   scintillator.length = 3.5 * cm;
-  zpos = teflon_front_face.center_position.z();
-  zpos += (0.5*teflon_front_face.length);
-  G4cout << "   Scintillator front to chamber center: "
-         << G4BestUnit(zpos, "Length") << G4endl;
-  zpos += (0.5*scintillator.length);
-  scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
-
-  G4cout << "*******************************************************" << G4endl;
   // ***********************************************************
 
   this-> DefineMaterials();
@@ -336,6 +260,9 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     G4VisAttributes *world_logVisAttributes = new G4VisAttributes(false);
     // world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
+
+
+    CalculateDimensions();
     ConstructAir();
     if (makeScintillators) ConstructScintillators(SDman);
     if (makeStripDetectors) ConstructStripDetectors(SDman);
@@ -349,6 +276,91 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     return world_phys_;
 }
 
+void K37DetectorConstruction::CalculateDimensions() {
+  // The FRONT of the mirror is 85 mm away so the center is slightly beyond that
+  G4double z = (85.0*mm) + ((mirror.length/2.0)/cos(mirror.rotation_angle));
+  mirror.center_position = G4ThreeVector(0.0, 0.0, z);
+  mirror_mount.center_position = mirror.center_position;
+  // Derived data
+  reentrant_flange_front_face.inner_radius2 =
+      reentrant_flange_front_face.inner_radius;
+
+  G4double outer_radius_change = reentrant_flange_pipe.outer_radius -
+      reentrant_flange_front_face.outer_radius;
+  reentrant_flange_front_face.outer_radius2 =
+      reentrant_flange_front_face.outer_radius + (0.5*outer_radius_change);
+  G4double zpos = mirror_mount.center_position.z() +
+      (0.5*mirror_mount.length) + (0.5*reentrant_flange_front_face.length);
+  reentrant_flange_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // ***********************************************************
+  // The beryllium window is defined in reentrant_flange.pdf
+  //  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, 96.89*mm);
+  zpos = reentrant_flange_front_face.center_position.z() +
+      (0.5*reentrant_flange_front_face.length) - (0.5*beryllium_window.length);
+  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // Reentrant flange descender
+  reentrant_flange_descender.inner_radius =
+      reentrant_flange_front_face.outer_radius;
+  reentrant_flange_descender.outer_radius =
+      reentrant_flange_front_face.outer_radius2;
+  zpos = reentrant_flange_front_face.center_position.z() +
+      (0.5*reentrant_flange_front_face.length) +
+      (0.5*reentrant_flange_descender.length);
+  reentrant_flange_descender.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // Reentrant flange pipe
+  zpos = reentrant_flange_descender.center_position.z() +
+      (0.5*reentrant_flange_descender.length) + (0.5*reentrant_flange_pipe.length);
+  reentrant_flange_pipe.center_position = G4ThreeVector(0, 0, zpos);
+
+  sd_frame.center_position =
+      G4ThreeVector(0.0, 0.0, reentrant_flange_front_face.center_position.z() +
+                    (0.5*reentrant_flange_front_face.length) +
+                    (0.5*sd_frame.depth));
+  strip_detector.center_position = sd_frame.center_position;
+  // Cutout will be EXACTLY the active Si
+  sd_inactive.center_position = sd_frame.center_position;
+  // There are 4 of them with different x,y coordinates but the same
+  // z-coordinate.  Define just that z-coordinate now
+  zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += (sd_mounting_screw_head.length/2.0);
+  G4double off_center = 25.0*mm;        // x,y dimensions away from
+                                        // the axis
+  sd_mounting_screw_head.center_position =
+      G4ThreeVector(off_center, off_center, zpos);
+  teflon_front_face.inner_radius = scintillator.inner_radius;
+  teflon_front_face.outer_radius = scintillator.outer_radius;
+
+  zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += sd_mounting_screw_head.length;
+  zpos += (teflon_front_face.length/2.0);
+  teflon_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+
+  zpos = teflon_front_face.center_position.z();
+  zpos += (0.5*teflon_front_face.length);
+  zpos += (0.5*scintillator.length);
+  scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  G4cout << "*******************************************************" << G4endl;
+
+  G4cout << "*******************************************************" << G4endl;
+  G4cout << "**************** Geometry Definitions: ****************" << G4endl;
+  G4cout << "   Mirror center to chamber center: "
+         << G4BestUnit(mirror.center_position.z(), "Length") << G4endl;
+  G4cout << "   Strip detector front to chamber center: "
+         << G4BestUnit(strip_detector.center_position.z() -
+                       (0.5*strip_detector.depth), "Length")
+         << G4endl;
+  G4cout << "   Scintillator front to chamber center: "
+         << G4BestUnit(scintillator.center_position.z() -
+                       (0.5*strip_detector.length), "Length") << G4endl;
+
+}
 
 void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   // Use same solid for both detectors :-)

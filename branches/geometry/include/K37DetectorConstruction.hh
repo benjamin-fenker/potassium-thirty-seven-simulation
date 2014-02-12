@@ -80,8 +80,10 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void SetElectronMCPradius(G4double d) {electron_mcp_radius_= d;}
   G4double GetElectronMCPradius() {return electron_mcp_radius_;}
 
+  void SetTeflonTapeThickness(G4double t) {teflon_front_face.length = t;}
  private:
   G4VPhysicalVolume* ConstructK37Experiment();
+  void CalculateDimensions();
   void ConstructScintillators(G4SDManager* SDman);
   void ConstructStripDetectors(G4SDManager* SDman);
   void ConstructChamber();      // Not a sensitive detector
