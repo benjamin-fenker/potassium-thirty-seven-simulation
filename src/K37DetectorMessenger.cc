@@ -122,6 +122,13 @@ K37DetectorMessenger::K37DetectorMessenger(K37DetectorConstruction* myDet)
         new G4UIcmdWithoutParameter("/K37/geometry/getElectronMCPradius", this);
     get_electron_mcp_radius_cmd_ -> SetGuidance("Print Electron MCP radius");
     get_electron_mcp_radius_cmd_ -> AvailableForStates(G4State_Idle);
+
+    set_teflon_thickness_cmd_ =
+        new G4UIcmdWithADoubleAndUnit("/K37/geometry/setTeflonThickness", this);
+    set_teflon_thickness_cmd_ ->
+        SetGuidance("Set the teflon front face's thickness");
+    set_teflon_thickness_cmd_ -> AvailableForStates(G4State_PreInit,
+                                                    G4State_Idle);
 }
 
 K37DetectorMessenger::~K37DetectorMessenger() {
@@ -189,6 +196,10 @@ void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
       G4cout << "Electron-MCP radius = "
              << G4BestUnit(myDetector -> GetElectronMCPradius(), "Length")
              << G4endl;
+    }
+    if (command == set_teflon_thickness_cmd_) {
+      myDetector -> SetTeflonTapeThickness(set_teflon_thickness_cmd_ ->
+                                           GetNewDoubleValue(newValue));
     }
 }
 
