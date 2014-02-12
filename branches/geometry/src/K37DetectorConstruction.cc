@@ -319,9 +319,10 @@ void K37DetectorConstruction::CalculateDimensions() {
       G4ThreeVector(0.0, 0.0, reentrant_flange_front_face.center_position.z() +
                     (0.5*reentrant_flange_front_face.length) +
                     (0.5*sd_frame.depth));
+
   strip_detector.center_position = sd_frame.center_position;
-  // Cutout will be EXACTLY the active Si
   sd_inactive.center_position = sd_frame.center_position;
+
   // There are 4 of them with different x,y coordinates but the same
   // z-coordinate.  Define just that z-coordinate now
   zpos = sd_frame.center_position.z();
@@ -347,8 +348,6 @@ void K37DetectorConstruction::CalculateDimensions() {
   scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
 
   G4cout << "*******************************************************" << G4endl;
-
-  G4cout << "*******************************************************" << G4endl;
   G4cout << "**************** Geometry Definitions: ****************" << G4endl;
   G4cout << "   Mirror center to chamber center: "
          << G4BestUnit(mirror.center_position.z(), "Length") << G4endl;
@@ -356,10 +355,14 @@ void K37DetectorConstruction::CalculateDimensions() {
          << G4BestUnit(strip_detector.center_position.z() -
                        (0.5*strip_detector.depth), "Length")
          << G4endl;
+  // G4cout << "   Teflon front to chamber center: "
+  //        << G4BestUnit(teflon_front_face.center_position.z() -
+  //                      (0.5*teflon_front_face.length), "Length")
+  //        << G4endl;
   G4cout << "   Scintillator front to chamber center: "
          << G4BestUnit(scintillator.center_position.z() -
-                       (0.5*strip_detector.length), "Length") << G4endl;
-
+                       (0.5*scintillator.length), "Length") << G4endl;
+  G4cout << "*******************************************************" << G4endl;
 }
 
 void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
