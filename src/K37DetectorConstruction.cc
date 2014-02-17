@@ -142,9 +142,11 @@ K37DetectorConstruction::K37DetectorConstruction()
   // cap heads stick up out ouf the SD frame and the scintillator
   // rests against these screws.  This creates a small gap between the
   // silicon and scintillator.   See BB1.pdf for palcement
+  // 0.082" = 2-56 socket head cap screw height
+  // 0.020" = #2 flat washer height
   sd_mounting_screw_head.inner_radius = 0.0*mm;
   sd_mounting_screw_head.outer_radius = (0.137/2.0) * inch;
-  sd_mounting_screw_head.length = 0.082 * inch;
+  sd_mounting_screw_head.length = (0.082 + 0.020) * inch;
 
   // ***********************************************************
 
