@@ -129,6 +129,15 @@ K37DetectorMessenger::K37DetectorMessenger(K37DetectorConstruction* myDet)
         SetGuidance("Set the teflon front face's thickness");
     set_teflon_thickness_cmd_ -> AvailableForStates(G4State_PreInit,
                                                     G4State_Idle);
+
+    set_screw_head_length_cmd_ =
+        new G4UIcmdWithADoubleAndUnit("/K37/geometry/setScrewHeadLength", this);
+    set_screw_head_length_cmd_ ->
+        SetGuidance("Set the length of the screw heads that mount the DSSSD.");
+    set_screw_head_length_cmd_ ->
+        SetGuidance("Defines distance from DSSSD mount to teflon front face");
+    set_screw_head_length_cmd_ -> AvailableForStates(G4State_PreInit,
+                                                     G4State_Idle);
 }
 
 K37DetectorMessenger::~K37DetectorMessenger() {
@@ -146,6 +155,8 @@ K37DetectorMessenger::~K37DetectorMessenger() {
     delete make_sd_holders_cmd_;
     delete set_electron_mcp_radius_cmd_;
     delete get_electron_mcp_radius_cmd_;
+    delete set_teflon_thickness_cmd_;
+    delete set_screw_head_length_cmd_;
 }
 
 void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
@@ -200,6 +211,10 @@ void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
     if (command == set_teflon_thickness_cmd_) {
       myDetector -> SetTeflonTapeThickness(set_teflon_thickness_cmd_ ->
                                            GetNewDoubleValue(newValue));
+    }
+    if (command == set_screw_head_length_cmd_) {
+      myDetector -> SetMountingScrewHeadLength(set_screw_head_length_cmd_ ->
+                                               GetNewDoubleValue(newValue));
     }
 }
 

@@ -58,7 +58,7 @@ K37DetectorConstruction::K37DetectorConstruction()
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), electron_mcp_radius_(20.0*mm),
-      shouldTheMirrorBeWFEDMCut(false), check_all_for_overlaps_(true),
+      shouldTheMirrorBeWFEDMCut(false), check_all_for_overlaps_(false),
       changeZtoX(0),
       changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
       changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),

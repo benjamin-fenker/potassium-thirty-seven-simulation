@@ -81,6 +81,8 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4double GetElectronMCPradius() {return electron_mcp_radius_;}
 
   void SetTeflonTapeThickness(G4double t) {teflon_front_face.length = t;}
+  void SetMountingScrewHeadLength(G4double l) {sd_mounting_screw_head.length = l;}
+
  private:
   G4VPhysicalVolume* ConstructK37Experiment();
   void CalculateDimensions();
