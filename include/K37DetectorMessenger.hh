@@ -39,6 +39,8 @@ class K37DetectorMessenger: public G4UImessenger {
   G4UIcmdWithABool *make_sd_holders_cmd_;
   G4UIcmdWithADoubleAndUnit *set_electron_mcp_radius_cmd_;
   G4UIcmdWithoutParameter* get_electron_mcp_radius_cmd_;
+  G4UIcmdWithADoubleAndUnit *set_teflon_thickness_cmd_;
+  G4UIcmdWithADoubleAndUnit *set_screw_head_length_cmd_;
 };
 
 //-----------------------------

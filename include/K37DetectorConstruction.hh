@@ -33,9 +33,16 @@ class HepRotation;
 struct GeometryElement {
   G4double inner_radius;
   G4double outer_radius;
-  G4double length;
+  G4double inner_radius2;
+  G4double outer_radius2;
+
   G4double rotation_angle;
   G4ThreeVector center_position;
+
+  // Three cartesian dimensions
+  G4double length;
+  G4double width;
+  G4double depth;
 
   G4double cutout_side_length;
   G4double cutout_radius;
@@ -73,8 +80,12 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void SetElectronMCPradius(G4double d) {electron_mcp_radius_= d;}
   G4double GetElectronMCPradius() {return electron_mcp_radius_;}
 
+  void SetTeflonTapeThickness(G4double t) {teflon_front_face.length = t;}
+  void SetMountingScrewHeadLength(G4double l) {sd_mounting_screw_head.length = l;}
+
  private:
   G4VPhysicalVolume* ConstructK37Experiment();
+  void CalculateDimensions();
   void ConstructScintillators(G4SDManager* SDman);
   void ConstructStripDetectors(G4SDManager* SDman);
   void ConstructChamber();      // Not a sensitive detector
@@ -83,6 +94,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructElectronMCP(G4SDManager *sd_man);
   void ConstructRecoilMCP(G4SDManager *sd_man);
   void ConstructCoils();        // Not a sensitive detector
+  void ConstructAir();          // Not a sensitive detector
   void DefineMaterials();
 
   G4Material* world_material_;          // default is vacuum
@@ -138,6 +150,9 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4LogicalVolume * mirror_log;
   G4Material* MirrorMaterial;
 
+  G4LogicalVolume *air_log_plus_;
+  G4LogicalVolume *air_log_mins_;
+
   G4Material* FullEnergyDetectorMaterial;
   G4Material* DeDxDetectorMaterial;
   G4Material* SiliconDetectorFrameMaterial;
@@ -152,6 +167,8 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4double electron_mcp_radius_;
 
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
+  G4bool check_all_for_overlaps_;
+
   // = true or straight cut = false
   CLHEP::HepRotation* changeZtoX;
   CLHEP::HepRotation* changeZto45;
@@ -193,6 +210,19 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
 
   GeometryElement mirror;
   GeometryElement mirror_mount;
+  GeometryElement sd_frame;
+  GeometryElement sd_inactive;
+  GeometryElement sd_mounting_screw_head;
+  GeometryElement strip_detector;
+  GeometryElement teflon_front_face;
+  GeometryElement scintillator;
+  GeometryElement beryllium_window;
+  GeometryElement reentrant_flange_front_face;
+  GeometryElement reentrant_flange_descender;
+  GeometryElement reentrant_flange_pipe;
+
+  std::map<G4String, G4Material*> trinat_materials_;
+
 };
 
 #endif
