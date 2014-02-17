@@ -122,6 +122,22 @@ K37DetectorMessenger::K37DetectorMessenger(K37DetectorConstruction* myDet)
         new G4UIcmdWithoutParameter("/K37/geometry/getElectronMCPradius", this);
     get_electron_mcp_radius_cmd_ -> SetGuidance("Print Electron MCP radius");
     get_electron_mcp_radius_cmd_ -> AvailableForStates(G4State_Idle);
+
+    set_teflon_thickness_cmd_ =
+        new G4UIcmdWithADoubleAndUnit("/K37/geometry/setTeflonThickness", this);
+    set_teflon_thickness_cmd_ ->
+        SetGuidance("Set the teflon front face's thickness");
+    set_teflon_thickness_cmd_ -> AvailableForStates(G4State_PreInit,
+                                                    G4State_Idle);
+
+    set_screw_head_length_cmd_ =
+        new G4UIcmdWithADoubleAndUnit("/K37/geometry/setScrewHeadLength", this);
+    set_screw_head_length_cmd_ ->
+        SetGuidance("Set the length of the screw heads that mount the DSSSD.");
+    set_screw_head_length_cmd_ ->
+        SetGuidance("Defines distance from DSSSD mount to teflon front face");
+    set_screw_head_length_cmd_ -> AvailableForStates(G4State_PreInit,
+                                                     G4State_Idle);
 }
 
 K37DetectorMessenger::~K37DetectorMessenger() {
@@ -139,6 +155,8 @@ K37DetectorMessenger::~K37DetectorMessenger() {
     delete make_sd_holders_cmd_;
     delete set_electron_mcp_radius_cmd_;
     delete get_electron_mcp_radius_cmd_;
+    delete set_teflon_thickness_cmd_;
+    delete set_screw_head_length_cmd_;
 }
 
 void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
@@ -189,6 +207,14 @@ void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
       G4cout << "Electron-MCP radius = "
              << G4BestUnit(myDetector -> GetElectronMCPradius(), "Length")
              << G4endl;
+    }
+    if (command == set_teflon_thickness_cmd_) {
+      myDetector -> SetTeflonTapeThickness(set_teflon_thickness_cmd_ ->
+                                           GetNewDoubleValue(newValue));
+    }
+    if (command == set_screw_head_length_cmd_) {
+      myDetector -> SetMountingScrewHeadLength(set_screw_head_length_cmd_ ->
+                                               GetNewDoubleValue(newValue));
     }
 }
 

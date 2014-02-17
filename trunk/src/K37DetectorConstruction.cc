@@ -58,7 +58,8 @@ K37DetectorConstruction::K37DetectorConstruction()
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMaterial(0),
       Hoop7Material(0), MCPMaterial(0), electron_mcp_radius_(20.0*mm),
-      shouldTheMirrorBeWFEDMCut(false), changeZtoX(0),
+      shouldTheMirrorBeWFEDMCut(false), check_all_for_overlaps_(false),
+      changeZtoX(0),
       changeZto45(0), changeZtoNeg45(0), changeZto35(0), changeZtoNeg35(0),
       changeZtoNeg62(0), changeZtoNeg118(0), changeYtoBeamAxis(0),
       changeYtoBeamAxisForLPP1(0), changeYtoBeamAxisForLPP2(0),
@@ -79,29 +80,90 @@ K37DetectorConstruction::K37DetectorConstruction()
   // Define the inch
   static const G4double inch = 2.54*cm;
 
+  // *************** All default dimensions should be placed here **************
+  // *** Any derived dimnesions will be calcualted in a function below *********
+
   // Mirror dimensions from meeting website on 30-Jan-2014
   // Placement from detectorDrawing.pdf
-  mirror.inner_radius = 0.0*inch;
-  mirror.outer_radius = 1.2*inch;
-  mirror.length = 0.25 * mm;
-  mirror.rotation_angle = 9.5*deg;
-  // The FRONT of the mirror is 85 mm away so the center is slightly beyond that
-  G4double z = (85.0*mm) + ((mirror.length/2.0)/cos(mirror.rotation_angle));
-  mirror.center_position = G4ThreeVector(0.0, 0.0, z);
-  //  G4cout << "Mirror z-placement: " << G4BestUnit(z, "Length") << G4endl;
-
+  mirror.inner_radius = 0.0*inch;       // Its solid - duh
+  mirror.outer_radius = 1.2*inch;       // 30-Jan-2014 meeting
+  mirror.length = 0.25 * mm;            // 30-Jan-2014 meeting
+  mirror.rotation_angle = 9.5*deg;      // 30-Jan-2014 meeting
   // Mirror mount dimensions from collimator_back.pdf & collimator_front.pdf
-  mirror_mount.inner_radius = 0.0*inch;
-  mirror_mount.outer_radius = (2.913/2.0) * inch;
+  mirror_mount.inner_radius = 0.0*inch; // Solid to start
+  mirror_mount.outer_radius = (2.913/2.0) * inch; // collimator_{front,back}.pdf
   // Take the fat side of one slice and add to it the thin side of the other
   // slice
   G4double lip =
       (0.519*inch) - (2.0*mirror_mount.outer_radius)*tan(mirror.rotation_angle);
   mirror_mount.length = (0.519*inch) + lip;
-  mirror_mount.center_position = mirror.center_position;
   mirror_mount.cutout_side_length = 1.220 * inch;
   mirror_mount.cutout_radius = 2.441/2.0 * inch;
   mirror_mount.cutout_depth = 0.040 * inch;
+
+  // ***********************************************************
+  // The reentrant flange manufactured by Brush-Wellman
+  // Described in reentrant_flange.pdf
+  // Data from the drawings
+  reentrant_flange_front_face.inner_radius = (58.00/2.0)*mm;
+  reentrant_flange_front_face.outer_radius = (94.59/2.0)*mm;
+  beryllium_window.inner_radius = 0.0*mm;
+  beryllium_window.outer_radius = (58.00/2.0) * mm;
+  beryllium_window.length = 0.229 * mm;
+  reentrant_flange_descender.inner_radius2 = (98.56*mm)/2.0;
+  reentrant_flange_descender.outer_radius2 = (101.60*mm)/2.0;
+  reentrant_flange_descender.length = 10.00*mm;
+  reentrant_flange_pipe.inner_radius = (98.56*mm)/2.0;
+  reentrant_flange_pipe.outer_radius = (101.60*mm)/2.0;
+  reentrant_flange_pipe.length = 130.0*mm;
+  reentrant_flange_front_face.length = 10.00 * mm;
+
+
+  // The SD frame is defined in the file BB1.pdf (the 3.0 mm thickness
+  // is measured by hand I think)
+  sd_frame.length = 55.0*mm;            // ???
+  sd_frame.width  = 55.0*mm;            // ???
+  sd_frame.depth  = 3.0*mm;
+  sd_frame.cutout_side_length = 44.4*mm; // Enough for the entire chip
+  sd_frame.cutout_depth = 1.05*sd_frame.depth; // All the way through
+  //  sd_frame.center_position = G4ThreeVector(0.0, 0.0, 98.5*mm);
+
+  strip_detector.length = 40.0*mm;
+  strip_detector.width  = 40.0*mm;
+  strip_detector.depth  = 0.3*mm;
+
+  // There is non-active area of silicon that should be included in
+  // the simulation.  See BB1.pdf
+  sd_inactive.length = 44.4*mm;
+  sd_inactive.width  = 44.4*mm;
+  sd_inactive.depth  = 0.3*mm;
+
+  // The SD is mounted to the flange by 4x 2-56 screws.  The socket
+  // cap heads stick up out ouf the SD frame and the scintillator
+  // rests against these screws.  This creates a small gap between the
+  // silicon and scintillator.   See BB1.pdf for palcement
+  // 0.082" = 2-56 socket head cap screw height
+  // 0.020" = #2 flat washer height
+  sd_mounting_screw_head.inner_radius = 0.0*mm;
+  sd_mounting_screw_head.outer_radius = (0.137/2.0) * inch;
+  sd_mounting_screw_head.length = (0.082 + 0.020) * inch;
+
+  // ***********************************************************
+
+  // Teflon front face and scintillator
+  // The teflon front face covers the entire front face of the
+  // scintillator. The covering is assumed to be completely uniform
+  // and flat mostly because modeling it as anything else would be
+  // impossible.  The thickness (90 um) comes from a perusing of the
+  // internet and could be off in reality by 10s of microns.  
+  scintillator.inner_radius = 0.0;
+  scintillator.outer_radius = (90.0/2.0) * mm;
+
+  teflon_front_face.length = 90.0*um;
+  // teflon_front_face.length = 5.0*mm;
+
+  scintillator.length = 3.5 * cm;
+  // ***********************************************************
 
   this-> DefineMaterials();
   detectorMessenger = new K37DetectorMessenger(this);
@@ -201,6 +263,9 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     // world_logVisAttributes = new G4VisAttributes(G4Colour(1.0,1.0,0));
     world_log_ -> SetVisAttributes(world_logVisAttributes);
 
+
+    CalculateDimensions();
+    ConstructAir();
     if (makeScintillators) ConstructScintillators(SDman);
     if (makeStripDetectors) ConstructStripDetectors(SDman);
     if (makeChamber) ConstructChamber();
@@ -209,49 +274,129 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeElectronMCP) ConstructElectronMCP(SDman);
     if (makeCoils) ConstructCoils();
     if (make_r_mcp_) ConstructRecoilMCP(SDman);
+
     return world_phys_;
 }
 
+void K37DetectorConstruction::CalculateDimensions() {
+  // The FRONT of the mirror is 85 mm away so the center is slightly beyond that
+  G4double z = (85.0*mm) + ((mirror.length/2.0)/cos(mirror.rotation_angle));
+  mirror.center_position = G4ThreeVector(0.0, 0.0, z);
+  mirror_mount.center_position = mirror.center_position;
+  // Derived data
+  reentrant_flange_front_face.inner_radius2 =
+      reentrant_flange_front_face.inner_radius;
+
+  G4double outer_radius_change = reentrant_flange_pipe.outer_radius -
+      reentrant_flange_front_face.outer_radius;
+  reentrant_flange_front_face.outer_radius2 =
+      reentrant_flange_front_face.outer_radius + (0.5*outer_radius_change);
+  G4double zpos = mirror_mount.center_position.z() +
+      (0.5*mirror_mount.length) + (0.5*reentrant_flange_front_face.length);
+  reentrant_flange_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // ***********************************************************
+  // The beryllium window is defined in reentrant_flange.pdf
+  //  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, 96.89*mm);
+  zpos = reentrant_flange_front_face.center_position.z() +
+      (0.5*reentrant_flange_front_face.length) - (0.5*beryllium_window.length);
+  beryllium_window.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // Reentrant flange descender
+  reentrant_flange_descender.inner_radius =
+      reentrant_flange_front_face.outer_radius;
+  reentrant_flange_descender.outer_radius =
+      reentrant_flange_front_face.outer_radius2;
+  zpos = reentrant_flange_front_face.center_position.z() +
+      (0.5*reentrant_flange_front_face.length) +
+      (0.5*reentrant_flange_descender.length);
+  reentrant_flange_descender.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  // Reentrant flange pipe
+  zpos = reentrant_flange_descender.center_position.z() +
+      (0.5*reentrant_flange_descender.length) + (0.5*reentrant_flange_pipe.length);
+  reentrant_flange_pipe.center_position = G4ThreeVector(0, 0, zpos);
+
+  sd_frame.center_position =
+      G4ThreeVector(0.0, 0.0, reentrant_flange_front_face.center_position.z() +
+                    (0.5*reentrant_flange_front_face.length) +
+                    (0.5*sd_frame.depth));
+
+  strip_detector.center_position = sd_frame.center_position;
+  sd_inactive.center_position = sd_frame.center_position;
+
+  // There are 4 of them with different x,y coordinates but the same
+  // z-coordinate.  Define just that z-coordinate now
+  zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += (sd_mounting_screw_head.length/2.0);
+  G4double off_center = 25.0*mm;        // x,y dimensions away from
+                                        // the axis
+  sd_mounting_screw_head.center_position =
+      G4ThreeVector(off_center, off_center, zpos);
+  teflon_front_face.inner_radius = scintillator.inner_radius;
+  teflon_front_face.outer_radius = scintillator.outer_radius;
+
+  zpos = sd_frame.center_position.z();
+  zpos += (sd_frame.depth/2.0);
+  zpos += sd_mounting_screw_head.length;
+  zpos += (teflon_front_face.length/2.0);
+  teflon_front_face.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+
+  zpos = teflon_front_face.center_position.z();
+  zpos += (0.5*teflon_front_face.length);
+  zpos += (0.5*scintillator.length);
+  scintillator.center_position = G4ThreeVector(0.0, 0.0, zpos);
+
+  G4cout << "*******************************************************" << G4endl;
+  G4cout << "**************** Geometry Definitions: ****************" << G4endl;
+  G4cout << "   Mirror center to chamber center: "
+         << G4BestUnit(mirror.center_position.z(), "Length") << G4endl;
+  G4cout << "   Strip detector front to chamber center: "
+         << G4BestUnit(strip_detector.center_position.z() -
+                       (0.5*strip_detector.depth), "Length")
+         << G4endl;
+  // G4cout << "   Teflon front to chamber center: "
+  //        << G4BestUnit(teflon_front_face.center_position.z() -
+  //                      (0.5*teflon_front_face.length), "Length")
+  //        << G4endl;
+  G4cout << "   Scintillator front to chamber center: "
+         << G4BestUnit(scintillator.center_position.z() -
+                       (0.5*scintillator.length), "Length") << G4endl;
+  G4cout << "*******************************************************" << G4endl;
+}
 
 void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
-  G4double Scint_rmax             = 45*mm;  // 90/2
-  G4double Scint_rmin             = 0.*mm;
-  G4double Scint_dz               = 35*mm;
-  G4double Scint_startPhi = 0.*deg;
-  G4double Scint_deltaPhi = 360.*deg;
-  G4double Scint_zPosition= 117.5*mm;
-
-  // if (scintillator_tubs_) delete scintillator_tubs_;
-  // if (upper_scintillator_log_) delete upper_scintillator_log_;
-  // if (upper_scintillator_phys_) delete upper_scintillator_phys_;
-  // if (lower_scintillator_log_) delete lower_scintillator_log_;
-  // if (lower_scintillator_phys_) delete lower_scintillator_phys_;
-
   // Use same solid for both detectors :-)
-  scintillator_tubs_ = new G4Tubs("scint_sol", Scint_rmin, Scint_rmax,
-                                  (Scint_dz/2.), Scint_startPhi,
-                                  Scint_deltaPhi);
+  scintillator_tubs_ = new G4Tubs("scint_sol", scintillator.inner_radius,
+                                  scintillator.outer_radius,
+                                  scintillator.length/2.0, 0.0, 2.0*M_PI);
+
   // Use same vis attributes for both detectors :-)
-  G4VisAttributes *scintillator_vis = new G4VisAttributes(G4Colour(0.0, 0.0,
-                                                                   1.0, 1.0));
+  G4VisAttributes *scintillator_vis =
+      new G4VisAttributes(G4Colour(0.11, 0.11, 0.44));
   scintillator_vis -> SetForceSolid(true);
+  G4ThreeVector pos = -1.0*(scintillator.center_position -
+                            reentrant_flange_pipe.center_position);
 
   upper_scintillator_log_ =  new G4LogicalVolume(scintillator_tubs_,
                                                  FullEnergyDetectorMaterial,
                                                  "scint_plusZ_log", 0, 0, 0);
+
   upper_scintillator_phys_ =
-      new G4PVPlacement(0, G4ThreeVector(0., 0., Scint_zPosition),
-                        upper_scintillator_log_, "scint_plusZ_phys", world_log_,
-                        false, 0);
+      new G4PVPlacement(0, pos,
+                        upper_scintillator_log_, "scint_plusZ_phys",
+                        air_log_plus_, false, 0, check_all_for_overlaps_);
   upper_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   lower_scintillator_log_ = new G4LogicalVolume(scintillator_tubs_,
                                                 FullEnergyDetectorMaterial,
                                                 "scint_minusZ_log", 0, 0, 0);
   lower_scintillator_phys_ =
-      new G4PVPlacement(0, G4ThreeVector(0., 0., -Scint_zPosition),
-                       lower_scintillator_log_, "scint_minusZ_phys", world_log_,
-                        false, 0);
+      new G4PVPlacement(0, pos,
+                        lower_scintillator_log_, "scint_minusZ_phys",
+                        air_log_mins_, false, 0, check_all_for_overlaps_);
   lower_scintillator_log_ -> SetVisAttributes(scintillator_vis);
 
   // Set up sensitive detectors
@@ -272,44 +417,67 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
   }
 
   lower_scintillator_log_ -> SetSensitiveDetector(lower_scintillator_sens_);
+
+  // Teflon front face
+  G4Tubs *teflon_tubs = new G4Tubs("teflon_tubs",
+                                   teflon_front_face.inner_radius,
+                                   teflon_front_face.outer_radius,
+                                   teflon_front_face.length/2.0,
+                                   0.0, 2*M_PI*rad);
+
+  G4LogicalVolume *teflon_log =
+      new G4LogicalVolume(teflon_tubs,
+                          trinat_materials_.find("G4_TEFLON") -> second,
+                          "teflon_front_face", 0, 0, 0);
+  // white
+  G4VisAttributes *teflon_vis = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
+  teflon_vis -> SetForceSolid(true);
+  teflon_log -> SetVisAttributes(teflon_vis);
+
+  pos = -1.0*(teflon_front_face.center_position -
+         reentrant_flange_pipe.center_position);
+  
+  new G4PVPlacement(0, pos, teflon_log,
+                    "teflon_plus_z", air_log_plus_, false, 0,
+                    check_all_for_overlaps_);
+  new G4PVPlacement(0, pos, teflon_log,
+                    "teflon_mins_z", air_log_mins_, false, 0,
+                    check_all_for_overlaps_);
 }
 
 void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
-  G4double Dedx_x = 40.0*mm;
-  G4double Dedx_y = 40.0*mm;
-  G4double Dedx_z = 0.3*mm;
-
-  G4double Dedx_zPosition = 98.5*mm;
-
   // Same solid for both detectors :-)
-  strip_detector_box_ = new G4Box("dedx_sol", (Dedx_x/2.),
-                                  (Dedx_y/2.), (Dedx_z/2.));
+  strip_detector_box_ = new G4Box("dedx_sol", strip_detector.length/2.0,
+                                  strip_detector.width/2.0,
+                                  strip_detector.depth/2.0);
   // Same vis for both detectors :-)
-  G4VisAttributes *strip_detector_vis = new G4VisAttributes(G4Colour(1.0,
-                                                                     1.0, 1.0));
+  G4VisAttributes *strip_detector_vis =
+      new G4VisAttributes(G4Colour(0.96, 0.96, 0.0, 0.5)); // yellow
+
   strip_detector_vis -> SetForceSolid(true);
-  G4ThreeVector dedx_PlusZ_pos = G4ThreeVector(0.0, 0.0, Dedx_zPosition);
   upper_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
                                                   DeDxDetectorMaterial,
                                                   "dedx_plusZ_log", 0, 0, 0);
   upper_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
-  upper_strip_detector_phys_ = new G4PVPlacement(0, dedx_PlusZ_pos,
+  G4ThreeVector pos = reentrant_flange_pipe.center_position -
+      strip_detector.center_position;
+  upper_strip_detector_phys_ = new G4PVPlacement(0,
+                                                 pos,
                                                  upper_strip_detector_log_,
                                                  "dedx_plusZ_phys",
-                                                 world_log_, false, 0);
+                                                 air_log_plus_, false, 0,
+                                                 check_all_for_overlaps_);
 
-
-
-  G4ThreeVector dedx_MinusZ_pos = G4ThreeVector(0.0, 0.0, -Dedx_zPosition);
   lower_strip_detector_log_ = new G4LogicalVolume(strip_detector_box_,
                                                   DeDxDetectorMaterial,
                                                   "dedx_MinusZ_log", 0,
                                                   0, 0);
   lower_strip_detector_log_ -> SetVisAttributes(strip_detector_vis);
-  lower_strip_detector_phys_ = new G4PVPlacement(0, dedx_MinusZ_pos,
+  lower_strip_detector_phys_ = new G4PVPlacement(0,
+                                                 pos,
                                                  lower_strip_detector_log_,
-                                                 "dedx_minusZ_phys", world_log_,
-                                                 false, 0);
+                                                 "dedx_minusZ_phys", air_log_mins_,
+                                                 false, 0, check_all_for_overlaps_);
 
 
   G4String dedx1SDname = "/mydet/dsssdPlusZ";
@@ -317,7 +485,8 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   if (!upper_strip_detector_sens_) {
     upper_strip_detector_sens_ = new K37StripDetectorSD(dedx1SDname);
     //                        pos_of_center, numStrips, stripWidth
-    upper_strip_detector_sens_ -> SetupParameters(dedx_PlusZ_pos, 40, 1.0*mm);
+    upper_strip_detector_sens_ -> SetupParameters(strip_detector.center_position,
+                                                  40, 1.0*mm);
     SDman->AddNewDetector(upper_strip_detector_sens_);
   }
   upper_strip_detector_log_->SetSensitiveDetector(upper_strip_detector_sens_);
@@ -327,36 +496,160 @@ void K37DetectorConstruction::ConstructStripDetectors(G4SDManager* SDman) {
   if (!lower_strip_detector_sens_) {
     lower_strip_detector_sens_ = new K37StripDetectorSD(dedx2SDname);
     //                        pos_of_center, numStrips, stripWidth
-    lower_strip_detector_sens_ -> SetupParameters(dedx_MinusZ_pos, 40, 1.0*mm);
+    lower_strip_detector_sens_ -> SetupParameters(-1.0*strip_detector.center_position,
+                                                  40, 1.0*mm);
     SDman->AddNewDetector(lower_strip_detector_sens_);
   }
   lower_strip_detector_log_->SetSensitiveDetector(lower_strip_detector_sens_);
 
   // ------------------------------ dedx mount
   if (make_sd_holders_) {
-    G4double strip_detector_frame_X  = 44.4*mm;
-
     G4VSolid * dedx_holder_sol = new G4Box("dedx_holder_sol",
-                                           strip_detector_frame_X/2.0,
-                                           strip_detector_frame_X/2.0,
-                                           1.5*mm);
+                                           sd_frame.length/2.0,
+                                           sd_frame.width/2.0,
+                                           sd_frame.depth/2.0);
     G4VSolid * dedx_holder_cut_sol = new G4Box("dedx_holder_cut_sol",
-                                               Dedx_x/2.0, Dedx_y/2.0, 1.7*mm);
+                                               sd_frame.cutout_side_length/2.0,
+                                               sd_frame.cutout_side_length/2.0,
+                                               sd_frame.cutout_depth/2.0);
     G4SubtractionSolid* dedxFrame_sol =
         new G4SubtractionSolid("dedxFrame_sol", dedx_holder_sol,
                                dedx_holder_cut_sol);
     G4LogicalVolume* dedxFrame_log =
         new G4LogicalVolume(dedxFrame_sol, SiliconDetectorFrameMaterial,
                             "dedxFrame_log", 0, 0, 0);
-    dedxFrame_logVisAttributes = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+    dedxFrame_logVisAttributes =
+        new G4VisAttributes(G4Colour(0.85, 0.65, 0.13));
     dedxFrame_logVisAttributes-> SetForceSolid(true);
     dedxFrame_log -> SetVisAttributes(dedxFrame_logVisAttributes);
-    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 98.5*mm), dedxFrame_log,
-                      "dedxFrame_plusZ_phys", world_log_, false, 0);
-    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -98.5*mm), dedxFrame_log,
-                      "dedxFrame_minusZ_phys", world_log_, false, 0);
+    pos = reentrant_flange_pipe.center_position - sd_frame.center_position;
+    new G4PVPlacement(0, pos, dedxFrame_log,
+                      "dedxFrame_plusZ_phys", air_log_plus_, false, 0,
+                      check_all_for_overlaps_);
+    new G4PVPlacement(0, pos, dedxFrame_log,
+                      "dedxFrame_minusZ_phys", air_log_mins_, false, 0,
+                      check_all_for_overlaps_);
+    // Add the inactive Si inside the frame
+    G4Box *sd_inactive_box = new G4Box("sd_inactive_box",
+                                       sd_inactive.length/2.0,
+                                       sd_inactive.width/2.0,
+                                       sd_inactive.depth/2.0);
+    G4SubtractionSolid *sd_inactive_sub =
+        new G4SubtractionSolid("sd_inactive_sub",
+                               sd_inactive_box,
+                               strip_detector_box_);
+    G4LogicalVolume *sd_inactive_log = new G4LogicalVolume(sd_inactive_sub,
+                                                           DeDxDetectorMaterial,
+                                                           "sd_inactive_log");
+    G4VisAttributes *sd_inactive_vis 
+        = new G4VisAttributes(G4Colour(0.5, 0.5, 0.0));
+    sd_inactive_vis -> SetForceSolid(true);
+    sd_inactive_log -> SetVisAttributes(sd_inactive_vis);
+    pos = reentrant_flange_pipe.center_position - sd_inactive.center_position;
+    new G4PVPlacement(0, pos, sd_inactive_log,
+                      "sd_inactive_plusZphys", air_log_plus_, false, 0,
+                      check_all_for_overlaps_);
+    new G4PVPlacement(0, pos, sd_inactive_log,
+                      "sd_inactive_minsZphys", air_log_mins_, false, 0,
+                      check_all_for_overlaps_);
+    // Add the heads of the mounting screws that the scintillator
+    // rests against
+    G4Tubs *mounting_screw_head = new G4Tubs("mounting_screw_head_tub",
+                                             sd_mounting_screw_head.inner_radius,
+                                             sd_mounting_screw_head.outer_radius,
+                                             sd_mounting_screw_head.length/2.0, 0, 2*M_PI);
+    G4LogicalVolume *mounting_screw_head_log =
+        new G4LogicalVolume(mounting_screw_head, ChamberMaterial,
+                            "mounting_screw_head_log");
+    G4VisAttributes *mounting_screw_head_vis =
+        new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
+    mounting_screw_head_vis -> SetForceSolid(true);
+    mounting_screw_head_log -> SetVisAttributes(mounting_screw_head_vis);
+    // Place them!
+    G4double xpos, ypos, zpos;
+    xpos = sd_mounting_screw_head.center_position.x();
+    ypos = sd_mounting_screw_head.center_position.y();
+    zpos = reentrant_flange_pipe.center_position.z() -
+        sd_mounting_screw_head.center_position.z();
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadP1",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM1",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadP2",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM2",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
+    ypos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadP3",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM3",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
+
+    xpos *= -1.0;
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadP4",
+                      air_log_plus_, false, 0, check_all_for_overlaps_);
+    new G4PVPlacement(0, G4ThreeVector(xpos, ypos, zpos),
+                      mounting_screw_head_log, "screwHeadM4",
+                      air_log_mins_, false, 0, check_all_for_overlaps_);
   }
+
+  
 }  // End construct stip detectors
+
+void K37DetectorConstruction::ConstructAir() {
+  G4NistManager* nist_manager = G4NistManager::Instance();
+  // Air is needed to fill the space between the strip detector and
+  // scintillator.  I will be constructed first to fill the entire
+  G4Tubs *reentrant_pipe = new G4Tubs("air_in_pipe",
+                                      0.0,
+                                      reentrant_flange_pipe.inner_radius,
+                                      reentrant_flange_pipe.length/2.0,
+                                      0.0, 2*M_PI*rad);
+  G4Cons *reentrant_des = new G4Cons("air_in_descender",
+                                     0.0,
+                                     reentrant_flange_descender.inner_radius2,
+                                     0.0,
+                                     reentrant_flange_descender.inner_radius,
+                                     reentrant_flange_descender.length/2.0,
+                                     0.0, 2.0*M_PI*rad);
+  G4UnionSolid *reentrant_air =
+      new G4UnionSolid("air_in_reentrant", reentrant_pipe, reentrant_des, 0,
+                       G4ThreeVector(0.0, 0.0,
+                                     0.5*(reentrant_flange_pipe.length +
+                                          reentrant_flange_descender.length)));
+  air_log_plus_ =
+      new G4LogicalVolume(reentrant_air,
+                          nist_manager -> FindOrBuildMaterial("G4_AIR"),
+                          "air_in_reentrant_plus", 0, 0, 0);
+  air_log_mins_ =
+      new G4LogicalVolume(reentrant_air,
+                          nist_manager -> FindOrBuildMaterial("G4_AIR"),
+                          "air_in_reentrant_mins", 0, 0, 0);
+
+  G4VisAttributes *air_vis =// new G4VisAttributes(false); // invisible
+      new G4VisAttributes(G4Colour(0.53, 0.80, 0.98, 0.1)); // sky blue
+  air_vis -> SetForceSolid(true);
+  air_log_plus_ -> SetVisAttributes(air_vis);
+  air_log_mins_ -> SetVisAttributes(air_vis);
+  G4ThreeVector pos = reentrant_flange_pipe.center_position;// -
+  //      G4ThreeVector(0.0, 0.0, 0.5*reentrant_flange_descender.length);
+  CLHEP::HepRotation *zRot = new CLHEP::HepRotation;
+  zRot -> rotateY(180.0*deg);
+
+  new G4PVPlacement(zRot, pos, air_log_plus_, "air_plus_z", world_log_,
+                    false, 0, check_all_for_overlaps_);
+
+  new G4PVPlacement(0, -1.0*pos, air_log_mins_, "air_mins_z", world_log_,
+                    false, 0, check_all_for_overlaps_);
+}
 
 void K37DetectorConstruction::ConstructChamber() {
   G4double chamberBlock_x = 558.8*mm;
@@ -600,7 +893,7 @@ void K37DetectorConstruction::ConstructChamber() {
   180.*deg);
   chamber_phys_ = new G4PVPlacement(y180, G4ThreeVector(0.0, 0.0, 0.0),
                                     chamber_log_, "chamber_phys", world_log_,
-                                    false, 0);
+                                    false, 0, check_all_for_overlaps_);
 
   // chamber_log_VisAttributes = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
   // chamber_logVisAttributes-> SetForceWireframe(true);
@@ -610,64 +903,81 @@ void K37DetectorConstruction::ConstructChamber() {
   // a non const pointer that can later be delete avoiding a memory
   // leak.
   //chamber_logVisAttributes = new G4VisAttributes(false);
-  chamber_logVisAttributes = new G4VisAttributes(
-        G4Colour(255/255., 170/255., 0, 0.1));
+  chamber_logVisAttributes = new G4VisAttributes(false);
+      //    G4Colour(255/255., 170/255., 0, 0.1));
 
-  chamber_logVisAttributes-> SetForceSolid(true);
+  chamber_logVisAttributes-> SetForceWireframe(true);
   chamber_log_ -> SetVisAttributes(chamber_logVisAttributes);
 
-  // ------------------------------ Optical Pumping Rentrant Flanges
+  // ------------------------------ Reentrant Flanges for beta-telescope
   // (z+ and z-) (OPRF)
 
 
-  G4VSolid * OPRF_sol = new G4Tubs("OPRF_sol", (98.298/2.0)*mm, (101.6/2.0)*mm,
-                                   (160.0/2.0)*mm, 0.0*deg, 360.0*deg);
+  G4VSolid * OPRF_sol = new G4Tubs("OPRF_sol",
+                                   reentrant_flange_pipe.inner_radius,
+                                   reentrant_flange_pipe.outer_radius,
+                                   reentrant_flange_pipe.length/2.0,
+                                   0.0*deg, 360.0*deg);
 
   G4LogicalVolume * OPRF_log = new G4LogicalVolume(OPRF_sol,
                                                    ChamberMaterial,
                                                    "OPRF_log", 0, 0, 0);
 
-  new G4PVPlacement(0, G4ThreeVector(0., 0., 182*mm), OPRF_log,
-                    "OPRF_plusZ_phys", world_log_, false, 0);
-  new G4PVPlacement(0, G4ThreeVector(0., 0., -182*mm), OPRF_log,
-                    "OPRF_minusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(0, reentrant_flange_pipe.center_position, OPRF_log,
+                    "OPRF_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
+  new G4PVPlacement(0, -1.0*reentrant_flange_pipe.center_position, OPRF_log,
+                    "OPRF_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
   OPRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   OPRF_logVisAttributes-> SetForceSolid(true);
-  // chamber_logVisAttributes-> SetForceWireframe(true);
+  //  chamber_logVisAttributes-> SetForceWireframe(true);
   OPRF_log -> SetVisAttributes(OPRF_logVisAttributes);
 
-  // ------------------------------ Rentrant Flange Descender (RFD)
+  // ------------------------------ Reentrant Flange Descender (RFD)
 
-  G4VSolid * RFD_sol = new G4Cons("RFD_sol", 47.431*mm, 48.951*mm, 49.153*mm,
-                                  50.673*mm, 2.5*mm, 0.0*deg, 360.0*deg);
+  G4VSolid * RFD_sol = new G4Cons("RFD_sol",
+                                  reentrant_flange_descender.inner_radius,
+                                  reentrant_flange_descender.outer_radius,
+                                  reentrant_flange_descender.inner_radius2,
+                                  reentrant_flange_descender.outer_radius2,
+                                  reentrant_flange_descender.length/2.0,
+                                  0.0*deg, 360.0*deg);
   G4LogicalVolume* RFD_log = new G4LogicalVolume(RFD_sol, ChamberMaterial,
                                                  "RFD_log", 0, 0, 0);
   RFD_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
   RFD_logVisAttributes-> SetForceSolid(true);
   RFD_log -> SetVisAttributes(RFD_logVisAttributes);
 
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 99.5*mm), RFD_log,
-                    "RFD_plusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(0, reentrant_flange_descender.center_position,
+                    RFD_log, "RFD_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 
 
   // G4RotationMatrix* RFDRotation = new G4RotationMatrix();
   RFDRotation = new CLHEP::HepRotation();
   RFDRotation->rotateX(180.*deg);
 
-  new G4PVPlacement(RFDRotation, G4ThreeVector(0.0, 0.0, -99.5*mm), RFD_log,
-                    "RFD_minusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(RFDRotation,
+                    -1.0*reentrant_flange_descender.center_position,
+                    RFD_log, "RFD_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 
   // ------------------------------ beryllium declared here so that a
   // socket could be cut out for it
-  G4VSolid * beryllium_sol = new G4Tubs("beryllium_sol", 0*mm, 30.0*mm,
-                                        (0.229/2.0)*mm, 0.0*deg,
-                                        360.0*deg);
+  G4VSolid * beryllium_sol = new G4Tubs("beryllium_sol",
+                                        beryllium_window.inner_radius,
+                                        beryllium_window.outer_radius,
+                                        beryllium_window.length/2.0,
+                                        0.0*rad, 2*M_PI*rad);
+
   G4LogicalVolume* beryllium_log = new G4LogicalVolume(beryllium_sol,
                                                        FoilMaterial,
                                                        "beryllium_log",
                                                        0, 0, 0);
 
-  beryllium_logVisAttributes = new G4VisAttributes(G4Colour(0.1, 0.2, 0.7));
+  beryllium_logVisAttributes =
+      new G4VisAttributes(G4Colour(0.80, 0.36, 0.36, 0.8)); // pale red
   // G4VisAttributes* beryllium_logVisAttributes =
   //   new G4VisAttributes(G4Colour(0.1, 0.2, 0.7));
 
@@ -675,45 +985,52 @@ void K37DetectorConstruction::ConstructChamber() {
 
   beryllium_log -> SetVisAttributes(beryllium_logVisAttributes);
 
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (97.0-(0.229/2.0))*mm),
+  new G4PVPlacement(0, beryllium_window.center_position,
                     beryllium_log, "beryllium_plusZ_phys", world_log_, false,
-                    0);
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, -(97.0-(0.229/2.0))*mm),
+                    0, check_all_for_overlaps_);
+  new G4PVPlacement(0, -1.0*beryllium_window.center_position,
                     beryllium_log, "beryllium_minusZ_phys",
-                    world_log_, false, 0);
+                    world_log_, false, 0, check_all_for_overlaps_);
 
-  // ------------------------------ Front Face Rentrant Flange (FFRF)
+  // ------------------------------ Front Face Reentrant Flange (FFRF)
 
-  G4VSolid * FFRF_beforeCut_sol = new G4Cons("FFRF_beforeCut_sol", 29.0*mm,
-                                             47.295*mm, 29.0*mm, 48.951*mm,
-                                             2.5*mm, 0.0*deg, 360.0*deg);
+  G4VSolid * FFRF_beforeCut_sol =
+      new G4Cons("FFRF_beforeCut_sol",
+                 reentrant_flange_front_face.inner_radius,
+                 reentrant_flange_front_face.outer_radius,
+                 reentrant_flange_front_face.inner_radius2,
+                 reentrant_flange_front_face.outer_radius2,
+                 reentrant_flange_front_face.length/2.0,
+                 0.0*deg, 360.0*deg);
 
-  G4ThreeVector cutForBeryllium(0.0*mm, 0.0*mm, (2.5 - (0.229/2.0))*mm);
+  G4ThreeVector cutForBeryllium(0.0, 0.0,
+        0.5*(reentrant_flange_front_face.length - beryllium_window.length));
 
   G4SubtractionSolid* FFRF_sol =
     new G4SubtractionSolid("FFRF_sol", FFRF_beforeCut_sol, beryllium_sol, 0,
                            cutForBeryllium);
-
-  G4LogicalVolume* FFRF_log = new G4LogicalVolume(FFRF_sol, ChamberMaterial,
+  
+  G4LogicalVolume* FFRF_log = new G4LogicalVolume(FFRF_sol,
+                                                  ChamberMaterial,
                                                   "FFRF_log", 0, 0, 0);
 
   FFRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
-  // G4VisAttributes* FFRF_logVisAttributes =
-  //   new G4VisAttributes(G4Colour(0.8, 0.4, 0.5));
-
   FFRF_logVisAttributes-> SetForceSolid(true);
-
   FFRF_log -> SetVisAttributes(FFRF_logVisAttributes);
 
-  new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 94.5*mm), FFRF_log,
-                    "FFRF_plusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(0,
+                    reentrant_flange_front_face.center_position,
+                    FFRF_log, "FFRF_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 
   // G4RotationMatrix* FFRFRotation = new G4RotationMatrix();
   FFRFRotation = new CLHEP::HepRotation();
   FFRFRotation->rotateX(180.*deg);
 
-  new G4PVPlacement(FFRFRotation, G4ThreeVector(0.0, 0.0, -94.5*mm),
-                    FFRF_log, "FFRF_minusZ_phys", world_log_, false, 0);
+  new G4PVPlacement(FFRFRotation,
+                    -1.0*reentrant_flange_front_face.center_position,
+                    FFRF_log, "FFRF_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 }  // End construct chamber
 
 void K37DetectorConstruction::ConstructMirrors() {
@@ -729,9 +1046,11 @@ void K37DetectorConstruction::ConstructMirrors() {
   mirror_log = new G4LogicalVolume(mirror_sol, MirrorMaterial,
                                    "mirror_log", 0, 0, 0);
   new G4PVPlacement(mirror_rotation, mirror.center_position,
-                    mirror_log, "mirror_plusZ_phys", world_log_, false, 0);
+                    mirror_log, "mirror_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
   new G4PVPlacement(mirror_rotation, -1.0*mirror.center_position,
-                    mirror_log, "mirror_minusZ_phys", world_log_, false, 0);
+                    mirror_log, "mirror_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
   mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.9, 0.1, 0.1, 0.9));
   mirror_logVisAttributes-> SetForceSolid(true);
   mirror_log -> SetVisAttributes(mirror_logVisAttributes);
@@ -749,24 +1068,6 @@ void K37DetectorConstruction::ConstructMirrors() {
   G4Tubs *mount_tubs = new G4Tubs("collimator_tubs",
                                   0.0, mirror_mount.cutout_radius,
                                   mirror_mount.cutout_depth/2.0, 0.0, 2*M_PI);
-  // G4VSolid * MM_beforCollimatorCut_sol =
-  //   new G4Tubs("MM_beforCollimatorCut_sol", 0.0*deg, 42.5*mm, 7.0*mm, 0.0*deg,
-  //              360.0*deg);
-  // if (shouldTheMirrorBeWFEDMCut == true) {
-  //   MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 16.05*mm, 18.93*mm,
-  //                                    16.05*mm, 18.93*mm, 7.1*mm);
-  // } else {
-  //   MM_CollimatorCut_sol = new G4Trd("MM_CollimatorCut_sol", 18.93*mm, 18.93*mm,
-  //                                    18.93*mm, 18.93*mm, 7.1*mm);
-  // }
-
-  // G4SubtractionSolid* MM_beforeMirrorCut_sol =
-  //   new G4SubtractionSolid("MM_beforeMirrorCut_sol", MM_beforCollimatorCut_sol,
-  //                          MM_CollimatorCut_sol);
-
-  // // G4RotationMatrix *MirrorCutRotation = new G4RotationMatrix();
-  // MirrorCutRotation = new CLHEP::HepRotation();
-  // MirrorCutRotation->rotateX(9.5*deg);
 
   G4SubtractionSolid* mirror_mount_sub =
       new G4SubtractionSolid("MM_sol", mirror_mount_tub, collimator_box);
@@ -783,17 +1084,19 @@ void K37DetectorConstruction::ConstructMirrors() {
   G4VisAttributes* MM_logVisAttributes =
       new G4VisAttributes(G4Colour(0.2, 0.9, 0.5));
 
-  //  MM_logVisAttributes-> SetForceSolid(true);
+  //MM_logVisAttributes-> SetForceSolid(true);
   MM_logVisAttributes-> SetForceWireframe(true);
   mirror_mount_log -> SetVisAttributes(MM_logVisAttributes);
 
   new G4PVPlacement(0, mirror_mount.center_position,
-                    mirror_mount_log, "MM_plusZ_phys", world_log_, false, 0);
+                    mirror_mount_log, "MM_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 
   CLHEP::HepRotation *MMRotation = new CLHEP::HepRotation();
   MMRotation->rotateX(180.*deg);
   new G4PVPlacement(MMRotation, -1.0*mirror_mount.center_position,
-                     mirror_mount_log, "MM_minusZ_phys", world_log_, false, 0);
+                    mirror_mount_log, "MM_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 }  // End ConstructMirrors
 
 void K37DetectorConstruction::ConstructHoops() {
@@ -1104,22 +1407,25 @@ void K37DetectorConstruction::ConstructHoops() {
 
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., 57.5*mm, 0.),
                     hoop_3through6_box_log, "hoop_3through6_phys_3",
-                    world_log_, false, 0);
+                    world_log_, false, 0, check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., 29.5*mm, 0.),
                     hoop_3through6_box_log, "hoop_3through6_phys_4",
-                    world_log_, false, 0);
+                    world_log_, false, 0, check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., -29.5*mm, 0.),
                     hoop_3through6_box_log, "hoop_3through6_phys_5",
-                    world_log_, false, 0);
+                    world_log_, false, 0, check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., -57.5*mm, 0.),
                     hoop_3through6_box_log, "hoop_3through6_phys_6",
-                    world_log_, false, 0);
+                    world_log_, false, 0, check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., -75.5*mm, 0.),
-                    hoop_7_log, "hoop_7_phys", world_log_, false, 0);
+                    hoop_7_log, "hoop_7_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., 75.5*mm, 0.),
-                    hoop_2_log, "hoop_2_phys", world_log_, false, 0);
+                    hoop_2_log, "hoop_2_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
   new G4PVPlacement(hoopRotation, G4ThreeVector(0., 97.5*mm, 0.),
-                    hoop_1_log, "hoop_1_phys", world_log_, false, 0);
+                    hoop_1_log, "hoop_1_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 }  // End construct hoops
 
 void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
@@ -1132,11 +1438,11 @@ void K37DetectorConstruction::ConstructElectronMCP(G4SDManager *sd_man) {
   electron_mcp_tub_ = new G4Tubs("SOED_sol", SOED_rmin, electron_mcp_radius_,
                                  SOED_dz, SOED_Sphi, SOED_Dphi);
   electron_mcp_log_ = new G4LogicalVolume(electron_mcp_tub_, MCPMaterial,
-                                          "SOED_log", 0, 0, 0);
+                                          "SOED_log", 0, 0, 0, check_all_for_overlaps_);
   electron_mcp_phys_ = new G4PVPlacement(changeZtoX,
                                          G4ThreeVector(0., SOED_z_pos, 0),
                                          electron_mcp_log_, "SOED_phys",
-                                         world_log_, false, 0);
+                                         world_log_, false, 0, check_all_for_overlaps_);
   SOED_logVisAttributes = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   SOED_logVisAttributes-> SetForceSolid(true);
   electron_mcp_log_ -> SetVisAttributes(SOED_logVisAttributes);
@@ -1167,7 +1473,7 @@ void K37DetectorConstruction::ConstructRecoilMCP(G4SDManager *sd_man) {
   recoil_mcp_phys_ = new G4PVPlacement(changeZtoX,
                                        G4ThreeVector(0., rmcp_z_pos, 0),
                                        recoil_mcp_log_, "rmcp_phys", world_log_,
-                                       false, 0);
+                                       false, 0, check_all_for_overlaps_);
   rmcp_logVisAttributes_ = new G4VisAttributes(G4Colour(0.3, 0.3, 0.3));
   rmcp_logVisAttributes_ -> SetForceSolid(true);
   recoil_mcp_log_ -> SetVisAttributes(rmcp_logVisAttributes_);
@@ -1195,9 +1501,9 @@ void K37DetectorConstruction::ConstructCoils() {
   G4LogicalVolume * coils_log = new G4LogicalVolume(coils_sol, CoilsMaterial,
                                                     "coils_log", 0, 0, 0);
   new G4PVPlacement(0, G4ThreeVector(0., 0., 65.), coils_log,
-                    "coils_plusZ_phys", world_log_, false, 0);
+                    "coils_plusZ_phys", world_log_, false, 0, check_all_for_overlaps_);
   new G4PVPlacement(0, G4ThreeVector(0., 0., -65.), coils_log,
-                    "coils_minusZ_phys", world_log_, false, 0);
+                    "coils_minusZ_phys", world_log_, false, 0, check_all_for_overlaps_);
 
   coils_logVisAttributes= new G4VisAttributes(G4Colour(0.6, 0.35, 0.0, 1.0));
   // G4VisAttributes* coils_logVisAttributes =
@@ -1343,6 +1649,10 @@ void K37DetectorConstruction::DefineMaterials() {
   Macor -> AddElement(F, fractionmass = 4*perCent);
 
   G4Material *lead_glass = nist_manager -> FindOrBuildMaterial("G4_GLASS_LEAD");
+  G4Material *teflon = nist_manager -> FindOrBuildMaterial("G4_TEFLON");
+  //  G4Material *air = nist_manager -> FindOrBuildMaterial("G4_AIR")
+  trinat_materials_.insert(std::pair<G4String, G4Material*>(teflon -> GetName(),
+                                                            teflon));
   /* Pre-defined material:
      density = 6.22 g/cm3
      mean excitation energy = 526.4 eV
@@ -1355,7 +1665,7 @@ void K37DetectorConstruction::DefineMaterials() {
                    Titanium (Z = 22) - 0.008092
                    Arsenic  (Z = 33) - 0.002651
    */
-
+  
   // Set default materials
   MirrorMaterial = SiliconCarbide;
   world_material_ = vacuum;
