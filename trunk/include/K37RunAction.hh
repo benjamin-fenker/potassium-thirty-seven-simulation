@@ -221,6 +221,7 @@ class K37RunAction : public G4UserRunAction {
   TDC_Channel *tdc_ion_mcp_, *tdc_electron_mcp_;
   TDC_Channel *tdc_photo_diode_;
   TDC_Channel *tdc_long_electron_, *tdc_nimio32_trigger_, *tdc_tdc_stop_;
+  TDC_Channel *volumeList;
   Generic_Channel *electron_kinetic_energy_generated_, *electron_mu_generated_;
   Generic_Channel *recoil_mu_generated_,  *run_action_, *recoil_mcp_particle_;
   Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_, *recoil_charge_state_;

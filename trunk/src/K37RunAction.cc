@@ -121,6 +121,7 @@ K37RunAction::K37RunAction()
   tdc_nimio32_trigger_ = new TDC_Channel("TDC_NIMIO32_TRIGGER", 205, "/v",
                                          false);
   tdc_tdc_stop_= new TDC_Channel("TDC_TDC_STOP", 205, "/v", false);
+  volumeList = new TDC_Channel("VOLUME_LIST", 206, "/vs", false);
 
   // Event generator and other Geant-only data
   electron_kinetic_energy_generated_ = new Generic_Channel("T_GEN_ELE", 301,
@@ -191,6 +192,7 @@ K37RunAction::~K37RunAction() {
   delete tdc_long_electron_;
   delete tdc_nimio32_trigger_;
   delete tdc_tdc_stop_;
+  delete volumeList;
   delete electron_kinetic_energy_generated_;
   delete electron_mu_generated_;
   delete recoil_mu_generated_;
@@ -313,6 +315,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(tdc_long_electron_);
   RegisterChannel(tdc_nimio32_trigger_);
   RegisterChannel(tdc_tdc_stop_);
+  RegisterChannel(volumeList);
 
   RegisterChannel(tnim_op_beam_);
   RegisterChannel(ttlbit_sigmaplus_);
