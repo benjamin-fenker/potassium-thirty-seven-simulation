@@ -4,7 +4,6 @@
 #define K37_Data_h 1
 
 #include <stdint.h>
-
 #include <string>
 #include <vector>
 
@@ -17,6 +16,7 @@ class K37_Data {
   // stored into the class with the InsertData function. In the case of a
   // waveform each element of the waveform requires is own call to InsertData
   virtual void InsertData(const double &) = 0;
+  virtual void InsertData(const std::string &) = 0;
 
   // Event By Event as data is upacked from the midas file it will than be
   // stored into the class with the InsertData function. I realized later that
@@ -63,6 +63,9 @@ class K37_Data {
 
   // This function will be used to fill the TTree.
   virtual std::vector<double>* GetReferenceV() = 0;
+
+  // This function will be used to fill the TTree.
+  virtual std::vector<std::string>* GetReferenceVS() = 0;
 
   // This function will be used to fill the TTree. Any is overloaded to handle
   // different types.

@@ -160,6 +160,11 @@ void Aggregator::ImplementAGG::OpenOutputChannel(const std::string &method_,
                             "std::vector<double>",
                             ((*it_data).second)->GetReferenceV());
         }
+        if (typeBit == "/vs") {
+          theNTuple->Branch(columnName.c_str(),
+                            "std::vector<std::string>",
+                            ((*it_data).second)->GetReferenceVS());
+        }
       }
     }
     writeToROOT = true;

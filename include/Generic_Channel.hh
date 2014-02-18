@@ -30,7 +30,8 @@ class Generic_Channel:public K37_ABC::K37_Data {
        data(0),
        defaultValue(0),
        uniqueName(uniqueName_),
-       dataType(dataType_) {}
+       dataType(dataType_),
+       stringData(std::string()){}
     ~Generic_Channel() {}
     void InsertData(const double &data_) {
         data = data_;
@@ -38,10 +39,12 @@ class Generic_Channel:public K37_ABC::K37_Data {
     }
 
     void InsertData(const uint32_t &data_) {intData = data_;}
+    void InsertData(const std::string &data_) {stringData = data_;}
     void InsertDataL(const uint64_t &data_) {longData = data_;}
     uint64_t* GetReferenceI() {return &longData;}
     double* GetReferenceD() {return &data;}
     std::vector<double>* GetReferenceV() {return &vectData;}
+    std::vector<std::string>* GetReferenceVS() {return &vectNames;}
     void SetDefaultValue(const double &defaultValue_) {
       defaultValue = defaultValue_;
     }
@@ -71,8 +74,10 @@ class Generic_Channel:public K37_ABC::K37_Data {
   double data;
   double defaultValue;
   std::vector<double> vectData;
+  std::vector<std::string> vectNames;
   std::string uniqueName;
   std::string dataType;
+  std::string stringData;
 };
 
 #endif

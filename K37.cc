@@ -25,6 +25,7 @@
 #include "K37SteppingVerbose.hh"
 #include "K37ElectricFieldSetup.hh"
 #include "K37StackingAction.hh"
+#include "K37SteppingAction.hh"
 #include "K37Config.hh"
 #include "G4VisTrajContext.hh"
 #include "Aggregator.hh"
@@ -132,11 +133,16 @@ int main(int argc, char** argv) {
   runManager   -> SetUserAction(event_action);
   the_aggregator -> SetEventAction(event_action);
 
-  // get the pointer to the User Interface manager
+  K37SteppingAction *stepping_action = new K37SteppingAction();
+  stepping_action -> SetActiveChannels(&active_channels);
+  runManager->SetUserAction(stepping_action);
+
   runManager->SetUserAction(new K37StackingAction);
+
   G4int result = static_cast<G4int>(system("rm -rf detectors.root"));
   if (result != 0) G4cout << "Could not remove detectors.root." << G4endl;
 
+  // get the pointer to the User Interface manager
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive("quiet");
   visManager->Initialize();
@@ -165,7 +171,7 @@ int main(int argc, char** argv) {
     G4String fileName = argv[1]; 
     G4UIExecutive * ui = new G4UIExecutive(argc, argv);
     UImanager->ApplyCommand(command+fileName);
-    ui -> SessionStart();
+    //ui -> SessionStart();
     delete ui;
     //   UImanager->ApplyCommand(command+fileName);
   } else {       // interactive mode : define UI session

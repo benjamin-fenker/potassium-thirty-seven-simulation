@@ -48,6 +48,13 @@ class TDC_Channel:public K37_ABC::K37_Data {
     theCount->InsertData(count);
   };
 
+  void InsertData(const std::string &data_ ) {
+    vectNames.push_back(data_);
+    count += 1;
+    dataIsOK = true;
+    theCount->InsertData(count);
+  };
+
   void InsertData(const uint32_t &data_ ) {
     intData = data_;
   };
@@ -62,6 +69,9 @@ class TDC_Channel:public K37_ABC::K37_Data {
   std::vector<double>* GetReferenceV() {
     return &vectData;
   };
+  std::vector<std::string>* GetReferenceVS() {
+    return &vectNames;
+  };
 
   void SetDefaultValue(const double &defaultValue_) {
     defaultValue = defaultValue_;
@@ -74,6 +84,7 @@ class TDC_Channel:public K37_ABC::K37_Data {
   void Clear() {
     data = defaultValue;
     vectData.clear(), count = 0;
+    vectNames.clear();
     dataIsOK = false;
   };
 
@@ -115,6 +126,7 @@ class TDC_Channel:public K37_ABC::K37_Data {
   double data;
   double defaultValue;
   std::vector<double> vectData;
+  std::vector<std::string> vectNames;
   std::string uniqueName;
   std::string dataType;
 };
