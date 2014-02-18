@@ -123,6 +123,12 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   set_cone_half_angle_cmd_ -> SetDefaultValue(acos(0.75)*rad);
   set_cone_half_angle_cmd_ -> SetDefaultUnit("radian");
 
+  set_BigA = new G4UIcmdWithADouble( "/K37/gun/setBigA", this);
+  set_BigA -> SetGuidance(
+        "Enter A_{beta}. The default value is the current SM prediction for 37K.");
+  set_BigA -> SetParameterName("A_{beta}", true);
+  set_BigA -> SetDefaultValue(-0.573938);
+
   // rad = 1.00 internally
 
 }
@@ -146,6 +152,8 @@ K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
   delete set_cloud_sail_velocity_v_;
   delete set_cloud_sail_velocity_d_;
   delete set_minimum_cos_theta_cmd_;
+  delete set_cone_half_angle_cmd_;
+  delete set_BigA;
 }
 
 // ----------------------------------
@@ -213,6 +221,11 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
     action_ -> GetEventGenerator() ->
         SetConeHalfAngle(set_cone_half_angle_cmd_ ->
                          GetNewDoubleValue(newValue));
+  }
+  if (command == set_BigA)
+  {
+    action_ -> GetEventGenerator() -> SetBigA(
+          set_BigA-> GetNewDoubleValue(newValue));
   }
 }
 

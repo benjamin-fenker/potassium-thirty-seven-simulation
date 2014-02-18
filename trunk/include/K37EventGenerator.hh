@@ -82,6 +82,7 @@ class K37EventGenerator {
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
     active_channels_ = active_channels;
   }
+  void SetBigA(G4double BigA_);
   void SetMinCosTheta(G4double mct);
   void SetConeHalfAngle(G4double angle);
 };
