@@ -62,6 +62,18 @@ K37EventGenerator::~K37EventGenerator() {
   delete FF;
 }
 
+void K37EventGenerator::SetBigA(G4double BigA_)
+{
+  if ((BigA_ > 1) && (BigA_ < -1))
+  {
+     G4cout << "Warning! A_{beta} should be in range [-1,1]. " 
+        << BigA_<<" is unacceptable!"<< G4endl;
+    G4cout << "No action taken." << G4endl;
+    return;
+  }
+  BigA = BigA_;
+}
+
 void K37EventGenerator::SetMinCosTheta(G4double mct) {
   if (mct < 0) {
     G4cout << "Warning! Minimum cos(theta) should be positive!" << G4endl;

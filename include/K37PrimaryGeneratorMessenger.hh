@@ -46,6 +46,7 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   G4UIcmdWithADoubleAndUnit *set_cloud_sail_velocity_d_;
   G4UIcmdWithADouble *set_minimum_cos_theta_cmd_;
   G4UIcmdWithADoubleAndUnit *set_cone_half_angle_cmd_;
+  G4UIcmdWithADouble *set_BigA;
 };
 
 //----------------------------------
