@@ -73,7 +73,8 @@ K37DetectorConstruction::K37DetectorConstruction()
       FFRF_logVisAttributes(0), mirror_logVisAttributes(0),
       MM_logVisAttributes(0), cut_ESP_logVisAttributes(0),
       hoop7_logVisAttributes(0), SOED_logVisAttributes(0),
-      coils_logVisAttributes(0), rmcp_logVisAttributes_(0) {
+      coils_logVisAttributes(0),coilLiquid_logVisAttributes(0),
+      rmcp_logVisAttributes_(0) {
 
   // Default values
   world_size_ = 2.0 * m;
@@ -118,38 +119,76 @@ K37DetectorConstruction::K37DetectorConstruction()
   {
      for(int xcount = 0; xcount < 4; ++xcount)
      {
-        tempName = nameStart+"_"+std::to_string(ycount)
+        tempName = nameStart+"_PZ_"+std::to_string(ycount)
            +"_"+std::to_string(xcount);
-        coil_inner_torus[ycount][xcount].nameBase = tempName;
-        coil_inner_torus[ycount][xcount].inner_radius = 0.0;
-        coil_inner_torus[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
-        coil_inner_torus[ycount][xcount].sweep_radius =
+        coil_inner_torus_PZ[ycount][xcount].nameBase = tempName;
+        coil_inner_torus_PZ[ycount][xcount].inner_radius = 0.0;
+        coil_inner_torus_PZ[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
+        coil_inner_torus_PZ[ycount][xcount].sweep_radius =
             ((distanceFromCloseEdgeToPolarization + (tubeOuterDiameter/2.0))
             +double(xcount)*(tubeOuterDiameter+tubeSpacing));
 
-        coil_inner_torus[ycount][xcount].start_phi = 0;
-        coil_inner_torus[ycount][xcount].delta_phi = 360*deg;
-        coil_inner_torus[ycount][xcount].center_position =
+        coil_inner_torus_PZ[ycount][xcount].start_phi = 0;
+        coil_inner_torus_PZ[ycount][xcount].delta_phi = 360*deg;
+        coil_inner_torus_PZ[ycount][xcount].center_position =
         G4ThreeVector(0, 0, ((distanceFromBottomToChamberCenter
             +(tubeOuterDiameter/2.0))
             +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
 
-        tempName = nameStartTub+"_"+std::to_string(ycount)
+        tempName = nameStartTub+"_PZ_"+std::to_string(ycount)
            +"_"+std::to_string(xcount);
-        coil_outer_tubs[ycount][xcount].nameBase = tempName;
-        coil_outer_tubs[ycount][xcount].inner_radius =
+        coil_outer_tubs_PZ[ycount][xcount].nameBase = tempName;
+        coil_outer_tubs_PZ[ycount][xcount].inner_radius =
            (distanceFromCloseEdgeToPolarization
             +(double(xcount)*(tubeOuterDiameter+tubeSpacing)));
 
-        coil_outer_tubs[ycount][xcount].outer_radius =
+        coil_outer_tubs_PZ[ycount][xcount].outer_radius =
            ((distanceFromCloseEdgeToPolarization + (tubeOuterDiameter))
             +(double(xcount)*(tubeOuterDiameter+tubeSpacing)));
 
-        coil_outer_tubs[ycount][xcount].length = tubeOuterDiameter;
+        coil_outer_tubs_PZ[ycount][xcount].length = tubeOuterDiameter;
 
-        coil_outer_tubs[ycount][xcount].start_phi = 0;
-        coil_outer_tubs[ycount][xcount].delta_phi = 360*deg;
-        coil_outer_tubs[ycount][xcount].center_position =
+        coil_outer_tubs_PZ[ycount][xcount].start_phi = 0;
+        coil_outer_tubs_PZ[ycount][xcount].delta_phi = 360*deg;
+        coil_outer_tubs_PZ[ycount][xcount].center_position =
+        G4ThreeVector(0, 0, ((distanceFromBottomToChamberCenter
+            +(tubeOuterDiameter/2.0))
+            +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
+
+        //====================================================================
+          
+        tempName = nameStart+"_MZ_"+std::to_string(ycount)
+           +"_"+std::to_string(xcount);
+        coil_inner_torus_MZ[ycount][xcount].nameBase = tempName;
+        coil_inner_torus_MZ[ycount][xcount].inner_radius = 0.0;
+        coil_inner_torus_MZ[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
+        coil_inner_torus_MZ[ycount][xcount].sweep_radius =
+            ((distanceFromCloseEdgeToPolarization + (tubeOuterDiameter/2.0))
+            +double(xcount)*(tubeOuterDiameter+tubeSpacing));
+
+        coil_inner_torus_MZ[ycount][xcount].start_phi = 0;
+        coil_inner_torus_MZ[ycount][xcount].delta_phi = 360*deg;
+        coil_inner_torus_MZ[ycount][xcount].center_position =
+        G4ThreeVector(0, 0, -((distanceFromBottomToChamberCenter
+            +(tubeOuterDiameter/2.0))
+            +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
+
+        tempName = nameStartTub+"_MZ_"+std::to_string(ycount)
+           +"_"+std::to_string(xcount);
+        coil_outer_tubs_MZ[ycount][xcount].nameBase = tempName;
+        coil_outer_tubs_MZ[ycount][xcount].inner_radius =
+           (distanceFromCloseEdgeToPolarization
+            +(double(xcount)*(tubeOuterDiameter+tubeSpacing)));
+
+        coil_outer_tubs_MZ[ycount][xcount].outer_radius =
+           ((distanceFromCloseEdgeToPolarization + (tubeOuterDiameter))
+            +(double(xcount)*(tubeOuterDiameter+tubeSpacing)));
+
+        coil_outer_tubs_MZ[ycount][xcount].length = tubeOuterDiameter;
+
+        coil_outer_tubs_MZ[ycount][xcount].start_phi = 0;
+        coil_outer_tubs_MZ[ycount][xcount].delta_phi = 360*deg;
+        coil_outer_tubs_MZ[ycount][xcount].center_position =
         G4ThreeVector(0, 0, -((distanceFromBottomToChamberCenter
             +(tubeOuterDiameter/2.0))
             +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
@@ -283,6 +322,7 @@ K37DetectorConstruction::~K37DetectorConstruction() {
   if (hoop7_logVisAttributes) delete hoop7_logVisAttributes;
   if (SOED_logVisAttributes) delete SOED_logVisAttributes;
   if (coils_logVisAttributes) delete coils_logVisAttributes;
+  if (coilLiquid_logVisAttributes) delete coilLiquid_logVisAttributes;
   if (rmcp_logVisAttributes_) delete rmcp_logVisAttributes_;
 }
 
@@ -1553,45 +1593,60 @@ void K37DetectorConstruction::ConstructCoils() {
   G4Tubs *coilMetal_sol;
   G4LogicalVolume *coilMetal_log;
 
+  G4SubtractionSolid *coilMetalSubtracted_sol;
+
   G4String solNameTorus = G4String();
   G4String logNameTorus = G4String();
   G4String physNameTorus = G4String();
 
+  G4String solNameTubSubtracted = G4String();
   G4String solNameTub = G4String();
   G4String logNameTub = G4String();
   G4String physNameTub = G4String();
 
-  coils_logVisAttributes= new G4VisAttributes(G4Colour(0.6, 0.35, 0.0, 1.0));
+  coils_logVisAttributes= new G4VisAttributes(G4Colour(0.6, 0.35, 0.0, 0.25));
   coils_logVisAttributes-> SetForceSolid(true);
-  // MM_logVisAttributes-> SetForceWireframe(true);
+  // coils_logVisAttributes-> SetForceWireframe(true);
+    
+  coilLiquid_logVisAttributes= new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 0.8));
+  coilLiquid_logVisAttributes-> SetForceSolid(true);
+  // coilLiquid_logVisAttributes-> SetForceWireframe(true);
 
   for(int ycount = 0; ycount < 4; ++ycount)
   {
      for(int xcount = 0; xcount < 4; ++xcount)
      {
-        solNameTorus = coil_inner_torus[ycount][xcount].nameBase + "_sol";
-        logNameTorus = coil_inner_torus[ycount][xcount].nameBase + "_log";
-        physNameTorus= coil_inner_torus[ycount][xcount].nameBase + "_phys";
+        solNameTorus = coil_inner_torus_PZ[ycount][xcount].nameBase + "_sol";
+        logNameTorus = coil_inner_torus_PZ[ycount][xcount].nameBase + "_log";
+        physNameTorus= coil_inner_torus_PZ[ycount][xcount].nameBase + "_phys";
 
-        solNameTub = coil_outer_tubs[ycount][xcount].nameBase + "_sol";
-        logNameTub = coil_outer_tubs[ycount][xcount].nameBase + "_log";
-        physNameTub= coil_outer_tubs[ycount][xcount].nameBase + "_phys";
+        solNameTubSubtracted = coil_outer_tubs_PZ[ycount][xcount].nameBase
+           + "_sub_sol";
+
+        solNameTub = coil_outer_tubs_PZ[ycount][xcount].nameBase + "_sol";
+        logNameTub = coil_outer_tubs_PZ[ycount][xcount].nameBase + "_log";
+        physNameTub= coil_outer_tubs_PZ[ycount][xcount].nameBase + "_phys";
 
         coil_sol = new G4Torus(solNameTorus, 
-        coil_inner_torus[ycount][xcount].inner_radius,
-        coil_inner_torus[ycount][xcount].outer_radius,
-        coil_inner_torus[ycount][xcount].sweep_radius,
-        coil_inner_torus[ycount][xcount].start_phi,
-        coil_inner_torus[ycount][xcount].delta_phi
+        coil_inner_torus_PZ[ycount][xcount].inner_radius,
+        coil_inner_torus_PZ[ycount][xcount].outer_radius,
+        coil_inner_torus_PZ[ycount][xcount].sweep_radius,
+        coil_inner_torus_PZ[ycount][xcount].start_phi,
+        coil_inner_torus_PZ[ycount][xcount].delta_phi
         );
 
         coilMetal_sol = new G4Tubs(solNameTub, 
-        coil_outer_tubs[ycount][xcount].inner_radius,
-        coil_outer_tubs[ycount][xcount].outer_radius,
-        coil_outer_tubs[ycount][xcount].length/2.0,
-        coil_outer_tubs[ycount][xcount].start_phi,
-        coil_outer_tubs[ycount][xcount].delta_phi
+        coil_outer_tubs_PZ[ycount][xcount].inner_radius,
+        coil_outer_tubs_PZ[ycount][xcount].outer_radius,
+        coil_outer_tubs_PZ[ycount][xcount].length/2.0,
+        coil_outer_tubs_PZ[ycount][xcount].start_phi,
+        coil_outer_tubs_PZ[ycount][xcount].delta_phi
         );
+
+        coilMetalSubtracted_sol = new G4SubtractionSolid(
+        solNameTubSubtracted,
+        coilMetal_sol,
+        coil_sol);
 
         coil_log = new G4LogicalVolume( coil_sol,
         CoilsLiquid,
@@ -1599,17 +1654,17 @@ void K37DetectorConstruction::ConstructCoils() {
         0,0,0 
         );
 
-        coilMetal_log = new G4LogicalVolume( coilMetal_sol,
+        coilMetal_log = new G4LogicalVolume( coilMetalSubtracted_sol,
         CoilsMetal,
         logNameTub,
         0,0,0 
         );
 
-        coil_log -> SetVisAttributes(coils_logVisAttributes);
+        coil_log -> SetVisAttributes(coilLiquid_logVisAttributes);
         coilMetal_log -> SetVisAttributes(coils_logVisAttributes);
 
         new G4PVPlacement(0, 
-        coil_inner_torus[ycount][xcount].center_position,
+        coil_inner_torus_PZ[ycount][xcount].center_position,
         coil_log,
         physNameTorus,
         world_log_,
@@ -1618,7 +1673,7 @@ void K37DetectorConstruction::ConstructCoils() {
         );
 
         new G4PVPlacement(0, 
-        coil_outer_tubs[ycount][xcount].center_position,
+        coil_outer_tubs_PZ[ycount][xcount].center_position,
         coilMetal_log,
         physNameTub,
         world_log_,
@@ -1626,40 +1681,75 @@ void K37DetectorConstruction::ConstructCoils() {
         0, check_all_for_overlaps_ 
         );
 
-        //tempName = nameStart+"_"+std::to_string(ycount)
-           //+"_"+std::to_string(xcount);
-        //coil_inner_torus[ycount][xcount].nameBase = tempName;
-        //coil_inner_torus[ycount][xcount].inner_radius = 0.0;
-        //coil_inner_torus[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
-        //coil_inner_torus[ycount][xcount].sweep_radius =
-            //((distanceFromCloseEdgeToPolarization + (tubeOuterDiameter/2.0))
-            //+double(xcount)*(tubeOuterDiameter+tubeSpacing));
+        //Minus Z coils =====================================================
 
-        //coil_inner_torus[ycount][xcount].start_phi = 0;
-        //coil_inner_torus[ycount][xcount].delta_phi = 360*deg;
-        //coil_inner_torus[ycount][xcount].center_position =
-        //G4ThreeVector(0, 0, ((distanceFromBottomToChamberCenter + (tubeOut)
-                    //+double(xcount)*(tubeOuterDiameter+tubeSpacing));
-     }
-  }
-  //G4double coils_rmax = 198./2. *mm;
-  //G4double coils_rmin = 138./2. *mm;
-  //G4double coils_dz   = 20./2.  *mm;
-  //G4double coils_Sphi = 0.          *deg;
-  //G4double coils_Dphi = 360.        *deg;
+        solNameTorus = coil_inner_torus_MZ[ycount][xcount].nameBase + "_sol";
+        logNameTorus = coil_inner_torus_MZ[ycount][xcount].nameBase + "_log";
+        physNameTorus= coil_inner_torus_MZ[ycount][xcount].nameBase + "_phys";
 
-  //G4Tubs * coils_sol = new G4Tubs("coils_sol", coils_rmin, coils_rmax,
-                                  //coils_dz, coils_Sphi, coils_Dphi);
-  //G4LogicalVolume * coils_log = new G4LogicalVolume(coils_sol, CoilsMetal,
-                                                    //"coils_log", 0, 0, 0);
-  //new G4PVPlacement(0, G4ThreeVector(0., 0., 65.), coils_log,
-                    //"coils_plusZ_phys", world_log_, false,
-                    //0, check_all_for_overlaps_);
+        solNameTubSubtracted = coil_outer_tubs_MZ[ycount][xcount].nameBase
+           + "_sub_sol";
 
-  //new G4PVPlacement(0, G4ThreeVector(0., 0., -65.), coils_log,
-                    //"coils_minusZ_phys", world_log_, false,
-                    //0, check_all_for_overlaps_);
+        solNameTub = coil_outer_tubs_MZ[ycount][xcount].nameBase + "_sol";
+        logNameTub = coil_outer_tubs_MZ[ycount][xcount].nameBase + "_log";
+        physNameTub= coil_outer_tubs_MZ[ycount][xcount].nameBase + "_phys";
 
+        coil_sol = new G4Torus(solNameTorus, 
+        coil_inner_torus_MZ[ycount][xcount].inner_radius,
+        coil_inner_torus_MZ[ycount][xcount].outer_radius,
+        coil_inner_torus_MZ[ycount][xcount].sweep_radius,
+        coil_inner_torus_MZ[ycount][xcount].start_phi,
+        coil_inner_torus_MZ[ycount][xcount].delta_phi
+        );
+
+        coilMetal_sol = new G4Tubs(solNameTub, 
+        coil_outer_tubs_MZ[ycount][xcount].inner_radius,
+        coil_outer_tubs_MZ[ycount][xcount].outer_radius,
+        coil_outer_tubs_MZ[ycount][xcount].length/2.0,
+        coil_outer_tubs_MZ[ycount][xcount].start_phi,
+        coil_outer_tubs_MZ[ycount][xcount].delta_phi
+        );
+
+        coilMetalSubtracted_sol = new G4SubtractionSolid(
+        solNameTubSubtracted,
+        coilMetal_sol,
+        coil_sol);
+
+        coil_log = new G4LogicalVolume( coil_sol,
+        CoilsLiquid,
+        logNameTorus,
+        0,0,0 
+        );
+
+        coilMetal_log = new G4LogicalVolume( coilMetalSubtracted_sol,
+        CoilsMetal,
+        logNameTub,
+        0,0,0 
+        );
+
+        coil_log -> SetVisAttributes(coilLiquid_logVisAttributes);
+        coilMetal_log -> SetVisAttributes(coils_logVisAttributes);
+
+        new G4PVPlacement(0, 
+        coil_inner_torus_MZ[ycount][xcount].center_position,
+        coil_log,
+        physNameTorus,
+        world_log_,
+        false,
+        0, check_all_for_overlaps_ 
+        );
+
+        new G4PVPlacement(0, 
+        coil_outer_tubs_MZ[ycount][xcount].center_position,
+        coilMetal_log,
+        physNameTub,
+        world_log_,
+        false,
+        0, check_all_for_overlaps_ 
+        );
+
+     } // end loop over x
+  } //end loop over y
 }  // End construct coils
 
 void K37DetectorConstruction::DefineMaterials() {
