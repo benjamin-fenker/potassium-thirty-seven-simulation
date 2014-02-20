@@ -3,6 +3,7 @@
 # the menu bar of the G4UIXm, G4UIQt, G4UIWin32 sessions.
 # It has no effect with G4UIterminal.
 #
+/control/execute icons.mac
 # File :
 /gui/addMenu g4file G4File
 /gui/addButton g4file Continue continue
