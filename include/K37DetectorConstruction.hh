@@ -31,11 +31,15 @@ class K37ElectricFieldSetup;
 class HepRotation;
 
 struct GeometryElement {
+  G4String nameBase;
   G4double inner_radius;
   G4double outer_radius;
   G4double inner_radius2;
   G4double outer_radius2;
+  G4double sweep_radius;
 
+  G4double start_phi;
+  G4double delta_phi;
   G4double rotation_angle;
   G4ThreeVector center_position;
 
@@ -160,11 +164,19 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4Material* FoilMaterial;
   G4Material* HoopMaterial;
   G4Material* MirrorMountMaterial;
-  G4Material* CoilsMaterial;
+  G4Material* CoilsMetal;
+  G4Material* CoilsLiquid;
   G4Material* Hoop7Material;
 
   G4Material*   MCPMaterial;
   G4double electron_mcp_radius_;
+
+  //Numbers for the coil construction see /Drawings/cros-coil.png
+  G4double distanceFromCloseEdgeToPolarization;
+  G4double distanceFromBottomToChamberCenter;
+  G4double tubeOuterDiameter;
+  G4double tubeInnerDiameter;
+  G4double tubeSpacing;
 
   G4bool shouldTheMirrorBeWFEDMCut;     // should the mirror be Wire Fed EDM cut
   G4bool check_all_for_overlaps_;
@@ -220,6 +232,8 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   GeometryElement reentrant_flange_front_face;
   GeometryElement reentrant_flange_descender;
   GeometryElement reentrant_flange_pipe;
+  GeometryElement coil_inner_torus[4][4];
+  GeometryElement coil_outer_tubs[4][4];
 
   std::map<G4String, G4Material*> trinat_materials_;
 
