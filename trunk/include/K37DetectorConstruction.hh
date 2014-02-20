@@ -213,6 +213,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VisAttributes * hoop7_logVisAttributes;
   G4VisAttributes * SOED_logVisAttributes;
   G4VisAttributes * coils_logVisAttributes;
+  G4VisAttributes * coilLiquid_logVisAttributes;
 
   G4VisAttributes * rmcp_logVisAttributes_;
   // Bools to turn off or on various aspects of the apparatus to simulate their
@@ -232,8 +233,10 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   GeometryElement reentrant_flange_front_face;
   GeometryElement reentrant_flange_descender;
   GeometryElement reentrant_flange_pipe;
-  GeometryElement coil_inner_torus[4][4];
-  GeometryElement coil_outer_tubs[4][4];
+  GeometryElement coil_inner_torus_PZ[4][4];
+  GeometryElement coil_outer_tubs_PZ[4][4];
+  GeometryElement coil_inner_torus_MZ[4][4];
+  GeometryElement coil_outer_tubs_MZ[4][4];
 
   std::map<G4String, G4Material*> trinat_materials_;
 
