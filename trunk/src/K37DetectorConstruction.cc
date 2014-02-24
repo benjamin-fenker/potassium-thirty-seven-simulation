@@ -1,5 +1,9 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
+#include <string>
+#include <iostream>
+#include <sstream>
+
 // CLHEP files
 #include <CLHEP/Vector/Rotation.h>
 
@@ -41,6 +45,16 @@
 #include "K37DetectorConstruction.hh"
 #include "K37DetectorMessenger.hh"
 #include "K37ElectricFieldSetup.hh"
+
+namespace patch
+{
+template < typename T > std::string to_string( const T& n )
+{                                                                                                                                                                                                                                  
+  std::ostringstream stm ;                                                                                                                                                                                                        
+  stm << n ;                                                                                                                                                                                                                      
+  return stm.str() ;                                                                                                                                                                                                              
+}                                                                                                                                                                                                                                  
+}  
 
 K37DetectorConstruction::K37DetectorConstruction()
     : world_material_(0), world_box_(0), world_log_(0), world_phys_(0),
@@ -119,8 +133,8 @@ K37DetectorConstruction::K37DetectorConstruction()
   {
      for(int xcount = 0; xcount < 4; ++xcount)
      {
-        tempName = nameStart+"_PZ_"+std::to_string(ycount)
-           +"_"+std::to_string(xcount);
+        tempName = nameStart+"_PZ_"+patch::to_string(ycount)
+           +"_"+patch::to_string(xcount);
         coil_inner_torus_PZ[ycount][xcount].nameBase = tempName;
         coil_inner_torus_PZ[ycount][xcount].inner_radius = 0.0;
         coil_inner_torus_PZ[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
@@ -135,8 +149,8 @@ K37DetectorConstruction::K37DetectorConstruction()
             +(tubeOuterDiameter/2.0))
             +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
 
-        tempName = nameStartTub+"_PZ_"+std::to_string(ycount)
-           +"_"+std::to_string(xcount);
+        tempName = nameStartTub+"_PZ_"+patch::to_string(ycount)
+           +"_"+patch::to_string(xcount);
         coil_outer_tubs_PZ[ycount][xcount].nameBase = tempName;
         coil_outer_tubs_PZ[ycount][xcount].inner_radius =
            (distanceFromCloseEdgeToPolarization
@@ -157,8 +171,8 @@ K37DetectorConstruction::K37DetectorConstruction()
 
         //====================================================================
           
-        tempName = nameStart+"_MZ_"+std::to_string(ycount)
-           +"_"+std::to_string(xcount);
+        tempName = nameStart+"_MZ_"+patch::to_string(ycount)
+           +"_"+patch::to_string(xcount);
         coil_inner_torus_MZ[ycount][xcount].nameBase = tempName;
         coil_inner_torus_MZ[ycount][xcount].inner_radius = 0.0;
         coil_inner_torus_MZ[ycount][xcount].outer_radius = tubeInnerDiameter/2.0;
@@ -173,8 +187,8 @@ K37DetectorConstruction::K37DetectorConstruction()
             +(tubeOuterDiameter/2.0))
             +double(ycount)*(tubeOuterDiameter+tubeSpacing)));
 
-        tempName = nameStartTub+"_MZ_"+std::to_string(ycount)
-           +"_"+std::to_string(xcount);
+        tempName = nameStartTub+"_MZ_"+patch::to_string(ycount)
+           +"_"+patch::to_string(xcount);
         coil_outer_tubs_MZ[ycount][xcount].nameBase = tempName;
         coil_outer_tubs_MZ[ycount][xcount].inner_radius =
            (distanceFromCloseEdgeToPolarization
