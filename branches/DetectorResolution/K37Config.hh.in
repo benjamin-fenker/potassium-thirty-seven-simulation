@@ -1,0 +1,3 @@
+// the configured options and settings for Tutorial
+#define K37_VERSION @K37_VERSION@
+
