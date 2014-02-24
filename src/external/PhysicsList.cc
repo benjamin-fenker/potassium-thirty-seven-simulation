@@ -173,6 +173,8 @@ void PhysicsList::AddPhysicsList(const G4String& name) {
     emPhysicsList = new G4EmStandardPhysics_option3();
 
   } else if (name == "standardSS") {
+    G4cout << "Enabling single scattering, expect slower, more accurate"
+           << " simulation" << G4endl;
     emName = name;
     delete emPhysicsList;
     emPhysicsList = new PhysListEmStandardSS(name);
