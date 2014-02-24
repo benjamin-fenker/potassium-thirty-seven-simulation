@@ -388,6 +388,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     if (fabs(sd_energy_total_minsZ_X - sd_energy_total_minsZ_Y) >
         pow(10.0, -3)*keV) {
       G4cout << "ERROR.  X-ENERGY != Y-ENERGY." << G4endl;
+      G4EventManager::GetEventManager()->KeepTheCurrentEvent();
     }
   }
 
