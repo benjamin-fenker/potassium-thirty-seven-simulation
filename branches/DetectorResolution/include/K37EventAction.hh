@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "globals.hh"
+#include "G4DigiManager.hh"
 #include "G4THitsMap.hh"
 #include "G4ThreeVector.hh"
 #include "G4TrajectoryContainer.hh"
@@ -19,6 +20,7 @@
 #include "K37DetectorConstruction.hh"
 #include "K37EventMessenger.hh"
 #include "K37PrimaryGeneratorAction.hh"
+#include "K37ScintillatorDigitizer.hh"
 #include "K37StripDetectorHit.hh"
 
 using std::map;
