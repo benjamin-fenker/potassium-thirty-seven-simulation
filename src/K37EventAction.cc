@@ -456,6 +456,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
   if (EventPassesTrigger(energyUpperScint_Total, energyLowerScint_Total,
                          electron_mcp_energy)) {
+
+  //if (energyUpperScint_Total > 1*MeV ||
+          //energyLowerScint_Total > 1*MeV ||
+          //electron_mcp_energy> 2*keV)
+  //{
+      //G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+  //}
     // G4cout << "Event passes my trigger with energy "
     //        << G4BestUnit(energyUpperScint_Total, "Energy") << " / "
     //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"
@@ -589,14 +596,18 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     (*active_channels_)["TTLBit_SigmaPlus"] -> InsertData(op_bit);
 
-    the_aggregator_ -> EndEvent();
+    the_aggregator_ -> EndEvent(true);
+  } 
+  else //Event did not pass trigger
+  {
+     the_aggregator_ -> EndEvent(false);
   }
-  // PrintEvent(evt);
-  //  G4cout << "------------------------------" << G4endl;
-  // Add a new row here to add a new row for EVERY EVENT, even events that were
-  // not "accepted."
+  //PrintEvent(evt);
+  //G4cout << "<><><><><><><><><><><><><><><>" << G4endl;
+
 }  // End of event action
-//----------------
+
+//--------------------------------------------------------------------------
 void K37EventAction::setEnteringDedx(G4ThreeVector enteringPosition) {
   spot.push_back(enteringPosition);
 }

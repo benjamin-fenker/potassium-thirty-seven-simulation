@@ -42,8 +42,8 @@ void K37SteppingAction::UserSteppingAction(const G4Step * theStep)
          G4StepPoint * thePostPoint = theStep->GetPostStepPoint();
          G4String thePostPVname = thePostPoint->GetPhysicalVolume()->GetName();
 
-         if ((thePostPoint -> GetStepStatus() == fGeomBoundary)
-               && (thePostPVname != "world_phys"))
+         if ((thePostPoint -> GetStepStatus() == fGeomBoundary))
+               //&& (thePostPVname != "world_phys"))
          {
             (*active_channels)["VOLUME_LIST"] -> InsertData(
                   static_cast<std::string>(thePostPVname));

@@ -311,8 +311,16 @@ void Aggregator::EndRun() {
   mAGG -> EndRun();
 }
 
-void Aggregator::EndEvent() {
-  mAGG->PrintDataToOutput();
+void Aggregator::EndEvent(const bool &recordEvent_)
+{
+   if(recordEvent_)
+   {
+      mAGG->PrintDataToOutput();
+   }
+   else
+   {
+      mAGG->ClearData();
+   }
 }
 
 void Aggregator::RegisterIOMethod(const std::string &fileName_) {
