@@ -24,7 +24,8 @@ K37StackingAction::K37StackingAction()
 
 //-----------------------------------------------
 
-K37StackingAction::~K37StackingAction() {}
+K37StackingAction::~K37StackingAction()
+{delete messenger_;}
 
 //-----------------------------------------------
 

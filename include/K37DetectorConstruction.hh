@@ -200,6 +200,10 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   CLHEP::HepRotation* FFRFRotation;
   CLHEP::HepRotation* MirrorCutRotation;
   CLHEP::HepRotation* hoopRotation;
+  CLHEP::HepRotation* zRot;
+  CLHEP::HepRotation* y180;
+  CLHEP::HepRotation* mirror_rotation;
+  CLHEP::HepRotation* MMRotation;
 
   G4VisAttributes * dedxFrame_logVisAttributes;
   G4VisAttributes * chamber_logVisAttributes;
@@ -214,6 +218,13 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VisAttributes * SOED_logVisAttributes;
   G4VisAttributes * coils_logVisAttributes;
   G4VisAttributes * coilLiquid_logVisAttributes;
+  G4VisAttributes * world_logVisAttributes;
+  G4VisAttributes * air_vis;
+  G4VisAttributes * scintillator_vis;
+  G4VisAttributes * teflon_vis;
+  G4VisAttributes * strip_detector_vis;
+  G4VisAttributes * sd_inactive_vis;
+  G4VisAttributes * mounting_screw_head_vis;
 
   G4VisAttributes * rmcp_logVisAttributes_;
   // Bools to turn off or on various aspects of the apparatus to simulate their

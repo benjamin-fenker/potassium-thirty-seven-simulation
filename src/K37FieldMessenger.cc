@@ -73,13 +73,14 @@ K37FieldMessenger::K37FieldMessenger(K37ElectricFieldSetup* pEMfield)
 
 //------------------------------------------------
 K37FieldMessenger::~K37FieldMessenger() {
+  delete fieldDir;
   delete StepperCmd;
   delete ElFieldCmd;
   delete MinStepCmd;
-  delete fieldDir;
   delete UpdateCmd;
   delete changeFieldCmd;
   delete print_field_cmd;
+  delete set_field_file_cmd_;
 }
 
 //------------------------------------------------
