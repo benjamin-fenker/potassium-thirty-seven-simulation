@@ -2,6 +2,7 @@
 #ifndef K37ScintillatorMessenger_h 
 #define K37ScintillatorMessenger_h 1
 
+#include <G4UIcmdWithABool.hh>
 #include <G4UIcmdWithADoubleAndUnit.hh>
 #include <G4UIdirectory.hh>
 #include <G4UImessenger.hh>
@@ -23,7 +24,8 @@ class K37ScintillatorMessenger : public G4UImessenger {
   G4UIdirectory *dir_;
   G4UIcmdWithADoubleAndUnit *threshold_cmd_;
   G4UIcmdWithADoubleAndUnit *resolution_sigma0_cmd_;
-  G4UIcmdWithADoubleAndUnit *resolution_mu_cmd_;
+  G4UIcmdWithADoubleAndUnit *resolution_lambda_cmd_;
+  G4UIcmdWithABool *apply_resolution_cmd_;
 };
 
 #endif

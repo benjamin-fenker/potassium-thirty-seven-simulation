@@ -22,6 +22,7 @@
 #include "K37PrimaryGeneratorAction.hh"
 #include "K37ScintillatorDigitizer.hh"
 #include "K37StripDetectorHit.hh"
+#include "K37StripDetectorDigitizer.hh"
 
 using std::map;
 using std::string;
@@ -61,17 +62,17 @@ class K37EventAction : public G4UserEventAction {
   G4double GetAccepted() {return accepted;}
   // Will return beta = v/c for the particle
   G4double GetRelativisticFactor(G4double particleMass, G4double totalE);
-  void SetUpperScintillatorThreshold(double t)
-  {upper_scintillator_threshold_ = t;}
-  void SetLowerScintillatorThreshold(double t)
-  {lower_scintillator_threshold_ = t;}
+  // void SetUpperScintillatorThreshold(double t)
+  // {upper_scintillator_threshold_ = t;}
+  // void SetLowerScintillatorThreshold(double t)
+  // {lower_scintillator_threshold_ = t;}
   void SetElectronMCPthreshold(double t) {electron_mcp_threshold_ = t;}
-  G4double GetUpperScintillatorThreshold() {
-    return upper_scintillator_threshold_;
-  }
-  G4double GetLowerScintillatorThreshold() {
-    return lower_scintillator_threshold_;
-  }
+  // G4double GetUpperScintillatorThreshold() {
+  //   return upper_scintillator_threshold_;
+  // }
+  // G4double GetLowerScintillatorThreshold() {
+  //   return lower_scintillator_threshold_;
+  // }
   G4double GetElectronMCPthreshold() {return electron_mcp_threshold_;}
   void SetAggregator(Aggregator *aggregator) {the_aggregator_ = aggregator;}
   void SetActiveChannels(map<string, K37_Data*> *active_channels) {
@@ -99,14 +100,7 @@ class K37EventAction : public G4UserEventAction {
   // for the SD you wnat to fill!!!
   void fillSDNtuples(vector<G4double> EDep_strip, G4int ntuple_number_start);
   void fillSDNtuples(vector<G4double> energy_strip, G4String name);
-  // *******************************
-  vector<G4double>GetEDepVector(K37StripDetectorHitsCollection *collection,
-                                G4int coordinate);
-  vector<G4double>GetEDepVectorX(K37StripDetectorHitsCollection *collection);
-  vector<G4double>GetEDepVectorY(K37StripDetectorHitsCollection *collection);
-  bool EventPassesTrigger(double upper_scintillator_energy,
-                          double lower_scintillator_energy,
-                          double electron_mcp_energy);
+
   void LookAtEvent(const G4Event *event);
   //  G4THitsMap<G4double>* energyBTdedxMap;
   //  G4THitsMap<G4double>* energyBTscintillatorMap;
@@ -202,8 +196,8 @@ class K37EventAction : public G4UserEventAction {
   vector< G4ThreeVector > spot;
   vector< G4ThreeVector > start;
 
-  double upper_scintillator_threshold_;
-  double lower_scintillator_threshold_;
+  // double upper_scintillator_threshold_;
+  // double lower_scintillator_threshold_;
   double electron_mcp_threshold_;
 
   K37EventMessenger *event_messenger_;

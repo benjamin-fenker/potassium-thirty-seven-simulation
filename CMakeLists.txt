@@ -48,9 +48,13 @@ ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
 set (K37_VERSION $ENV{K37_VERSION})
 # configure a header file to pass some of the CMake settings
 # to the source code
+
+# Configuration files for resolution etc.
+set (CONFIGURATION_DIRECTORY ${PROJECT_SOURCE_DIR}/Configuration)
+
 configure_file (
 	"${PROJECT_SOURCE_DIR}/K37Config.hh.in"
-	"${PROJECT_SOURCE_DIR}/K37Config.hh"
+	"${PROJECT_SOURCE_DIR}/include/K37Config.hh"
 	)
 
 configure_file (

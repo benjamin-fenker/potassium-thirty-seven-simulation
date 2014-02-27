@@ -1,3 +1,9 @@
 // the configured options and settings for Tutorial
+#ifndef K37Config_hh
+#define K37Config_hh 1
+
 #define K37_VERSION @K37_VERSION@
+#define CONFIGURATION_DIRECTORY "@CONFIGURATION_DIRECTORY@"
+
+#endif
 
