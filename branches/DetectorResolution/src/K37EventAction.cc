@@ -574,7 +574,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       op_bit = -10.0;
     }
     (*active_channels_)["TTLBit_SigmaPlus"] -> InsertData(op_bit);
-
+    //    G4cout << "Printing event!" << G4endl;
     the_aggregator_ -> EndEvent();
   }
   // PrintEvent(evt);
