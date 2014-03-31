@@ -128,6 +128,12 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
       eDotn = electron.X*neutrino.X + electron.Y*neutrino.Y +
         electron.Z*neutrino.Z;
 
+      Zhi     = the_StandardModel_37K->zhi      (electron.T);
+      BigA    = the_StandardModel_37K->A_beta   (electron.T);
+      BigB    = the_StandardModel_37K->B_nu     (electron.T);
+      LittleC = the_StandardModel_37K->c_align  (electron.T);
+      LittleA = the_StandardModel_37K->a_beta_nu(electron.T);
+
       Omega = (1.0/(4.0*pow(M_PI, 3.0)))
         *(FF->getVFF(electron.T))
         *electron.Pmag

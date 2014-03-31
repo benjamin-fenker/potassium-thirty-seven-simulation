@@ -7,9 +7,14 @@
 #include "G4Proton.hh"
 #include "G4Gamma.hh"
 #include "G4UnitsTable.hh"
+#include "K37Config.hh"
 
 K37EventGenerator::K37EventGenerator()
-  :FF(0) {
+  :FF(0)
+{
+   G4String configPath = CONFIGFILES_;
+   G4String K37configFile = configPath + "K_37_INPUT.txt";
+   the_StandardModel_37K = new ISO::Isotope(K37configFile);
   // G4Electron *ele = G4Electron::ElectronDefinition();
   // G4double Mass_e = ele -> GetPDGMass();
 
@@ -60,6 +65,7 @@ K37EventGenerator::~K37EventGenerator() {
   // G4cout << "BF LOOK HERE: total v/c = " << v_over_c_running << G4endl;
   // G4cout << "num = " << running_num << " denom: " << running_denom << G4endl;
   delete FF;
+  delete the_StandardModel_37K;
 }
 
 void K37EventGenerator::SetBigA(G4double BigA_)

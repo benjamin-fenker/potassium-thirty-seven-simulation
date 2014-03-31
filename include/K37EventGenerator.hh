@@ -10,6 +10,7 @@
 
 #include "Aggregator.hh"
 #include "K37_Data.hh"
+#include "Isotope.hh"
 
 using AGG::Aggregator;
 using K37_ABC::K37_Data;
@@ -45,6 +46,7 @@ class K37EventGenerator {
   K37FermiFunction* FF;
   G4double v_over_c_running;    // Will keep a running tally of v/c coming out
   Aggregator *the_aggregator_;
+  ISO::Isotope *the_StandardModel_37K;
   map<string, K37_Data*> *active_channels_;
   // of event generator for testing purposes
   // Used to only simulate events in a cone around the detectors.
