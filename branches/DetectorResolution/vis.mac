@@ -1,3 +1,5 @@
+#Uncomment the following line to track the volumes that the beta entered.
+#/K37/SteppingControl/SetTrackVolumes true
 /control/verbose 0
 /control/saveHistory
 /run/verbose 0
@@ -27,15 +29,15 @@
 /vis/scene/add/trajectories smooth   #makes cureved tracks
 #/vis/scene/add/trajectories rich    #Keeps additional information
 
-/vis/modeling/trajectories/create/drawByCharge
-/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
-/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1
+#The next three lines show how to draw by charge. There is a better default 
+#scheme already defined in the source code.
+#/vis/modeling/trajectories/create/drawByCharge
+#/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+#/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 1
 /vis/scene/endOfEventAction accumulate
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 /vis/viewer/set/background 0.0 0.3 0.3
-
-
 
 #These are the picture print settings that
 #I have had luck with.

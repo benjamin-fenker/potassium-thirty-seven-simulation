@@ -121,7 +121,7 @@ K37EventAction::K37EventAction(K37RunAction* run)
   // lower_scintillator_threshold_ = 100.0 * keV;
   electron_mcp_threshold_ = 2.0 * keV;
 
-  G4cout << G4String(CONFIGURATION_DIRECTORY) << G4endl;
+  G4cout << G4String(CONFIGFILES_) << G4endl;
   // Declare digitizers here (following example advanced/ChargeExchangeMC)
   G4DigiManager *digiManager(G4DigiManager::GetDMpointer());
 
@@ -131,15 +131,15 @@ K37EventAction::K37EventAction(K37RunAction* run)
       AddNewModule(new K37ScintillatorDigitizer("scintillatorMinusZ"));
 
   digiManager -> AddNewModule(new K37StripDetectorDigitizer("dsssdPlusZ",
-                            (G4String(CONFIGURATION_DIRECTORY) +
+                            (G4String(CONFIGFILES_) +
                              G4String("/upper_strip_detector_x.res")).c_str(),
-                            (G4String(CONFIGURATION_DIRECTORY) +
+                            (G4String(CONFIGFILES_) +
                              G4String("/upper_strip_detector_y.res")).c_str()));
 
   digiManager -> AddNewModule(new K37StripDetectorDigitizer("dsssdMinusZ",
-                            (G4String(CONFIGURATION_DIRECTORY) +
+                            (G4String(CONFIGFILES_) +
                              G4String("/lower_strip_detector_x.res")).c_str(),
-                            (G4String(CONFIGURATION_DIRECTORY) +
+                            (G4String(CONFIGFILES_) +
                              G4String("/lower_strip_detector_y.res")).c_str()));
 
   digiManager -> List();
@@ -442,6 +442,13 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       lower_scintillator_digitizer -> IsTriggered() ||
       electron_mcp_energy > electron_mcp_threshold_) {
     G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+
+  //if (energyUpperScint_Total > 1*MeV ||
+          //energyLowerScint_Total > 1*MeV ||
+          //electron_mcp_energy> 2*keV)
+  //{
+      //G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+  //}
     // G4cout << "Event passes my trigger with energy "
     //        << G4BestUnit(energyUpperScint_Total, "Energy") << " / "
     //        << G4BestUnit(energyDedx, "Energy") << G4endl << "\t\t"
@@ -575,14 +582,18 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     }
     (*active_channels_)["TTLBit_SigmaPlus"] -> InsertData(op_bit);
     //    G4cout << "Printing event!" << G4endl;
-    the_aggregator_ -> EndEvent();
+    the_aggregator_ -> EndEvent(true);
+  } 
+  else //Event did not pass trigger
+  {
+     the_aggregator_ -> EndEvent(false);
   }
-  // PrintEvent(evt);
-  //  G4cout << "------------------------------" << G4endl;
-  // Add a new row here to add a new row for EVERY EVENT, even events that were
-  // not "accepted."
+  //PrintEvent(evt);
+  //G4cout << "<><><><><><><><><><><><><><><>" << G4endl;
+
 }  // End of event action
-//----------------
+
+//--------------------------------------------------------------------------
 void K37EventAction::setEnteringDedx(G4ThreeVector enteringPosition) {
   spot.push_back(enteringPosition);
 }

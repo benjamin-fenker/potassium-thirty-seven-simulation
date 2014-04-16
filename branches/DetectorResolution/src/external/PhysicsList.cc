@@ -103,6 +103,9 @@ PhysicsList::~PhysicsList() {
   delete pMessenger;
   delete emPhysicsList;
   delete decPhysicsList;
+  if(stepMaxProcess)
+  { delete stepMaxProcess; }
+
   for (size_t i = 0; i < hadronPhys.size(); i++) {delete hadronPhys[i];}
 }
 
