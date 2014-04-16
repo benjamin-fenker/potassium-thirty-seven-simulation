@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(K37)
 
 #It is best to set the build type from the build.sh
-#SET( CMAKE_CXX_COMPILER "g++" )
+SET( CMAKE_CXX_COMPILER "g++" )
 #SET( CMAKE_CXX_COMPILER "clang++" )
 #SET( CMAKE_CXX_COMPILER "c++" )
 
@@ -35,23 +35,16 @@ include(${Geant4_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/external)
 
 #----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# NB: headers are included so they will show up in IDEs
-#
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/src/external/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${PROJECT_SOURCE_DIR}/include/external/*.hh)
 
-#----------------------------------------------------------------------------
-ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
-#----------------------------------------------------------------------------
+SET (CONFIGFILES_ "\"${CMAKE_BINARY_DIR}/configurationFiles/\"")
 
-set (K37_VERSION $ENV{K37_VERSION})
+execute_process(COMMAND svnversion
+                COMMAND cut -c1-3
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                OUTPUT_VARIABLE K37_VERSION)
+
 # configure a header file to pass some of the CMake settings
 # to the source code
-
-# Configuration files for resolution etc.
-set (CONFIGURATION_DIRECTORY ${PROJECT_SOURCE_DIR}/Configuration)
-
 configure_file (
 	"${PROJECT_SOURCE_DIR}/K37Config.hh.in"
 	"${PROJECT_SOURCE_DIR}/include/K37Config.hh"
@@ -63,7 +56,22 @@ configure_file (
 	)
 
 #----------------------------------------------------------------------------
+# Locate sources and headers for this project
+# NB: headers are included so they will show up in IDEs
+#
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/src/external/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${PROJECT_SOURCE_DIR}/include/external/*.hh)
+
+#----------------------------------------------------------------------------
+ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
+#----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
+
+# AFTER the G4/ROOT setups, add the necessary c++ flags
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Werror" )
+
+SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" )
+SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3 -DNDEBUG" )
 
 add_executable(K37 K37.cc ${sources} ${headers})
 target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
@@ -87,6 +95,23 @@ foreach(_script ${K37_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
+    COPYONLY
+    )
+endforeach()
+
+#Copy The Isotope Definitions ==========
+set(CONFIGFILES
+  K_37_INPUT.txt
+  upper_strip_detector_x.res
+  upper_strip_detector_y.res
+  lower_strip_detector_x.res
+  lower_strip_detector_y.res
+  )
+
+foreach(_file ${CONFIGFILES})
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/configurationFiles/${_file}
+    ${CMAKE_BINARY_DIR}/configurationFiles/${_file}
     COPYONLY
     )
 endforeach()

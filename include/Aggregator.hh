@@ -17,7 +17,7 @@ class Aggregator {
   void RegisterData(K37_ABC::K37_Data *dataPointer_);
   void RegisterIOMethod(const std::string &fileName_);
   void BeginRun();
-  void EndEvent();
+  void EndEvent(const bool &recordEvent_);
   void EndRun();
   TFile *GetRootFile();
  private:

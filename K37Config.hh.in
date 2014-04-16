@@ -1,9 +1,9 @@
-// the configured options and settings for Tutorial
-#ifndef K37Config_hh
-#define K37Config_hh 1
-
-#define K37_VERSION @K37_VERSION@
+#ifndef K37CONFIG_H
+#define K37CONFIG_H
+  
+#cmakedefine K37_VERSION @K37_VERSION@
+#cmakedefine CONFIGFILES_ @CONFIGFILES_@
 #define CONFIGURATION_DIRECTORY "@CONFIGURATION_DIRECTORY@"
-
-#endif
+   
+#endif // K37CONFIG_H
 
