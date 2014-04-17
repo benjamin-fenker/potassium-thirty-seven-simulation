@@ -9,6 +9,17 @@ GeantAggregator::GeantAggregator() {}
 
 void GeantAggregator::EndRun() {
   TArrayD *parameters = new TArrayD(23);
+
+  // Get digitizer modules to look up thresholds
+  G4DigiManager *digitizer_manager(G4DigiManager::GetDMpointer());
+  K37ScintillatorDigitizer *upper_scintillator_digitizer(
+      static_cast<K37ScintillatorDigitizer *>(
+          digitizer_manager -> FindDigitizerModule("scintillatorPlusZ")));
+
+  K37ScintillatorDigitizer *lower_scintillator_digitizer(
+      static_cast<K37ScintillatorDigitizer *>(
+          digitizer_manager -> FindDigitizerModule("scintillatorMinusZ")));
+
   parameters -> AddAt(primary_generator_action_ -> GetPolarization()       , 0);
   parameters -> AddAt(primary_generator_action_ -> GetAlignment()          , 1);
   parameters -> AddAt(electric_field_setup_ ->
@@ -37,8 +48,8 @@ void GeantAggregator::EndRun() {
                       GetTemperature().z()/kelvin, 13);
   parameters -> AddAt(primary_generator_action_ -> GetRecoilCharge(), 14);
   parameters -> AddAt(event_action_ -> GetElectronMCPthreshold(), 15);
-  parameters -> AddAt(event_action_ -> GetUpperScintillatorThreshold(), 16);
-  parameters -> AddAt(event_action_ -> GetLowerScintillatorThreshold(), 17);
+  parameters -> AddAt(upper_scintillator_digitizer -> GetThreshold(), 16);
+  parameters -> AddAt(lower_scintillator_digitizer -> GetThreshold(), 17);
   parameters -> AddAt(physics_list_ -> GetDefaultCutValue()/micrometer, 18);
   G4String list_str = physics_list_ -> GetEmName();
   double list_code = -1;
