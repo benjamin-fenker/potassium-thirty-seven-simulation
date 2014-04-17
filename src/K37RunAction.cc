@@ -243,7 +243,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   nonVetoed = 0;
 
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
-  G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  //  G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 
   ///////////////////////// My new stuff //////////////////
   // Create analysis manager
