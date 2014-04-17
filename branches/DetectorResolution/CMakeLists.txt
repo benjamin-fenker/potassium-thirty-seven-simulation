@@ -69,7 +69,7 @@ ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
 
 # AFTER the G4/ROOT setups, add the necessary c++ flags
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Werror" )
-
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register" )
 SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" )
 SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3 -DNDEBUG" )
 
