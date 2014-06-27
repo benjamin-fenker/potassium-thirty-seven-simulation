@@ -1,0 +1,24 @@
+I have included a bash script that will get you going.
+There are a few things to keep in mind that you need cmake >2.8.7 and geant >4.9.5
+for things to work out correctly. 
+
+First after checking out the code to say ~/simulation/K37source.
+>cd ~/simulation
+>mkdir ~/simulation/K37build
+>ls
+  K37build  K37source
+>cp K37build/build.sh K37source/.
+>cd K37build
+>ls
+  build.sh
+!!!! now you must edit the script with the paths ~/simulation/K37source and ~/simulation/K37build
+!!!! and the path for cmake to find your installation of at least geant9.5.0 then 
+>./build.sh
+
+The purpose of the build script is to find the revesion number from svn and put it into the program so
+that there is no confusion about how old the code is. It does this by dynamically creating K37Config.hh be sure not to add this back to the repository for version control as it is dynamically generated. 
+
+There are now some tools that will help in the post simulation analysis 
+they are script files that read the generated root file. These scripts are 
+located in the rootScripts directory and can be copied to wherever they root
+files are being put. 
