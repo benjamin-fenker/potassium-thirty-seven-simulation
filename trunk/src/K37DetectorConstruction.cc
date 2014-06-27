@@ -48,12 +48,12 @@
 
 namespace patch
 {
-template < typename T > std::string to_string( const T& n )
-{                                                                                                                                                                                                                                  
-  std::ostringstream stm ;                                                                                                                                                                                                        
-  stm << n ;                                                                                                                                                                                                                      
-  return stm.str() ;                                                                                                                                                                                                              
-}                                                                                                                                                                                                                                  
+   template < typename T > std::string to_string( const T& n )
+   {
+      std::ostringstream stm ;
+      stm << n ;
+      return stm.str() ;
+   }
 }  
 
 K37DetectorConstruction::K37DetectorConstruction()
@@ -1830,7 +1830,9 @@ void K37DetectorConstruction::DefineMaterials() {
                                    2.73*kelvin, 3.e-18*pascal);
 
   G4Material* SiliconCarbide = new G4Material("SiliconCarbide",
-                                              density = 3.21*g/cm3, nel = 2);
+                                              density = 3.21*g/cm3, nel = 2);  //nominal
+                                              //density = 2.889*g/cm3, nel = 2); //+10%
+                                              //density = 3.531*g/cm3, nel = 2); //-10%
   SiliconCarbide->AddElement(Si, natoms = 1);
   SiliconCarbide->AddElement(C, natoms = 1);
 
@@ -1884,7 +1886,9 @@ void K37DetectorConstruction::DefineMaterials() {
                                             density = 1.5*g/cm3);
   G4Material* Beryllium = new G4Material("Beryllium", z = 4.,
                                          a = 9.012182*g/mole,
-                                         density = 1.848*g/cm3);
+                                         density = 1.848*g/cm3); //nominal
+                                         //density = 2.0328*g/cm3); //+10%
+                                         //density = 1.6632*g/cm3); //-10%
   G4Material* SiliconMat = new G4Material("SiliconMat", z = 14.,
                                           a = 28.086*g/mole,
                                           density= 2.329*g/cm3);
