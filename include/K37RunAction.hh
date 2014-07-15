@@ -225,6 +225,7 @@ class K37RunAction : public G4UserRunAction {
   Generic_Channel *electron_kinetic_energy_generated_, *electron_mu_generated_;
   Generic_Channel *recoil_mu_generated_,  *run_action_, *recoil_mcp_particle_;
   Generic_Channel *tnim_op_beam_, *ttlbit_sigmaplus_, *recoil_charge_state_;
+  Generic_Channel *two_percent_branch_;
   Generic_Channel *ttlbit_op_beam_, *upper_pmt_particle_, *lower_pmt_particle_;
   Generic_Channel *num_hits_r_mcp_, *num_hits_e_mcp_, *electron_mcp_particle_;
   map<string, K37_Data*> *active_channels_;

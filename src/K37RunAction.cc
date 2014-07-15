@@ -131,6 +131,7 @@ K37RunAction::K37RunAction()
   recoil_mcp_particle_   = new Generic_Channel("ION_MCP_PARTICLE_PDG",
                                                303, "/D");
   recoil_charge_state_   = new Generic_Channel("ION_CHARGE", 304, "/D");
+  two_percent_branch_    = new Generic_Channel("TWO_PERCENT_BRANCH", -1, "/D");
   upper_pmt_particle_    = new Generic_Channel("UPPER_SCINTILLATOR_PDG",
                                                305, "/D");
   lower_pmt_particle_    = new Generic_Channel("LOWER_SCINTILLATOR_PDG",
@@ -201,6 +202,7 @@ K37RunAction::~K37RunAction() {
   delete tnim_op_beam_;
   delete ttlbit_sigmaplus_;
   delete recoil_charge_state_;
+  delete two_percent_branch_;
   delete ttlbit_op_beam_;
   delete upper_pmt_particle_;
   delete lower_pmt_particle_;
@@ -320,6 +322,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(tnim_op_beam_);
   RegisterChannel(ttlbit_sigmaplus_);
   RegisterChannel(recoil_charge_state_);
+  RegisterChannel(two_percent_branch_);
   RegisterChannel(ttlbit_op_beam_);
   RegisterChannel(upper_pmt_particle_);
   RegisterChannel(lower_pmt_particle_);

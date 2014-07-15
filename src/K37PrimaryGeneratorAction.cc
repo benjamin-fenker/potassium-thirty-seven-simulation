@@ -8,7 +8,7 @@
 #include "K37PrimaryGeneratorMessenger.hh"
 #include "K37CloudSize.hh"
 #include "K37EventGenerator.hh"
-
+#include "K37EventGeneratorNoRecoilOrderEffects.hh"
 
 #include "globals.hh"
 #include "G4DecayTable.hh"
@@ -25,53 +25,76 @@
 
 
 K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
-                           K37DetectorConstruction* det,
-                           K37EventGenerator* evGen) :
-    polarization_(1.0), alignment_(1.0), charge_state_ratio_(8, 1.0/8.0),
-    detector(det), v(), vertex(NULL),
-    EventVertex(), K37Neutral(NULL), K37Minus(NULL), decayTableAr37Minus(NULL),
-    K37MinusDecayMode(NULL), cloud(NULL), evGenerator(evGen),
-    make_beta_(true), make_recoil_(true), make_shakeoff_electrons_(true) {
-  gunMessenger = new K37PrimaryGeneratorMessenger(this);
-  insideCollimator = detector->GetSubtraction();
-  distanceToTrap =detector->GetDistanceToTrap();
-  // G4cout <<"Subtraction: " << insideCollimator << " Distance to Trap (cm): "
-  //        << distanceToTrap << G4endl;
+      K37DetectorConstruction* det,
+      K37EventGenerator* evGen,
+      K37EventGeneratorNoRecoilOrderEffects* twoP)
+   : //Initalizer List
+      polarization_(1.0),
+      alignment_(1.0),
+      charge_state_ratio_(8, 1.0/8.0),
+      branching_ratio(2, 1.0/2.0),
+      detector(det),
+      v(),
+      vertex(NULL),
+      EventVertex(),
+      K37Neutral(NULL),
+      K37Minus(NULL),
+      decayTableAr37Minus(NULL),
+      K37MinusDecayMode(NULL),
+      cloud(NULL),
+      evGenerator(evGen),
+      twoPercent(twoP),
+      make_beta_(true),
+      make_recoil_(true),
+      make_shakeoff_electrons_(true),
+      makeTwoPercent(true),
+      thisEventIsATwoPercent(false)
+{
+   gunMessenger = new K37PrimaryGeneratorMessenger(this);
+   insideCollimator = detector->GetSubtraction();
+   distanceToTrap =detector->GetDistanceToTrap();
+   // G4cout <<"Subtraction: " << insideCollimator << " Distance to Trap (cm): "
+   //        << distanceToTrap << G4endl;
 
-  // G4int n_particle = 1;
-  // particleGun = new G4ParticleGun(n_particle);
+   // G4int n_particle = 1;
+   // particleGun = new G4ParticleGun(n_particle);
 
-  //                     temp , size
+   //                     temp , size
 
-  charge_state_ratio_[0] = 1.0;
-  charge_state_ratio_[1] = 0.69699;
-  charge_state_ratio_[2] = 0.19483;
-  charge_state_ratio_[3] = 0.08173;
-  charge_state_ratio_[4] = 0.01953;
-  charge_state_ratio_[5] = 0.00581;
-  charge_state_ratio_[6] = 0.00110;
-  charge_state_ratio_[7] = 0.0;
-  NormalizeChargeStateRatio();
+   charge_state_ratio_[0] = 1.0;
+   charge_state_ratio_[1] = 0.69699;
+   charge_state_ratio_[2] = 0.19483;
+   charge_state_ratio_[3] = 0.08173;
+   charge_state_ratio_[4] = 0.01953;
+   charge_state_ratio_[5] = 0.00581;
+   charge_state_ratio_[6] = 0.00110;
+   charge_state_ratio_[7] = 0.0;
+   NormalizeChargeStateRatio();
 
-  cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),  // center
-                           G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
-                                         0.0014*kelvin),          // temperature
-                           G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm),    // width
-                           G4ThreeVector(0.0 *mm/ns, 0.0*mm/ns, 0.0*mm/ns));
-  particleGun = new G4SingleParticleSource();
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  // ion = particleTable->GetIon(18, 37, 0);
-  positron = particleTable->FindParticle(particleName="e+");
-  electron = particleTable->FindParticle(particleName="e-");
-  Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
-  recoil_charge_ = 1.0;
+   branching_ratio[0] = 0.9789; //Main branch we care about
+   branching_ratio[1] = 0.0207; //Two percent branch.
+   NormalizeBranchingRatio();
 
-  // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
-  // evGenerator->MakeEvent();
-  // G4IonTable* ionTable = particleTable-> GetIonTable();
-  // ionTable->DumpTable();
-  // particleTable->DumpTable();
+   cloud = new K37CloudSize(G4ThreeVector(1.07*mm, 1.07*mm, -2.05*mm),  // center
+         G4ThreeVector(0.00029*kelvin, 0.00029*kelvin,
+            0.0014*kelvin),          // temperature
+         G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm),    // width
+         G4ThreeVector(0.0 *mm/ns, 0.0*mm/ns, 0.0*mm/ns));
+   particleGun = new G4SingleParticleSource();
+   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+   G4String particleName;
+   // ion = particleTable->GetIon(18, 37, 0);
+   positron = particleTable->FindParticle(particleName="e+");
+   electron = particleTable->FindParticle(particleName="e-");
+   gamma = particleTable->FindParticle(particleName="gamma");
+   Ar37MinusParticle = particleTable->FindParticle(particleName="Ar37Minus");
+   recoil_charge_ = 1.0;
+
+   // G4cout<<"The fermi function from evGenerator is: "<<G4endl;
+   // evGenerator->MakeEvent();
+   // G4IonTable* ionTable = particleTable-> GetIonTable();
+   // ionTable->DumpTable();
+   // particleTable->DumpTable();
 }
 
 K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
@@ -87,6 +110,21 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
 
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   G4double recoil_charge_this_event;
+
+  if(makeTwoPercent)
+  {
+     thisEventIsATwoPercent = TwoPercentEvent();
+  }
+
+  if(thisEventIsATwoPercent)
+  {
+     (*active_channels_)["TWO_PERCENT_BRANCH"] ->  InsertData(1.0);
+  }
+  else
+  {
+     (*active_channels_)["TWO_PERCENT_BRANCH"] ->  InsertData(0.0);
+  }
+
   if (recoil_charge_ == -2) {
     recoil_charge_this_event = GetChargeStateThisEvent();
   } else {
@@ -106,8 +144,17 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     SetPhotoionizationVertices(anEvent);
   } else {                              // beta-decay
     // Setup initial momenta of B-decay particles
-    evGenerator -> MakeEvent(polarization_, alignment_,
-                             recoil_charge_this_event);
+    if(thisEventIsATwoPercent)
+    {
+       twoPercent -> MakeEvent(polarization_, alignment_,
+             recoil_charge_this_event);
+    }
+    else
+    {
+       evGenerator -> MakeEvent(polarization_, alignment_,
+             recoil_charge_this_event);
+    }
+
     rho = 1;
 
     if (make_beta_) {
@@ -120,6 +167,9 @@ void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     }
     if (make_shakeoff_electrons_) {
       SetSOelectronVertices(anEvent, recoil_charge_this_event + 1);
+    }
+    if (thisEventIsATwoPercent) {
+      SetGammaVertex(anEvent);
     }
   }
 }
@@ -134,9 +184,17 @@ G4double K37PrimaryGeneratorAction::getVelocity(G4double kineticEnergy,
 
 void K37PrimaryGeneratorAction::setBetaVertex() {
   vertex = new G4PrimaryVertex(EventVertex, 0);
-  G4PrimaryParticle* particle =
-    new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
-                          evGenerator->eMomentumY(), evGenerator->eMomentumZ());
+  G4PrimaryParticle* particle = 0;
+  if(thisEventIsATwoPercent)
+  {
+     particle = new G4PrimaryParticle(positron, twoPercent->eMomentumX(),
+           twoPercent->eMomentumY(), twoPercent->eMomentumZ());
+  }
+  else
+  {
+     particle = new G4PrimaryParticle(positron, evGenerator->eMomentumX(),
+           evGenerator->eMomentumY(), evGenerator->eMomentumZ());
+  }
   vertex->SetPrimary(particle);
 }
 
@@ -178,6 +236,19 @@ void K37PrimaryGeneratorAction::SetPhotoionizationVertices(G4Event *ev) {
   ev -> AddPrimaryVertex(vertex);
 }
 
+void K37PrimaryGeneratorAction::SetGammaVertex(G4Event *ev)
+{
+  vertex = new G4PrimaryVertex(EventVertex, 0);
+  G4double gamma_energy = 2.796 * MeV;
+  G4ThreeVector gamma_direction = G4RandomDirection(); //isotropic
+  G4PrimaryParticle *twoPercentGamma = new G4PrimaryParticle(gamma);
+  twoPercentGamma -> SetMomentumDirection(gamma_direction);
+  twoPercentGamma -> SetKineticEnergy(gamma_energy);
+
+  vertex -> SetPrimary(twoPercentGamma);
+  ev -> AddPrimaryVertex(vertex);
+}
+
 void K37PrimaryGeneratorAction::setDaughterVertex(G4double recoil_charge) {
   // G4ThreeVector momentum(evGenerator -> dMomentumX(),
   //                        evGenerator -> dMomentumY(),
@@ -187,10 +258,19 @@ void K37PrimaryGeneratorAction::setDaughterVertex(G4double recoil_charge) {
   vertex = new G4PrimaryVertex(EventVertex, 0);
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition *ion = particleTable -> GetIon(18, 37, 0);  // 37Ar
-  G4PrimaryParticle* particle =
-      new G4PrimaryParticle(ion, evGenerator->dMomentumX(),
-                            evGenerator->dMomentumY(),
-                            evGenerator->dMomentumZ());
+  G4PrimaryParticle* particle = 0;
+  if(thisEventIsATwoPercent)
+  {
+     particle = new G4PrimaryParticle(ion,twoPercent->dMomentumX(),
+           twoPercent->dMomentumY(),
+           twoPercent->dMomentumZ());
+  }
+  else
+  {
+     particle = new G4PrimaryParticle(ion, evGenerator->dMomentumX(),
+           evGenerator->dMomentumY(),
+           evGenerator->dMomentumZ());
+  }
   // Simulate any charge state >= +1
   particle -> SetCharge(recoil_charge * eplus);
   if (debug) {
@@ -299,6 +379,19 @@ void K37PrimaryGeneratorAction::NormalizeChargeStateRatio() {
   }
 }
 
+void K37PrimaryGeneratorAction::NormalizeBranchingRatio()
+{
+  G4double sum = 0.0;
+  for (unsigned int i = 0; i < branching_ratio.size(); i++)
+  {
+    sum += branching_ratio[i];
+  }
+  for (unsigned int i = 0; i < branching_ratio.size(); i++)
+  {
+    branching_ratio[i] = branching_ratio[i] / sum;
+  }
+}
+
 G4double K37PrimaryGeneratorAction::GetChargeStateThisEvent() {
   G4double charge_state = -2.0, sum = 0.0;
   unsigned c = 0;
@@ -317,4 +410,18 @@ G4double K37PrimaryGeneratorAction::GetChargeStateThisEvent() {
   // G4cout << "Random is " << guess << " --> charge state is +" << charge_state
   //        << "\n" << G4endl;
   return charge_state;
+}
+
+G4bool K37PrimaryGeneratorAction::TwoPercentEvent()
+{
+   G4double guess = CLHEP::RandFlat::shoot(0.0, 1.0);
+
+   if (guess < branching_ratio[1])
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
 }

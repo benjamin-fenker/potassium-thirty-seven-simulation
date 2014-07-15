@@ -26,6 +26,7 @@ class G4DecayTable;
 class G4PhaseSpaceDecayChannel;
 class K37CloudSize;
 class K37EventGenerator;
+class K37EventGeneratorNoRecoilOrderEffects;
 
 using AGG::Aggregator;
 using K37_ABC::K37_Data;
@@ -36,7 +37,8 @@ using std::vector;
 class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   K37PrimaryGeneratorAction(K37DetectorConstruction*,
-                            K37EventGenerator*);
+                            K37EventGenerator*, 
+                            K37EventGeneratorNoRecoilOrderEffects*);
   ~K37PrimaryGeneratorAction();
 
  public:
@@ -49,6 +51,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void setDaughterVertex(G4double recoil_charge);
   void SetSOelectronVertices(G4Event *ev, G4int num_so_electron);
   void SetPhotoionizationVertices(G4Event *ev);
+  void SetGammaVertex(G4Event *ev);
   void SetPolarization(G4double pol);
   G4double GetPolarization() {return polarization_;}
   void SetAlignment(G4double ali);
@@ -65,6 +68,9 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetMakeShakeoffElectrons(G4bool flag) {make_shakeoff_electrons_ = flag;}
   K37EventGenerator* GetEventGenerator() {return evGenerator;}
  private:
+  void NormalizeChargeStateRatio();
+  void NormalizeBranchingRatio();
+  G4bool TwoPercentEvent();
   G4double      distanceToTrap;
 
   G4SingleParticleSource*       particleGun;
@@ -74,6 +80,7 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4double      insideCollimator;
   G4ParticleDefinition* electron;
   G4ParticleDefinition* positron;
+  G4ParticleDefinition* gamma;
   G4ParticleDefinition* Ar37MinusParticle;
 
   G4double polarization_;
@@ -81,6 +88,8 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4double recoil_charge_;               // Also determines number of SOE
   // Ratios of recoil charge distribution...
   vector<G4double> charge_state_ratio_;      // Ar0 -> Ar+7
+  vector<G4double> branching_ratio; //Just contains mainbrnach and 2% now. 
+                         //The other branches enter in at the 0.04% level. 
 
   G4String use_recoil_;
   K37DetectorConstruction* detector;
@@ -97,8 +106,8 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4PhaseSpaceDecayChannel *K37MinusDecayMode;
   K37CloudSize *cloud;
   K37EventGenerator *evGenerator;
+  K37EventGeneratorNoRecoilOrderEffects *twoPercent;
 
-  void NormalizeChargeStateRatio();
   G4double GetChargeStateThisEvent();
   Aggregator *the_aggregator_;
   map<string, K37_Data*> *active_channels_;
@@ -106,6 +115,8 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   G4bool make_beta_;
   G4bool make_recoil_;
   G4bool make_shakeoff_electrons_;
+  G4bool makeTwoPercent;
+  G4bool thisEventIsATwoPercent;
 };
 
 #endif
