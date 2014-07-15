@@ -13,8 +13,10 @@
 #include "G4TrajectoryDrawByParticleID.hh"
 
 #include "K37EventGenerator.hh"
+#include "K37EventGeneratorNoRecoilOrderEffects.hh"
 #include "Holstein_Event.hh"
 #include "JTW_Event.hh"
+#include "JTW_EventNoRecoilOrderEffects.hh"
 #include "K37_Data.hh"
 #include "K37FermiFunction.hh"
 #include "K37DetectorConstruction.hh"
@@ -107,12 +109,17 @@ int main(int argc, char** argv) {
   //runManager->Initialize();
 
   // User Action classes
+  // The main 98% branch 
   K37EventGenerator * evGen = new JTW_Event();
   evGen -> SetAggregator(the_aggregator);
   evGen -> SetActiveChannels(&active_channels);
 
+  // The 2% branch 
+  K37EventGeneratorNoRecoilOrderEffects *twoPercent =
+     new JTW_EventNoRecoilOrderEffects();
+
   K37PrimaryGeneratorAction* gen_action =
-      new K37PrimaryGeneratorAction(detector, evGen);
+      new K37PrimaryGeneratorAction(detector, evGen, twoPercent);
   gen_action -> SetAggregator(the_aggregator);
   gen_action -> SetActiveChannels(&active_channels);
   runManager -> SetUserAction(gen_action);

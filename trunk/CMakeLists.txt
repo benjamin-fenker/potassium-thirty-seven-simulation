@@ -8,6 +8,19 @@ SET( CMAKE_CXX_COMPILER "g++" )
 #SET( CMAKE_CXX_COMPILER "clang++" )
 #SET( CMAKE_CXX_COMPILER "c++" )
 
+FUNCTION(WarningAsError)
+   IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+   ELSEIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+   ENDIF()
+ENDFUNCTION()
+
+OPTION(K37_WARNINGS_AS_ERROR "Force compilation ot treat warnings as errors." OFF)
+
+IF(K37_WARNINGS_AS_ERROR)
+   WarningAsError()
+ENDIF(K37_WARNINGS_AS_ERROR)
 
 #----------------------------------------------------------------------------
 # Find Root so that we can link the aggregator class to it
@@ -68,8 +81,9 @@ ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
 # Add the executable, and link it to the Geant4 libraries
 
 # AFTER the G4/ROOT setups, add the necessary c++ flags
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Werror" )
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+#SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror" )
+#SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register" )
 SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" )
 SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3 -DNDEBUG" )
 
