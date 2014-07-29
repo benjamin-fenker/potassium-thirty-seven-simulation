@@ -43,6 +43,7 @@ namespace ISO
       public:
          ImplementI(const std::string &filename_);
          ~ImplementI();
+         void ChangeRho (const double &NewRhoValue_);
          void Print();
          double FindValue(const std::string &key_) const;
          void SetValue(const std::string &key_, const double &value_);
@@ -201,6 +202,17 @@ namespace ISO
       radcorr(true)
    {
       this->FillMap();
+
+      //std::cout<<"=========================================="<<std::endl;
+      //std::ios::fmtflags flags( std::cout.flags() );
+      //std::cout<<"Isotope Name: "<<isotopeName<<std::endl;
+      //for(auto i : theInputs)
+      //{
+         //std::cout<<std::left<<setw(32)<<i.first;
+         //i.second->Print();
+      //}
+      //std::cout.flags( flags );
+
       this->AddTotalNucleons();
       this->AddPartialHalflife();
       this->AddComparativeHalflife();
@@ -238,7 +250,7 @@ namespace ISO
       this->Add_Y_coulomb();
       this->FillStaticValues();
 
-      //std::ios::fmtflags f( std::cout.flags() );
+      //std::cout<<"=========================================="<<std::endl;
       //std::cout<<"Isotope Name: "<<isotopeName<<std::endl;
       //for(auto i : theInputs)
       //{
@@ -246,7 +258,7 @@ namespace ISO
          //i.second->Print();
       //}
       //std::cout<<"=========================================="<<std::endl;
-      //std::cout.flags( f );
+      //std::cout.flags( flags );
    }
 
    Isotope::ImplementI::~ImplementI()
@@ -256,8 +268,82 @@ namespace ISO
          delete i.second;
       }
       theInputs.clear();
+
    }
 
+   void Isotope::ImplementI::ChangeRho (const double &NewRhoValue_)
+   {
+      //cout<<"I got here."<<endl;
+      for(auto i : theInputs)
+      {
+         delete i.second;
+      }
+      theInputs.clear();
+
+      this->FillMap();
+
+      //std::cout<<"++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
+      //std::ios::fmtflags flags( std::cout.flags() );
+      //std::cout<<"Isotope Name: "<<isotopeName<<std::endl;
+      //for(auto i : theInputs)
+      //{
+         //std::cout<<std::left<<setw(32)<<i.first;
+         //i.second->Print();
+      //}
+      //std::cout.flags( flags );
+      this->AddTotalNucleons();
+      this->AddPartialHalflife();
+      this->AddComparativeHalflife();
+      this->AddCorrectedComparativeHalflife();
+      this->Add_U_AxialOverVector();
+      this->AddRho();
+      this->SetValue("RHO",NewRhoValue_);
+      this->AddIsospin();
+      this->AddWeakMagnetism();
+      this->AddInitalMass();
+      this->AddFinalMass();
+      this->AddDeltaM();
+      this->AddAverageMass();
+      this->AddTotalEndpointEnergy();
+      this->AddHalfEndpoint();
+      this->DivideBy_hbarC2();
+      this->AddRecoilCorrection();
+
+      double gA = FindValue("GA");
+      double rc = FindValue("RECOIL_CORRECTION");
+      this->SetValue("M_GT",((-NewRhoValue_*rc)/gA));
+
+      this->Add_a1();
+      this->Add_Delta_a1();
+      this->Add_Delta_c1();
+      this->Add_a2();
+      this->Add_b();
+      this->Add_c1();
+      this->Add_c2();
+      this->Add_dI();
+      this->Add_dII();
+      this->Add_eI();
+      this->Add_eII();
+      this->Add_f();
+      this->Add_g();
+      this->Add_h();
+      this->Add_j2();
+      this->Add_j3();
+      this->AddHolstein_g();
+      this->Add_X_coulomb();
+      this->Add_Y_coulomb();
+      this->FillStaticValues();
+
+      //std::cout<<"++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
+      //std::cout<<"Isotope Name: "<<isotopeName<<std::endl;
+      //for(auto i : theInputs)
+      //{
+         //std::cout<<std::left<<setw(32)<<i.first;
+         //i.second->Print();
+      //}
+      //std::cout<<"++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
+      //std::cout.flags( flags );
+   }
 
    double Isotope::ImplementI::f_1(const double &T_) const
    {
@@ -735,17 +821,17 @@ namespace ISO
 
    void Isotope::ImplementI::AddInitalMass()
    {
-      double M = FindValue("MASS_OF_PARENT");
+      double M_ = FindValue("MASS_OF_PARENT");
       double amu_to_mev = FindValue("AMU_TO_MEV");
-      theInputs["INITIAL_MASS_MEV"] = new values(M*amu_to_mev, 0, "!calculated!");
+      theInputs["INITIAL_MASS_MEV"] = new values(M_*amu_to_mev, 0, "!calculated!");
    }
 
    void Isotope::ImplementI::AddFinalMass()
    {
-      double M = FindValue("MASS_OF_DAUGHTER");
+      double M_ = FindValue("MASS_OF_DAUGHTER");
       double amu_to_mev = FindValue("AMU_TO_MEV");
-      double me = FindValue("MASS_OF_ELECTRON");
-      theInputs["FINAL_MASS_MEV"] = new values(M*amu_to_mev+me, 0, "!calculated!");
+      double me_ = FindValue("MASS_OF_ELECTRON");
+      theInputs["FINAL_MASS_MEV"] = new values(M_*amu_to_mev+me_, 0, "!calculated!");
    }
 
    void Isotope::ImplementI::AddDeltaM()
@@ -850,8 +936,8 @@ namespace ISO
       double gM      = FindValue("GM");
       double M_GT    = FindValue("M_GT");
       double M_L     = FindValue("M_L");
-      double A       = FindValue("TOTAL_NUCLEONS");
-      double temp = A*(gM*M_GT + gV*M_L);
+      double A_      = FindValue("TOTAL_NUCLEONS");
+      double temp = A_*(gM*M_GT + gV*M_L);
       
       theInputs["B"] = new values(temp,0, "!calculated!");
    }
@@ -866,9 +952,9 @@ namespace ISO
    void Isotope::ImplementI::Add_dII()
    {
       double gII     = FindValue("GII");
-      double A       = FindValue("TOTAL_NUCLEONS");
+      double A_      = FindValue("TOTAL_NUCLEONS");
       double M_GT    = FindValue("M_GT");
-      double temp = -gII*A*M_GT;
+      double temp = -gII*A_*M_GT;
       
       theInputs["DII"] = new values(temp,0, "!calculated!");
    }
@@ -876,9 +962,9 @@ namespace ISO
    void Isotope::ImplementI::Add_eII()
    {
       double gS      = FindValue("GS");
-      double A       = FindValue("TOTAL_NUCLEONS");
+      double A_      = FindValue("TOTAL_NUCLEONS");
       double M_F     = FindValue("M_F");
-      double temp    = -gS*A*M_F;
+      double temp    = -gS*A_*M_F;
       
       theInputs["EII"] = new values(temp,0, "!calculated!");
    }
@@ -984,13 +1070,13 @@ namespace ISO
       double M_sr2   = FindValue("M_SR2");
       double M_1y    = FindValue("M_1Y");
       double aveM    = FindValue("AVERAGE_MASS");
-      double A       = FindValue("TOTAL_NUCLEONS");
+      double A_      = FindValue("TOTAL_NUCLEONS");
       double M_sL    = FindValue("M_SL");
       double M_srp   = FindValue("M_SRP");
       double rc      = FindValue("RECOIL_CORRECTION");
       double temp = gA*( -M_GT + sq(deltaM)*(M_sr2/6.0)
 		   + M_1y*deltaM*(aveM+deltaM/6.0)/sqrt(10.)
-		   + (A*M_sL) + (aveM*M_srp))/rc;
+		   + (A_*M_sL) + (aveM*M_srp))/rc;
       
       theInputs["DI"] = new values(temp,0, "!calculated!");
    }
@@ -1013,13 +1099,13 @@ namespace ISO
       double deltaM  = FindValue("DELTA_MASS");
       double M_sr2   = FindValue("M_SR2");
       double M_1y    = FindValue("M_1Y");
-      double A       = FindValue("TOTAL_NUCLEONS");
+      double A_      = FindValue("TOTAL_NUCLEONS");
       double M_sL    = FindValue("M_SL");
       double aveM    = FindValue("AVERAGE_MASS");
       double M_srp   = FindValue("M_SRP");
       double rc      = FindValue("RECOIL_CORRECTION");
       double temp = gA*( (-sq(deltaM)*M_sr2/6.0) + (2.0*sq(deltaM)*M_1y/(6.0*sqrt(10.)))
-			 + (A*deltaM*M_sL/(2.0*aveM))
+			 + (A_*deltaM*M_sL/(2.0*aveM))
 			 + (deltaM*M_srp/2.0))/rc;
       
       theInputs["DELTA_C1"] = new values(temp,0, "!calculated!");
@@ -1089,8 +1175,8 @@ namespace ISO
       double T3_d = FindValue("DAUGHTER_ISOSPIN_T3");
       double mu_p = FindValue("PARENT_MAGNETIC_MOMENT");
       double mu_d = FindValue("DAUGHTER_MAGNETIC_MOMENT");
-      double A    = N+Z;
-      return A*sqrt((j+1.0)/j)*(mu_p-mu_d)/(T3_p-T3_d);
+      double A_   = N+Z;
+      return A_*sqrt((j+1.0)/j)*(mu_p-mu_d)/(T3_p-T3_d);
    }
 
    double Isotope::ImplementI::U_WeakMagnetism()const
@@ -1109,8 +1195,8 @@ namespace ISO
       double fafv    = FindValue("FA/FV");
       double FT      = FindValue("CORRECTED_COMPARATIVE_HALFLIFE");
       double FT_0T0  = FindValue("FT_0T0");
-      double sign    = FindValue("SIGN_RHO");
-      return sign*sqrt(((2.0*FT_0T0/FT) - 1.0)/fafv);
+      double sign_    = FindValue("SIGN_RHO");
+      return sign_*sqrt(((2.0*FT_0T0/FT) - 1.0)/fafv);
    }
 
    double Isotope::ImplementI::U_Rho()const
@@ -1357,6 +1443,11 @@ namespace ISO
    double Isotope::zhi(const double &T_)
    {
       return 2.0*mI->f_1(T_);
+   }
+
+   void Isotope::ChangeRho (const double &NewRhoValue_)
+   {
+      mI->ChangeRho(NewRhoValue_);
    }
 
    double Isotope::FindValue(const std::string &key_) const

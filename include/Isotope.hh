@@ -21,6 +21,8 @@ namespace ISO
          //Get zhi as a function of kinetic energy of e+ 
          double zhi      (const double &T_);
 
+         void ChangeRho (const double &NewRhoValue_);
+
          //This function can retrieve the value of a const stored in the 
          //isotope database. Really this should not be used in simulations
          //but is useful for debugging.
