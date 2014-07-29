@@ -3,6 +3,8 @@
 
 #include <string>
 
+class IsotopeMessenger;
+
 namespace ISO
 {
    class Isotope
@@ -36,6 +38,10 @@ namespace ISO
          class ImplementI;
          //my Isotope
          ImplementI *mI;
+
+         IsotopeMessenger* isotopeMessenger;   // messenger of this class
+
+
    };
 }
 #endif

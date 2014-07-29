@@ -1,4 +1,5 @@
 #include "Isotope.hh"
+#include "IsotopeMessenger.hh"
 #include "SplitString.hh"
 #include <iostream>
 #include <iomanip>
@@ -1411,7 +1412,8 @@ namespace ISO
 
 
    Isotope::Isotope(const std::string &filename_)
-      :mI(new ImplementI(filename_))
+      :mI(new ImplementI(filename_)),
+      isotopeMessenger(new IsotopeMessenger(this))
    {
    }
 
