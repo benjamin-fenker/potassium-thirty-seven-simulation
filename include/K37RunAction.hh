@@ -209,7 +209,10 @@ class K37RunAction : public G4UserRunAction {
   Generic_Channel *qdc_lower_dssd_e;
   Generic_Channel *qdc_upper_dssd_g;
   Generic_Channel *qdc_lower_dssd_g;
-
+  Generic_Channel *qdc_upper_mirror;
+  Generic_Channel *qdc_lower_mirror;
+  Generic_Channel *qdc_upper_BeWindow;
+  Generic_Channel *qdc_lower_BeWindow;
   //-------------------------------------------------------------------
 
   TDC_Channel *dl_x_pos_, *dl_z_pos_;

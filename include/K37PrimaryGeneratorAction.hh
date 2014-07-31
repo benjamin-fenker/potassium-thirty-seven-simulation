@@ -67,13 +67,17 @@ class K37PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetMakeRecoil(G4bool flag) {make_recoil_ = flag;}
   void SetMakeShakeoffElectrons(G4bool flag) {make_shakeoff_electrons_ = flag;}
   K37EventGenerator* GetEventGenerator() {return evGenerator;}
+  void ToggleUseGPS();
+  void SetUseGPS(bool b);
  private:
+  bool use_gps;
   void NormalizeChargeStateRatio();
   void NormalizeBranchingRatio();
   G4bool TwoPercentEvent();
   G4double      distanceToTrap;
 
-  G4SingleParticleSource*       particleGun;
+  //  G4SingleParticleSource*       particleGun;
+  G4VPrimaryGenerator *particleGun;
   G4double      rho;
   //  G4double      phi;
   //  G4double      theta;

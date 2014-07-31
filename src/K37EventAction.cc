@@ -289,6 +289,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   K37RecoilMCPHitsCollection* recoil_mcp_hit_collection = 0;
   K37ElectronMCPHitsCollection* electron_mcp_hit_collection = 0;
 
+  
   if (hit_collection) {
     recoil_mcp_hit_collection =
         static_cast<K37RecoilMCPHitsCollection*>(hit_collection ->
@@ -301,11 +302,38 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       detector_construction_ -> GetMakeElectronMCP();
   G4bool recoil_mcp_constructed = detector_construction_ -> GetMakeRecoilMCP();
 
+  G4double upper_mirror_E = 0.0;
+  G4double lower_mirror_E = 0.0;
+  G4double upper_beWindow_E = 0.0;
+  G4double lower_beWindow_E = 0.0;
+  G4double *pval;
+  G4SDManager * SDman = G4SDManager::GetSDMpointer();
 
+  //  G4THitsMap<G4double> *scorer_map;
+
+  G4THitsMap<G4double> *scorer_map = (G4THitsMap<G4double>*)
+      (hit_collection->GetHC(SDman->GetCollectionID("MirrorEnergyScorer/Edep")));
+  pval = (*scorer_map)[0];
+  if (pval) upper_mirror_E = *pval;
+  pval = (*scorer_map)[1];
+  if (pval) lower_mirror_E = *pval;
+  // G4cout << "Upper: " << upper_mirror_E/keV << " keV\tLower: "
+  //        << lower_mirror_E/keV << " keV" << G4endl;
+
+  scorer_map = (G4THitsMap<G4double>*)
+      (hit_collection->GetHC(SDman->GetCollectionID("BeWindowEnergyScorer/Edep")));
+  pval = (*scorer_map)[0];
+  if (pval) upper_beWindow_E = *pval;
+  pval = (*scorer_map)[1];
+  if (pval) lower_beWindow_E = *pval;
+  // G4cout << "Upper: " << upper_beWindow_E/keV << " keV\tLower: "
+  //        << lower_beWindow_E/keV << " keV" << G4endl;
+  
   // ************************************************************
   // -------------------- Query the upper scintillator
   // ************************************************************
   energyUpperScint_Total = upper_scintillator_digitizer -> GetEnergyTotal();
+  //  G4cout << "Scintillator: " << energyUpperScint_Total/keV << " keV\t";
   energyUpperScint_Electron =
       upper_scintillator_digitizer -> GetEnergyElectron();
 
@@ -341,6 +369,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   sd_energy_plusZ_Y = upper_strip_detector_digitizer -> GetEnergyYstrip();
 
   energyUpperSilicon_Total = upper_strip_detector_digitizer -> GetEnergyTotal();
+  //  G4cout << "DSSSD: " << energyUpperSilicon_Total/keV << " keV" << G4endl;
   energyUpperSilicon_Electron =
       upper_strip_detector_digitizer -> GetEnergyElectron();
 
@@ -493,21 +522,30 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
     (*active_channels_)["QDC_LowerSilicon_E" ] -> InsertData(energyLowerSilicon_Electron/keV);
     (*active_channels_)["QDC_LowerSilicon_G" ] -> InsertData(energyLowerSilicon_Gamma/keV   );
 
+    (*active_channels_)["Upper_Mirror_Edep"] -> InsertData(upper_mirror_E/keV);
+    (*active_channels_)["Lower_Mirror_Edep"] -> InsertData(lower_mirror_E/keV);
+    (*active_channels_)["Upper_BeWindow_Edep"] -> InsertData(upper_beWindow_E/keV);
+    (*active_channels_)["Lower_BeWindow_Edep"] -> InsertData(lower_beWindow_E/keV);
 
     (*active_channels_)["TDC_SCINT_TOP"] ->
         InsertData(time_upper_scintillator/ns/v1190_factor_ns);
     (*active_channels_)["TDC_SCINT_BOTTOM"] ->
         InsertData(time_lower_scintillator/ns/v1190_factor_ns);
+
     // G4cout << "TDC_ION_MCP     : " << recoil_mcp_time/ns << G4endl;
     // G4cout << "TDC_ELECTRON_MCP: " << electron_mcp_time/ns << G4endl;
     if (electron_mcp_constructed) {
+
       (*active_channels_)["TDC_ELECTRON_MCP"] ->
           InsertData(electron_mcp_time/ns/v1190_factor_ns);
-      (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
-          InsertData((G4double)electron_mcp_hit_collection -> entries());
+      if (electron_mcp_hit_collection) {
+        (*active_channels_)["ELECTRON_MCP_N_HITS"] ->
+            InsertData((G4double)electron_mcp_hit_collection -> entries());
+      }
       (*active_channels_)["ELECTRON_MCP_PARTICLE_PDG"] ->
           InsertData((G4double)electron_pdg);
     }
+
     if (recoil_mcp_constructed) {
       (*active_channels_)["DL_X_Pos"] -> InsertData(recoil_mcp_x_pos/mm);
       (*active_channels_)["DL_Z_Pos"] -> InsertData(recoil_mcp_z_pos/mm);
@@ -589,7 +627,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
      the_aggregator_ -> EndEvent(false);
   }
   //PrintEvent(evt);
-  //G4cout << "<><><><><><><><><><><><><><><>" << G4endl;
+  //  G4cout << "<><><><><><><><><><><><><><><>" << G4endl;
 
 }  // End of event action
 
