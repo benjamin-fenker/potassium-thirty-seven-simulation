@@ -96,6 +96,10 @@ K37RunAction::K37RunAction()
   qdc_lower_dssd_e  = new Generic_Channel("QDC_LowerSilicon_E" , -1, "/D");
   qdc_upper_dssd_g  = new Generic_Channel("QDC_UpperSilicon_G" , -1, "/D");
   qdc_lower_dssd_g  = new Generic_Channel("QDC_LowerSilicon_G" , -1, "/D");
+  qdc_upper_mirror  = new Generic_Channel("Upper_Mirror_Edep", -1, "/D");
+  qdc_lower_mirror  = new Generic_Channel("Lower_Mirror_Edep", -1, "/D");
+  qdc_upper_BeWindow = new Generic_Channel("Upper_BeWindow_Edep", -1, "/D");
+  qdc_lower_BeWindow = new Generic_Channel("Lower_BeWindow_Edep", -1, "/D");
 
   dl_x_pos_      = new TDC_Channel("DL_X_Pos"    , 3, "/v", false);
   dl_z_pos_      = new TDC_Channel("DL_Z_Pos"    , 4, "/v", false);
@@ -209,6 +213,11 @@ K37RunAction::~K37RunAction() {
   delete num_hits_r_mcp_;
   delete num_hits_e_mcp_;
   delete electron_mcp_particle_;
+  delete qdc_upper_mirror;
+  delete qdc_lower_mirror;
+  delete qdc_upper_BeWindow;
+  delete qdc_lower_BeWindow;
+
 }
 
 //----------------------------------
@@ -287,6 +296,10 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(qdc_lower_dssd_e);
   RegisterChannel(qdc_upper_dssd_g);
   RegisterChannel(qdc_lower_dssd_g);
+  RegisterChannel(qdc_upper_mirror);
+  RegisterChannel(qdc_lower_mirror);
+  RegisterChannel(qdc_upper_BeWindow);
+  RegisterChannel(qdc_lower_BeWindow);
   if (detector_construction_ -> GetMakeRecoilMCP()) {
     RegisterChannel(dl_x_pos_);
     RegisterChannel(dl_z_pos_);

@@ -22,6 +22,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 #include "Randomize.hh"
+#include "G4SingleParticleSource.hh"
+#include "G4GeneralParticleSource.hh"
 
 
 K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
@@ -29,6 +31,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
       K37EventGenerator* evGen,
       K37EventGeneratorNoRecoilOrderEffects* twoP)
    : //Initalizer List
+    use_gps(false),
       polarization_(1.0),
       alignment_(1.0),
       charge_state_ratio_(8, 1.0/8.0),
@@ -50,6 +53,7 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
       makeTwoPercent(true),
       thisEventIsATwoPercent(false)
 {
+
    gunMessenger = new K37PrimaryGeneratorMessenger(this);
    insideCollimator = detector->GetSubtraction();
    distanceToTrap =detector->GetDistanceToTrap();
@@ -80,7 +84,11 @@ K37PrimaryGeneratorAction::K37PrimaryGeneratorAction(
             0.0014*kelvin),          // temperature
          G4ThreeVector(0.51*mm, 0.51*mm, 0.64*mm),    // width
          G4ThreeVector(0.0 *mm/ns, 0.0*mm/ns, 0.0*mm/ns));
-   particleGun = new G4SingleParticleSource();
+   if (use_gps) {
+     particleGun = new G4GeneralParticleSource();
+   } else {
+     particleGun = new G4SingleParticleSource();
+   }
    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
    G4String particleName;
    // ion = particleTable->GetIon(18, 37, 0);
@@ -109,6 +117,11 @@ K37PrimaryGeneratorAction::~K37PrimaryGeneratorAction() {
 
 
 void K37PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+  if (use_gps) {
+    particleGun -> GeneratePrimaryVertex(anEvent);
+    return;
+  }
+
   G4double recoil_charge_this_event;
 
   if(makeTwoPercent)
@@ -424,4 +437,22 @@ G4bool K37PrimaryGeneratorAction::TwoPercentEvent()
    {
       return false;
    }
+}
+
+void K37PrimaryGeneratorAction::ToggleUseGPS() {
+  use_gps = !(use_gps);
+  delete particleGun;
+  if (use_gps) {
+    particleGun = new G4GeneralParticleSource();
+  } else {
+    particleGun = new G4SingleParticleSource();
+  }
+}
+
+void K37PrimaryGeneratorAction::SetUseGPS(bool g) {
+  if (g == use_gps) {
+  } else {
+    ToggleUseGPS();
+  }
+  return;  
 }

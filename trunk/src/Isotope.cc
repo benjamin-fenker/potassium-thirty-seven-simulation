@@ -11,6 +11,7 @@
 
 using std::cerr; using std::endl; using std::cout;
 using std::left; using std::setw;
+using std::cin;
 
 namespace ISO
 {
@@ -62,6 +63,7 @@ namespace ISO
          void Add_U_AxialOverVector();
          double Rho()const;
          double U_Rho()const;
+         void BlindRho();
          void AddRho();
          void AddIsospin();
          double WeakMagnetism()const;
@@ -220,6 +222,7 @@ namespace ISO
       this->AddCorrectedComparativeHalflife();
       this->Add_U_AxialOverVector();
       this->AddRho();
+      //      this->BlindRho();
       this->AddIsospin();
       this->AddWeakMagnetism();
       this->AddInitalMass();
@@ -1196,8 +1199,56 @@ namespace ISO
       double fafv    = FindValue("FA/FV");
       double FT      = FindValue("CORRECTED_COMPARATIVE_HALFLIFE");
       double FT_0T0  = FindValue("FT_0T0");
-      double sign_    = FindValue("SIGN_RHO");
-      return sign_*sqrt(((2.0*FT_0T0/FT) - 1.0)/fafv);
+      double sign    = FindValue("SIGN_RHO");
+      double rho = sign*sqrt(((2.0*FT_0T0/FT) - 1.0)/fafv);
+      printf("rho = %g\n", rho);
+      return rho;
+   }
+
+   void Isotope::ImplementI::BlindRho()
+   {
+     // Blinding rho blinds the data in an unbiased way
+
+     // To blind rho, first calculate an unknon hash between 0 and 1
+     // using "Middle-square method."  Note that using a built-in c++
+     // random number generator won't work as they are platform and
+     // compiler dependent.  That is, even using the same seed,
+     // different computers will come up with different numbers.  The
+     // Middle-square method avoid this by simply using integer
+     // multiplication and mod.  
+     // The chosen hash number seed for the Jun2014 data set is:
+     cout << "BLINDING RHO" << endl;
+     int j;
+     cin >> j;
+     int seed = 2214;                   // (Jun) 22, 2014
+     std::string seq = "";
+     while (seq.length() < 41) {
+       seed = seed*seed;
+       std::string seed_str = std::to_string(seed);
+       // Zero pad the string 2345678 becomes 02345678
+       int l = seed_str.length();
+       for (int i = 0; i < 8-l; i++) seed_str = "0" + seed_str;
+
+       seed_str = seed_str.substr(2, 4);  // Start at the 3rd digit, go four more
+       seq = seq + seed_str;
+       seed = std::stoi(seed_str);
+     }
+     // 12345678 becomes 3456
+
+     seed = std::stoi(seq.substr(37, 4));
+     double hash = static_cast<double>(seed)/10000.0;
+     // printf("Seed str = %s\n", seq.c_str());
+     // printf("Hash = %g\n", hash);
+
+
+     double rho0 = FindValue("RHO");
+     double drho = FindUncertainty("RHO");
+     // Allow rho to vary by +/- 1.5 times its uncertainty
+     double rho_vary = 1.5*drho;
+     //     printf("rho_vary = %g\n", rho_vary);
+     double new_rho = rho0 - rho_vary + 2.0*hash*rho_vary;
+     SetValue("RHO", new_rho);
+     //     printf("rho = %g\n", FindValue("RHO"));
    }
 
    double Isotope::ImplementI::U_Rho()const

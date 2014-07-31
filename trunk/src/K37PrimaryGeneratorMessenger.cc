@@ -129,8 +129,12 @@ K37PrimaryGeneratorMessenger::K37PrimaryGeneratorMessenger(
   set_BigA -> SetParameterName("A_{beta}", true);
   set_BigA -> SetDefaultValue(-0.573938);
 
-  // rad = 1.00 internally
+  toggle_gps_ = new G4UIcmdWithoutParameter("/K37/gun/toggleGPS", this);
+  toggle_gps_ -> SetGuidance("Turn on/off the G4GeneralParticleSource");
 
+  set_gps_ = new G4UIcmdWithABool("/K37/gun/useGPS", this);
+  set_gps_ -> SetGuidance("Turn on/off the G4GeneralParticleSource");
+  set_gps_ -> SetDefaultValue(false);
 }
 
 // ----------------------------------
@@ -154,6 +158,7 @@ K37PrimaryGeneratorMessenger::~K37PrimaryGeneratorMessenger() {
   delete set_minimum_cos_theta_cmd_;
   delete set_cone_half_angle_cmd_;
   delete set_BigA;
+  delete toggle_gps_;
 }
 
 // ----------------------------------
@@ -222,10 +227,15 @@ void K37PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command,
         SetConeHalfAngle(set_cone_half_angle_cmd_ ->
                          GetNewDoubleValue(newValue));
   }
-  if (command == set_BigA)
-  {
+  if (command == set_BigA) {
     action_ -> GetEventGenerator() -> SetBigA(
           set_BigA-> GetNewDoubleValue(newValue));
+  }
+  if (command == toggle_gps_) {
+    action_ -> ToggleUseGPS();
+  }
+  if (command == set_gps_) {
+    action_ -> SetUseGPS(set_gps_ -> GetNewBoolValue(newValue));
   }
 }
 

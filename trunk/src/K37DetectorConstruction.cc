@@ -38,6 +38,7 @@
 #include "G4Trd.hh"
 #include "G4UnionSolid.hh"
 #include "G4VPrimitiveScorer.hh"
+#include "G4PSEnergyDeposit.hh"
 #include "G4VSDFilter.hh"
 #include "G4VisAttributes.hh"
 
@@ -1111,12 +1112,19 @@ void K37DetectorConstruction::ConstructChamber() {
 
   beryllium_log -> SetVisAttributes(beryllium_logVisAttributes);
 
+  // Set up primitive scorer for mirror
+  G4MultiFunctionalDetector *be_scorer = new G4MultiFunctionalDetector("BeWindowEnergyScorer");
+  G4VPrimitiveScorer *edep_sens = new G4PSEnergyDeposit("Edep");
+  be_scorer -> RegisterPrimitive(edep_sens);
+  beryllium_log -> SetSensitiveDetector(be_scorer);
+  G4SDManager::GetSDMpointer() -> AddNewDetector(be_scorer);
+
   new G4PVPlacement(0, beryllium_window.center_position,
                     beryllium_log, "beryllium_plusZ_phys", world_log_, false,
                     0, check_all_for_overlaps_);
   new G4PVPlacement(0, -1.0*beryllium_window.center_position,
                     beryllium_log, "beryllium_minusZ_phys",
-                    world_log_, false, 0, check_all_for_overlaps_);
+                    world_log_, false, 1, check_all_for_overlaps_);
 
   // ------------------------------ Front Face Reentrant Flange (FFRF)
 
@@ -1171,15 +1179,23 @@ void K37DetectorConstruction::ConstructMirrors() {
 
   mirror_log = new G4LogicalVolume(mirror_sol, MirrorMaterial,
                                    "mirror_log", 0, 0, 0);
+
+  mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.9, 0.1, 0.1, 0.9));
+  mirror_logVisAttributes-> SetForceSolid(true);
+  mirror_log -> SetVisAttributes(mirror_logVisAttributes);
+  // Set up primitive scorer for mirror
+  G4MultiFunctionalDetector *mirror_scorer = new G4MultiFunctionalDetector("MirrorEnergyScorer");
+  G4VPrimitiveScorer *edep_sens = new G4PSEnergyDeposit("Edep");
+  mirror_scorer -> RegisterPrimitive(edep_sens);
+  mirror_log -> SetSensitiveDetector(mirror_scorer);
+  G4SDManager::GetSDMpointer() -> AddNewDetector(mirror_scorer);
+
   new G4PVPlacement(mirror_rotation, mirror.center_position,
                     mirror_log, "mirror_plusZ_phys", world_log_, false, 0,
                     check_all_for_overlaps_);
   new G4PVPlacement(mirror_rotation, -1.0*mirror.center_position,
-                    mirror_log, "mirror_minusZ_phys", world_log_, false, 0,
+                    mirror_log, "mirror_minusZ_phys", world_log_, false, 1,
                     check_all_for_overlaps_);
-  mirror_logVisAttributes = new G4VisAttributes(G4Colour(0.9, 0.1, 0.1, 0.9));
-  mirror_logVisAttributes-> SetForceSolid(true);
-  mirror_log -> SetVisAttributes(mirror_logVisAttributes);
   // ------------------------------ Mirror Mount (MM)
   G4VSolid *mirror_mount_tub =
       new G4Tubs("mirror_mount_tub", mirror_mount.inner_radius,
@@ -1220,7 +1236,7 @@ void K37DetectorConstruction::ConstructMirrors() {
   MMRotation = new CLHEP::HepRotation();
   MMRotation->rotateX(180.*deg);
   new G4PVPlacement(MMRotation, -1.0*mirror_mount.center_position,
-                    mirror_mount_log, "MM_minusZ_phys", world_log_, false, 0,
+                    mirror_mount_log, "MM_minusZ_phys", world_log_, false, 1,
                     check_all_for_overlaps_);
 }  // End ConstructMirrors
 
@@ -1634,11 +1650,11 @@ void K37DetectorConstruction::ConstructCoils() {
   G4String physNameTub = G4String();
 
   coils_logVisAttributes= new G4VisAttributes(G4Colour(0.6, 0.35, 0.0, 0.25));
-  coils_logVisAttributes-> SetForceSolid(true);
+  coils_logVisAttributes-> SetForceSolid(false);
   // coils_logVisAttributes-> SetForceWireframe(true);
     
   coilLiquid_logVisAttributes= new G4VisAttributes(G4Colour(0.0, 0.0, 1.0, 0.8));
-  coilLiquid_logVisAttributes-> SetForceSolid(true);
+    coilLiquid_logVisAttributes-> SetForceSolid(false);
   // coilLiquid_logVisAttributes-> SetForceWireframe(true);
 
   for(int ycount = 0; ycount < 4; ++ycount)

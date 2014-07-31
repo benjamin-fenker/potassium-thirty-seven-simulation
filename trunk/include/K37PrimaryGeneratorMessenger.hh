@@ -9,6 +9,7 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithAnInteger.hh"
+#include "G4UIcmdWithoutParameter.hh"
 #include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
 #include "G4UnitsTable.hh"
@@ -47,6 +48,8 @@ class K37PrimaryGeneratorMessenger: public G4UImessenger {
   G4UIcmdWithADouble *set_minimum_cos_theta_cmd_;
   G4UIcmdWithADoubleAndUnit *set_cone_half_angle_cmd_;
   G4UIcmdWithADouble *set_BigA;
+  G4UIcmdWithoutParameter *toggle_gps_;
+  G4UIcmdWithABool *set_gps_;
 };
 
 //----------------------------------
