@@ -34,7 +34,6 @@
 #include "GeantAggregator.hh"
 #include "Generic_Channel.hh"
 #include "external/PhysicsList.hh"
-#include "K37GPSPrimaryGeneratorAction.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
