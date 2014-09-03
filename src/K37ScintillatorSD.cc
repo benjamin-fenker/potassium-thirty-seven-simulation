@@ -4,6 +4,7 @@
 #include "K37ScintillatorHit.hh"
 #include "G4Step.hh"
 #include "G4HCofThisEvent.hh"
+#include "G4SDManager.hh"
 #include "G4TouchableHistory.hh"
 #include "G4ios.hh"
 
@@ -31,7 +32,7 @@ K37ScintillatorSD::~K37ScintillatorSD() {
 
 void K37ScintillatorSD::Initialize(G4HCofThisEvent* HCE) {
   // G4cout << "K37ScintillatorSD::Initialize(G4HCofThisEvent *)" << G4endl;
-  static int HCID = -1;
+  //  static int HCID = -1;
   // G4cout << "SensitiveDetectorName: " << SensitiveDetectorName << G4endl;
 
   // if(HCID<0)
@@ -39,17 +40,23 @@ void K37ScintillatorSD::Initialize(G4HCofThisEvent* HCE) {
   //    HCID = GetCollectionID(0);
   //  }
 
-  if (SensitiveDetectorName == "scintillatorPlusZ") {
-    HCID = 0;
-  } else if (SensitiveDetectorName == "scintillatorMinusZ") {
-    HCID = 1;
-  }
+  // if (SensitiveDetectorName == "scintillatorPlusZ") {
+  //   HCID = 0;
+  // } else if (SensitiveDetectorName == "scintillatorMinusZ") {
+  //   HCID = 1;
+  // }
   // G4cout << "HCID is: " << HCID << G4endl;
   // G4cout << "collectionName[0]: " << collectionName[0] << G4endl;
   fullenergy1Collection =
     new K37ScintillatorHitsCollection(SensitiveDetectorName, collectionName[0]);
   // G4cout << "About to HCE" << G4endl;
-  HCE -> AddHitsCollection(HCID, fullenergy1Collection);
+  // G4cout << SensitiveDetectorName << G4endl;
+  // G4cout << collectionName[0] << G4endl;
+  // G4SDManager::GetSDMpointer() -> ListTree();
+  // G4cout << G4SDManager::GetSDMpointer() -> GetCollectionID(SensitiveDetectorName) << G4endl;
+  HCE -> AddHitsCollection(G4SDManager::GetSDMpointer() ->
+                           GetCollectionID(collectionName[0]),
+                           fullenergy1Collection);
 }
 
 G4bool K37ScintillatorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*) {

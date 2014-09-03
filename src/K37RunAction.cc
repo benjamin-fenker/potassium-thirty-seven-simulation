@@ -68,7 +68,7 @@ K37RunAction::K37RunAction()
   snprintf(configuration_filename_, sizeof(configuration_filename_),
            "IOconfiguration.mac");
   snprintf(output_directory_, sizeof(output_directory_),
-           "/home/bfenker/geant4_workdir/K37Build");
+           "/home/bfenker/geant4_workdir/K37");
 
   outFileName = "old_analysis_manager";
   // manager automatically
@@ -339,11 +339,11 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   RegisterChannel(ttlbit_op_beam_);
   RegisterChannel(upper_pmt_particle_);
   RegisterChannel(lower_pmt_particle_);
-
+  cout << "Done registering channels" << endl;
   the_aggregator_ -> RegisterIOMethod(configuration_filename_);
   // the_aggregator_ -> RegisterIOMethod("ScreenIO.mac");
   the_aggregator_ -> BeginRun();
-
+  cout << "Done with BeginRun" << endl;
   // test_channel_ -> InsertData(10.0);
   // the_aggregator_ -> EndEvent();
 

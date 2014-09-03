@@ -5,6 +5,7 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Track.hh"
+#include "G4SDManager.hh"
 #include "G4Step.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4VTouchable.hh"
@@ -34,18 +35,19 @@ K37StripDetectorSD::~K37StripDetectorSD() {
 }
 
 void K37StripDetectorSD::Initialize(G4HCofThisEvent* HCE) {
-  static int HCID = -1;
+  //  static int HCID = -1;
   dedx1Collection =
     new K37StripDetectorHitsCollection(SensitiveDetectorName,
                                        collectionName[0]);
   // if(HCID<0)
   // { HCID = GetCollectionID(0); }
-  if (SensitiveDetectorName == "dsssdPlusZ") {
-    HCID = 2;
-  } else if (SensitiveDetectorName == "dsssdMinusZ") {
-    HCID = 3;
-  }
-  HCE->AddHitsCollection(HCID, dedx1Collection);
+  // if (SensitiveDetectorName == "dsssdPlusZ") {
+  //   HCID = 2;
+  // } else if (SensitiveDetectorName == "dsssdMinusZ") {
+  //   HCID = 3;
+  // }
+  HCE->AddHitsCollection(G4SDManager::GetSDMpointer() ->
+                         GetCollectionID(collectionName[0]), dedx1Collection);
 }
 
 

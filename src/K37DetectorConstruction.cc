@@ -20,7 +20,6 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4Material.hh"
 #include "G4MaterialTable.hh"
-#include "G4MultiFunctionalDetector.hh"
 #include "G4NistManager.hh"
 #include "G4PSEnergyDeposit.hh"
 #include "G4PVParameterised.hh"
@@ -69,7 +68,8 @@ K37DetectorConstruction::K37DetectorConstruction()
       chamber_box_(0), chamber_log_(0), chamber_phys_(0), electron_mcp_tub_(0),
       electron_mcp_log_(0), electron_mcp_phys_(0), electron_mcp_sens_(0),
       recoil_mcp_tub_(0), recoil_mcp_log_(0), recoil_mcp_phys_(0),
-      recoil_mcp_sens_(0), detectorMessenger(0), mirror_log(0),
+  recoil_mcp_sens_(0), be_scorer_(0),
+  detectorMessenger(0), mirror_log(0),
       MirrorMaterial(0), FullEnergyDetectorMaterial(0), DeDxDetectorMaterial(0),
       SiliconDetectorFrameMaterial(0), ChamberMaterial(0), FoilMaterial(0),
       HoopMaterial(0), MirrorMountMaterial(0), CoilsMetal(0),CoilsLiquid(0),
@@ -108,7 +108,7 @@ K37DetectorConstruction::K37DetectorConstruction()
   // Placement from detectorDrawing.pdf
   mirror.inner_radius = 0.0*inch;       // Its solid - duh
   mirror.outer_radius = 1.2*inch;       // 30-Jan-2014 meeting
-  mirror.length = 0.25 * mm;            // 30-Jan-2014 meeting
+  mirror.length = 0.275 * mm;            // 30-Jan-2014 meeting
   mirror.rotation_angle = 9.5*deg;      // 30-Jan-2014 meeting
   // Mirror mount dimensions from collimator_back.pdf & collimator_front.pdf
   mirror_mount.inner_radius = 0.0*inch; // Solid to start
@@ -293,6 +293,7 @@ K37DetectorConstruction::K37DetectorConstruction()
     makeCoils = true;
     make_r_mcp_ = true;
     make_sd_holders_ = true;
+    make_beryllium_foils_ = true;
 }
 
 K37DetectorConstruction::~K37DetectorConstruction() {
@@ -370,6 +371,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
       volumes can be added and subtracted more easily.
       ------------------------------------------------------------------------*/
     G4SDManager* SDman = G4SDManager::GetSDMpointer();
+
     // G4double world_x = 1.0*m;
     // G4double world_y = 1.0*m;
     // G4double world_z = 1.0*m;
@@ -400,7 +402,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeElectronMCP) ConstructElectronMCP(SDman);
     if (makeCoils) ConstructCoils();
     if (make_r_mcp_) ConstructRecoilMCP(SDman);
-
+    if (make_beryllium_foils_) ConstructBerylliumFoils(SDman);
     return world_phys_;
 }
 
@@ -530,6 +532,7 @@ void K37DetectorConstruction::ConstructScintillators(G4SDManager* SDman) {
 
   if (!upper_scintillator_sens_) {
     upper_scintillator_sens_ = new K37ScintillatorSD(fullenergy1SDname);
+    
     SDman->AddNewDetector(upper_scintillator_sens_);
   }
 
@@ -1089,8 +1092,10 @@ void K37DetectorConstruction::ConstructChamber() {
                     -1.0*reentrant_flange_descender.center_position,
                     RFD_log, "RFD_minusZ_phys", world_log_, false, 0,
                     check_all_for_overlaps_);
+}  // End construct chamber
 
-  // ------------------------------ beryllium declared here so that a
+void K37DetectorConstruction::ConstructBerylliumFoils(G4SDManager *SDman) {
+    // ------------------------------ beryllium declared here so that a
   // socket could be cut out for it
   G4VSolid * beryllium_sol = new G4Tubs("beryllium_sol",
                                         beryllium_window.inner_radius,
@@ -1112,12 +1117,15 @@ void K37DetectorConstruction::ConstructChamber() {
 
   beryllium_log -> SetVisAttributes(beryllium_logVisAttributes);
 
-  // Set up primitive scorer for mirror
-  G4MultiFunctionalDetector *be_scorer = new G4MultiFunctionalDetector("BeWindowEnergyScorer");
-  G4VPrimitiveScorer *edep_sens = new G4PSEnergyDeposit("Edep");
-  be_scorer -> RegisterPrimitive(edep_sens);
-  beryllium_log -> SetSensitiveDetector(be_scorer);
-  G4SDManager::GetSDMpointer() -> AddNewDetector(be_scorer);
+  // Set up primitive scorer for beryllium
+  if (!be_scorer_) {
+    be_scorer_ = new G4MultiFunctionalDetector("BeWindowEnergyScorer");
+    G4VPrimitiveScorer *edep_sens = new G4PSEnergyDeposit("Edep");
+    be_scorer_ -> RegisterPrimitive(edep_sens);
+    SDman -> AddNewDetector(be_scorer_);
+  }
+  beryllium_log -> SetSensitiveDetector(be_scorer_);
+
 
   new G4PVPlacement(0, beryllium_window.center_position,
                     beryllium_log, "beryllium_plusZ_phys", world_log_, false,
@@ -1125,7 +1133,6 @@ void K37DetectorConstruction::ConstructChamber() {
   new G4PVPlacement(0, -1.0*beryllium_window.center_position,
                     beryllium_log, "beryllium_minusZ_phys",
                     world_log_, false, 1, check_all_for_overlaps_);
-
   // ------------------------------ Front Face Reentrant Flange (FFRF)
 
   G4VSolid * FFRF_beforeCut_sol =
@@ -1165,7 +1172,7 @@ void K37DetectorConstruction::ConstructChamber() {
                     -1.0*reentrant_flange_front_face.center_position,
                     FFRF_log, "FFRF_minusZ_phys", world_log_, false, 0,
                     check_all_for_overlaps_);
-}  // End construct chamber
+}
 
 void K37DetectorConstruction::ConstructMirrors() {
   // SiC mirrors to reflect OP light
@@ -1986,6 +1993,7 @@ void K37DetectorConstruction::SetMirrorMaterial(G4String materialChoice) {
 }
 
 void K37DetectorConstruction::UpdateGeometry() {
+  
   G4RunManager::GetRunManager() ->
     DefineWorldVolume(ConstructK37Experiment());
 }

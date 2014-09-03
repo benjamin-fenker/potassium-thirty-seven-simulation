@@ -6,6 +6,7 @@
 #include <CLHEP/Vector/Rotation.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 #include "G4Box.hh"
+#include "G4MultiFunctionalDetector.hh"
 #include "G4SDManager.hh"
 #include "G4SubtractionSolid.hh"
 #include "G4Tubs.hh"
@@ -99,6 +100,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructRecoilMCP(G4SDManager *sd_man);
   void ConstructCoils();        // Not a sensitive detector
   void ConstructAir();          // Not a sensitive detector
+void ConstructBerylliumFoils(G4SDManager* SDman);
   void DefineMaterials();
 
   G4Material* world_material_;          // default is vacuum
@@ -150,6 +152,8 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   G4VPhysicalVolume *recoil_mcp_phys_;      // pointer to the physcial rMCP
   K37RecoilMCPSD *recoil_mcp_sens_;         // pointer to the sensitive rMCP
 
+  G4MultiFunctionalDetector *be_scorer_;   // pointer to the sensitive Be
+  
   K37DetectorMessenger* detectorMessenger;  // pointer to the Messenger
   G4LogicalVolume * mirror_log;
   G4Material* MirrorMaterial;
@@ -231,6 +235,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   // individual effects
   G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
   G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_, make_sd_holders_;
+  G4bool make_beryllium_foils_;
 
   GeometryElement mirror;
   GeometryElement mirror_mount;

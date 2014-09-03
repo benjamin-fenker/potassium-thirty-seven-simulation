@@ -4,6 +4,7 @@
 #include "K37ElectronMCPHit.hh"
 #include "G4Step.hh"
 #include "G4HCofThisEvent.hh"
+#include "G4SDManager.hh"
 #include "G4TouchableHistory.hh"
 
 K37ElectronMCPSD::K37ElectronMCPSD(G4String name)
@@ -17,7 +18,9 @@ void K37ElectronMCPSD::Initialize(G4HCofThisEvent* hit_collection_this_event) {
   emcp_hit_collection_ =
       new K37ElectronMCPHitsCollection(SensitiveDetectorName,
                                        collectionName[0]);
-  hit_collection_this_event -> AddHitsCollection(4, emcp_hit_collection_);
+  hit_collection_this_event ->
+      AddHitsCollection(G4SDManager::GetSDMpointer() ->
+                        GetCollectionID("eMCP_HC"), emcp_hit_collection_);
 }
 
 G4bool K37ElectronMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {

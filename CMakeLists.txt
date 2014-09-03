@@ -16,7 +16,7 @@ FUNCTION(WarningAsError)
    ENDIF()
 ENDFUNCTION()
 
-OPTION(K37_WARNINGS_AS_ERROR "Force compilation ot treat warnings as errors." OFF)
+OPTION(K37_WARNINGS_AS_ERROR "Force compilation to treat warnings as errors." OFF)
 
 IF(K37_WARNINGS_AS_ERROR)
    WarningAsError()
