@@ -174,6 +174,7 @@ void K37EventAction::BeginOfEventAction(const G4Event* ev) {
 
   energyDedx = 0;
   energyDedx_Primaries = 0;
+
   energyDedx_Secondaries = 0;
 
   energyDedx2 = 0;
@@ -289,11 +290,18 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   K37RecoilMCPHitsCollection* recoil_mcp_hit_collection = 0;
   K37ElectronMCPHitsCollection* electron_mcp_hit_collection = 0;
 
-  
+  // for (int i = 0; i < hit_collection -> GetCapacity(); i++) {
+  //   G4VHitsCollection *h = hit_collection -> GetHC(i);
+  //   if (h) G4cout << "SDname: " << h -> GetSDname() << G4endl;
+  // }
+  // int j;
+  // G4cin >> j;
+
   if (hit_collection) {
     recoil_mcp_hit_collection =
         static_cast<K37RecoilMCPHitsCollection*>(hit_collection ->
                                               GetHC(recoil_mcp_collection_id));
+    //    G4cout << recoil_mcp_hit_collection -> entries() << G4endl;
     electron_mcp_hit_collection =
         static_cast<K37ElectronMCPHitsCollection*>(hit_collection ->
                                            GetHC(electron_mcp_collection_id));
@@ -434,7 +442,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
       // for (G4int i = 0; i < recoil_mcp_hit_collection -> entries(); i++) {
       //   G4cout << "Ion Hit " << i << " at time "
       //          << G4BestUnit(recoil_mcp_time, "Time") << G4endl;
-      // }
+      //      }
     } else {
       // G4cout << "Got no hits in rMCP!" << G4endl;
       recoil_mcp_x_pos = 0.0;
@@ -470,7 +478,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   if (upper_scintillator_digitizer -> IsTriggered() ||
       lower_scintillator_digitizer -> IsTriggered() ||
       electron_mcp_energy > electron_mcp_threshold_) {
-    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+    //    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
 
   //if (energyUpperScint_Total > 1*MeV ||
           //energyLowerScint_Total > 1*MeV ||
@@ -625,6 +633,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   else //Event did not pass trigger
   {
      the_aggregator_ -> EndEvent(false);
+        G4EventManager::GetEventManager()->KeepTheCurrentEvent();
   }
   //PrintEvent(evt);
   //  G4cout << "<><><><><><><><><><><><><><><>" << G4endl;

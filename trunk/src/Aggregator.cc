@@ -133,7 +133,7 @@ void Aggregator::ImplementAGG::OpenOutputChannel(const std::string &method_,
       theNTuple = 0;
     }
 
-    rootFile = new TFile(fileName_.c_str(), "RECREATE", "", 0);
+    rootFile = new TFile(fileName_.c_str(), "RECREATE");//, "", 0);
     theNTuple = new TTree("ntuple", "TheTuple");
     std::string columnName;
     std::string typeBit;

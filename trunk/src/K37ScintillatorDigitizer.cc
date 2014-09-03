@@ -68,7 +68,7 @@ void K37ScintillatorDigitizer::ApplyResolution() {
   // measured detector resolution.  It overwrites the energy_dep_*
   // variables.  After this function, information about the true
   // energy of the event is lost
-
+  G4cout << "Applying resolution..." << G4endl;
   // Resolution of detector at given energy is equal to...
   // res^2 = sigma0^2 + lambda*Energy
   G4double res_total = sqrt(pow(resolution_sigma0, 2.0) +

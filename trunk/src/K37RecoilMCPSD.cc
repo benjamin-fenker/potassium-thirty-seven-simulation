@@ -2,6 +2,7 @@
 // Authors: Spencer Behling and Benjamin Fenker 2013
 
 #include "G4HCofThisEvent.hh"
+#include "G4SDManager.hh"
 #include "G4Step.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4TouchableHistory.hh"
@@ -22,7 +23,9 @@ void K37RecoilMCPSD::Initialize(G4HCofThisEvent* hit_collection_this_event) {
   rmcp_hit_collection_ =
       new K37RecoilMCPHitsCollection(SensitiveDetectorName,
                                        collectionName[0]);
-  hit_collection_this_event -> AddHitsCollection(5, rmcp_hit_collection_);
+  hit_collection_this_event ->
+      AddHitsCollection(G4SDManager::GetSDMpointer() ->
+                        GetCollectionID("rMCP_HC"), rmcp_hit_collection_);
 }
 
 G4bool K37RecoilMCPSD::ProcessHits(G4Step *step, G4TouchableHistory*) {
