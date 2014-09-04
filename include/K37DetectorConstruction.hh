@@ -71,7 +71,29 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void SetMirrorMaterial(G4String);
   void PrintMaterialList();
 
-  void SetMakeChamber(G4bool f) {makeChamber = f;}
+  void SetMakeChamber(G4bool f) {
+     if((makeSimpleChamber == true) && (f == true) )
+     {
+        G4cerr<<"Cannot make chamber and simple chamber simultanously."<<G4endl;
+        G4cerr<<"Turn off simple chamber and try again."<<G4endl;
+     }
+     else
+     {
+        makeChamber = f;
+     }
+  }
+  void SetMakeSimpleChamber(G4bool f) {
+     if(( makeChamber == true) && (f == true) )
+     {
+        G4cerr<<"Cannot make chamber and simple chamber simultanously."<<G4endl;
+        G4cerr<<"Turn off chamber and try again."<<G4endl;
+     }
+     else
+     {
+        makeSimpleChamber = f;
+     }
+  }
+
   void SetMakeMirrors(G4bool f) {makeMirrors = f;}
   void SetMakeHoops(G4bool f) {makeHoops = f;}
   void SetMakeElectronMCP(G4bool f) {makeElectronMCP = f;}
@@ -94,6 +116,7 @@ class K37DetectorConstruction : public G4VUserDetectorConstruction {
   void ConstructScintillators(G4SDManager* SDman);
   void ConstructStripDetectors(G4SDManager* SDman);
   void ConstructChamber();      // Not a sensitive detector
+  void ConstructSimpleChamber();// Not a sensitive detector
   void ConstructMirrors();      // Not a sensitive detector
   void ConstructHoops();        // Not a sensitive detector
   void ConstructElectronMCP(G4SDManager *sd_man);
@@ -235,8 +258,10 @@ void ConstructBerylliumFoils(G4SDManager* SDman);
   // individual effects
   G4bool makeScintillators, makeStripDetectors, makeChamber, makeMirrors;
   G4bool makeHoops, makeElectronMCP, makeCoils, make_r_mcp_, make_sd_holders_;
-  G4bool make_beryllium_foils_;
+  G4bool make_beryllium_foils_, makeSimpleChamber;
 
+  GeometryElement simpleChamberTub;
+  GeometryElement simpleChamberRentrantFlangeCut;
   GeometryElement mirror;
   GeometryElement mirror_mount;
   GeometryElement sd_frame;

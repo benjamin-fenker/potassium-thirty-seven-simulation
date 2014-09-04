@@ -63,6 +63,13 @@ K37DetectorMessenger::K37DetectorMessenger(K37DetectorConstruction* myDet)
     make_chamber_cmd_ -> SetDefaultValue(true);
     make_chamber_cmd_ -> AvailableForStates(G4State_PreInit, G4State_Idle);
 
+    make_simple_chamber_cmd_ =
+        new G4UIcmdWithABool("/K37/geometry/setMakeSimpleChamber", this);
+    make_simple_chamber_cmd_ -> SetGuidance("Include simple chamber in simulation?");
+    make_simple_chamber_cmd_ -> SetParameterName("make_simple_chamber", true);
+    make_simple_chamber_cmd_ -> SetDefaultValue(true);
+    make_simple_chamber_cmd_ -> AvailableForStates(G4State_PreInit, G4State_Idle);
+
     make_mirrors_cmd_ =
         new G4UIcmdWithABool("/K37/geometry/setMakeMirrors", this);
     make_mirrors_cmd_ -> SetGuidance("Include mirrors in simulation?");
@@ -147,6 +154,7 @@ K37DetectorMessenger::~K37DetectorMessenger() {
     delete UpdateGeometryCommand;
     delete PrintAvailableMaterials;
     delete make_chamber_cmd_;
+    delete make_simple_chamber_cmd_;
     delete make_mirrors_cmd_;
     delete make_hoops_cmd_;
     delete make_electron_mcp_cmd_;
@@ -177,6 +185,9 @@ void K37DetectorMessenger::SetNewValue(G4UIcommand* command,
     }
     if (command == make_chamber_cmd_) {
       myDetector->SetMakeChamber(make_chamber_cmd_->GetNewBoolValue(newValue));
+    }
+    if (command == make_simple_chamber_cmd_) {
+      myDetector->SetMakeSimpleChamber(make_simple_chamber_cmd_->GetNewBoolValue(newValue));
     }
     if (command == make_mirrors_cmd_) {
       myDetector->SetMakeMirrors(make_mirrors_cmd_->GetNewBoolValue(newValue));
