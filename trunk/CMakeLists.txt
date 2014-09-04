@@ -81,11 +81,11 @@ ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src/auxiliary aux)
 # Add the executable, and link it to the Geant4 libraries
 
 # AFTER the G4/ROOT setups, add the necessary c++ flags
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+#SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 #SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror" )
 #SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register" )
-SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" )
-SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3 -DNDEBUG" )
+#SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0" )
+#SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -O3 -DNDEBUG" )
 
 add_executable(K37 K37.cc ${sources} ${headers})
 target_link_libraries(K37 ${Geant4_LIBRARIES} Core RIO Tree)
