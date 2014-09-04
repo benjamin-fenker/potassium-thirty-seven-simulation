@@ -122,6 +122,17 @@ K37DetectorConstruction::K37DetectorConstruction()
   mirror_mount.cutout_radius = 2.441/2.0 * inch;
   mirror_mount.cutout_depth = 0.040 * inch;
 
+
+  // ***********************************************************
+  // The dimensions on the drawing are given in diameter. 
+  simpleChamberTub.inner_radius = (11.75/2.0)*inch;
+  simpleChamberTub.outer_radius = (12.5/2.0)*inch;
+  simpleChamberTub.length       = 22.0*inch;
+
+  simpleChamberRentrantFlangeCut.inner_radius = 0.0*inch; //Solid for cut
+  simpleChamberRentrantFlangeCut.outer_radius = (4.2/2.0)*inch;
+  simpleChamberRentrantFlangeCut.length       = 13.0*inch;
+
   // ***********************************************************
   // These are the coil dimensions outlined in /Drawings/cros-coil.png
   // I will use the unit cm here because that is what gets injected 
@@ -287,6 +298,7 @@ K37DetectorConstruction::K37DetectorConstruction()
     makeScintillators = true;     // Must be true!
     makeStripDetectors = true;    // Must be true!
     makeChamber = true;
+    makeSimpleChamber = false;
     makeMirrors = true;
     makeHoops = true;
     makeElectronMCP = true;
@@ -397,6 +409,7 @@ G4VPhysicalVolume* K37DetectorConstruction:: ConstructK37Experiment() {
     if (makeScintillators) ConstructScintillators(SDman);
     if (makeStripDetectors) ConstructStripDetectors(SDman);
     if (makeChamber) ConstructChamber();
+    if (makeSimpleChamber) ConstructSimpleChamber();
     if (makeMirrors) ConstructMirrors();
     if (makeHoops) ConstructHoops();
     if (makeElectronMCP) ConstructElectronMCP(SDman);
@@ -778,6 +791,105 @@ void K37DetectorConstruction::ConstructAir() {
 
   new G4PVPlacement(0, -1.0*pos, air_log_mins_, "air_mins_z", world_log_,
                     false, 0, check_all_for_overlaps_);
+}
+
+void K37DetectorConstruction::ConstructSimpleChamber()
+{
+
+  G4Tubs* Chamber_sol = new G4Tubs("Chamber_sol",
+        simpleChamberTub.inner_radius,
+        simpleChamberTub.outer_radius,
+        simpleChamberTub.length/2.0,
+        0.0*deg,
+        360.0*deg);
+
+  G4Tubs* RentrantCut_sol = new G4Tubs("RentrantCut_sol",
+        simpleChamberRentrantFlangeCut.inner_radius,
+        simpleChamberRentrantFlangeCut.outer_radius,
+        simpleChamberRentrantFlangeCut.length/2.0,
+        0.0*deg,
+        360.0*deg);
+
+  //G4Tubs* CFTVDP_sol = new G4Tubs("CFTVDP_sol", 0.0, (106.68/2.0)*mm,
+                                  //(510.0/2.)*mm, 0.0*deg, 360.0*deg);
+
+  G4ThreeVector noChange(0, 0, 0);
+
+  G4SubtractionSolid* ChamberCut1_sol =
+    new G4SubtractionSolid("ChamberCut1_sol",
+    Chamber_sol, RentrantCut_sol, changeZtoX, noChange);
+
+  chamber_log_ = new G4LogicalVolume(ChamberCut1_sol, ChamberMaterial,
+                                     "chamber_log", 0, 0, 0);
+
+  chamber_phys_ = new G4PVPlacement(changeZtoX,
+        noChange,
+        chamber_log_,
+        "chamber_phys",
+        world_log_,
+        false,
+        0,
+        check_all_for_overlaps_);
+
+  chamber_logVisAttributes = new G4VisAttributes(
+         G4Colour(255/255., 170/255., 0, 0.1));
+
+  //chamber_logVisAttributes-> SetForceWireframe(true);
+  chamber_logVisAttributes-> SetForceSolid(true);
+  chamber_log_ -> SetVisAttributes(chamber_logVisAttributes);
+
+  // ------------------------------ Reentrant Flanges for beta-telescope
+  // (z+ and z-) (OPRF)
+
+  G4VSolid * OPRF_sol = new G4Tubs("OPRF_sol",
+                                   reentrant_flange_pipe.inner_radius,
+                                   reentrant_flange_pipe.outer_radius,
+                                   reentrant_flange_pipe.length/2.0,
+                                   0.0*deg, 360.0*deg);
+
+  G4LogicalVolume * OPRF_log = new G4LogicalVolume(OPRF_sol,
+                                                   ChamberMaterial,
+                                                   "OPRF_log", 0, 0, 0);
+
+  new G4PVPlacement(0, reentrant_flange_pipe.center_position, OPRF_log,
+                    "OPRF_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
+  new G4PVPlacement(0, -1.0*reentrant_flange_pipe.center_position, OPRF_log,
+                    "OPRF_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
+  OPRF_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
+  OPRF_logVisAttributes-> SetForceSolid(true);
+  //  chamber_logVisAttributes-> SetForceWireframe(true);
+  OPRF_log -> SetVisAttributes(OPRF_logVisAttributes);
+
+  // ------------------------------ Reentrant Flange Descender (RFD)
+
+  G4VSolid * RFD_sol = new G4Cons("RFD_sol",
+                                  reentrant_flange_descender.inner_radius,
+                                  reentrant_flange_descender.outer_radius,
+                                  reentrant_flange_descender.inner_radius2,
+                                  reentrant_flange_descender.outer_radius2,
+                                  reentrant_flange_descender.length/2.0,
+                                  0.0*deg, 360.0*deg);
+  G4LogicalVolume* RFD_log = new G4LogicalVolume(RFD_sol, ChamberMaterial,
+                                                 "RFD_log", 0, 0, 0);
+  RFD_logVisAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5, 0.5));
+  RFD_logVisAttributes-> SetForceSolid(true);
+  RFD_log -> SetVisAttributes(RFD_logVisAttributes);
+
+  new G4PVPlacement(0, reentrant_flange_descender.center_position,
+                    RFD_log, "RFD_plusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
+
+
+  // G4RotationMatrix* RFDRotation = new G4RotationMatrix();
+  RFDRotation = new CLHEP::HepRotation();
+  RFDRotation->rotateX(180.*deg);
+
+  new G4PVPlacement(RFDRotation,
+                    -1.0*reentrant_flange_descender.center_position,
+                    RFD_log, "RFD_minusZ_phys", world_log_, false, 0,
+                    check_all_for_overlaps_);
 }
 
 void K37DetectorConstruction::ConstructChamber() {

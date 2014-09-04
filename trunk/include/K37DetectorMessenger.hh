@@ -31,6 +31,7 @@ class K37DetectorMessenger: public G4UImessenger {
   G4UIcmdWithoutParameter* UpdateGeometryCommand;
   G4UIcmdWithoutParameter* PrintAvailableMaterials;
   G4UIcmdWithABool *make_chamber_cmd_;
+  G4UIcmdWithABool *make_simple_chamber_cmd_;
   G4UIcmdWithABool *make_mirrors_cmd_;
   G4UIcmdWithABool *make_hoops_cmd_;
   G4UIcmdWithABool *make_electron_mcp_cmd_;
