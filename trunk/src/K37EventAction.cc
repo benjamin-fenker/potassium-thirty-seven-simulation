@@ -366,8 +366,8 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
 
   energyLowerScint_Gamma = lower_scintillator_digitizer -> GetEnergyGamma();
   energyLowerScint_AllElse = lower_scintillator_digitizer -> GetEnergyOther();
-  time_upper_scintillator = upper_scintillator_digitizer -> GetHitTime();
-  upper_scintillator_pdg = upper_scintillator_digitizer -> GetParticleCode();
+  time_lower_scintillator = lower_scintillator_digitizer -> GetHitTime();
+  lower_scintillator_pdg = lower_scintillator_digitizer -> GetParticleCode();
   // ------------------------------------------------------------
 
   // ************************************************************
