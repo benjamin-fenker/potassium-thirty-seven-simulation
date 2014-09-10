@@ -181,8 +181,8 @@ class K37RunAction : public G4UserRunAction {
 
   // ROOT output filename
   G4String outFileName;
-  char configuration_filename_[200];
-  char output_directory_[200];
+  char configuration_filename_[400];
+  char output_directory_[400];
 
   // Event generator testing 1/18/2013
   //  G4int numPlus, numMinus;

@@ -265,7 +265,7 @@ void K37RunAction::BeginOfRunAction(const G4Run* aRun) {
   //
   // G4String fileName = "K37";
   FILE *io_file;
-  char data_type[80], out_file[80];
+  char data_type[200], out_file[200];
   io_file = fopen(GetConfigurationFileName(), "r");
   int result = fscanf(io_file, "%s %s", data_type, out_file);
   if (result != 2) {
