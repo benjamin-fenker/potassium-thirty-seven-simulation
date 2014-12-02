@@ -341,10 +341,11 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
   // -------------------- Query the upper scintillator
   // ************************************************************
   energyUpperScint_Total = upper_scintillator_digitizer -> GetEnergyTotal();
+  if (energyUpperScint_Total > 350*keV)
+    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
   //  G4cout << "Scintillator: " << energyUpperScint_Total/keV << " keV\t";
   energyUpperScint_Electron =
       upper_scintillator_digitizer -> GetEnergyElectron();
-
   energyUpperScint_Positron =
       upper_scintillator_digitizer -> GetEnergyPositron();
 
@@ -419,7 +420,7 @@ void K37EventAction::EndOfEventAction(const G4Event* evt) {
         << upper_strip_detector_digitizer -> GetParticleCode() << "\t"
         << energyLowerSilicon_Total/keV << "\t"
         << lower_strip_detector_digitizer -> GetParticleCode() << G4endl;
-    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
+    //    G4EventManager::GetEventManager()->KeepTheCurrentEvent();
     ofs.close();
   }
   // ------------------------------------------------------------
