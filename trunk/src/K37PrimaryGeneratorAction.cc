@@ -359,7 +359,19 @@ void K37PrimaryGeneratorAction::SetPolarization(G4double pol) {
 }
 
 void K37PrimaryGeneratorAction::SetAlignment(G4double ali) {
-  if (fabs(ali) <= 1.0) {
+  if (ali <= 1.0 && ali >= 0.0) {
+    alignment_ = ali;
+  } else if (ali < 0.0 && ali >= -1.0) {
+    ali = fabs(ali);
+    G4cout << "WARNING: Alignment must be positive (for both polarization states)";
+    G4cout << G4endl;
+    G4cout << "Note that this sign convention is opposite that in JTW 1957 and that";
+    G4cout << G4endl;
+    G4cout << "this change is fully documented in the \"JTWEvent.cc\" source file";
+    G4cout << G4endl;
+    G4cout << "*********************************************************" << G4endl;
+    G4cout << "   Setting alignment to T = +" << ali << G4endl;
+    G4cout << "*********************************************************" << G4endl;
     alignment_ = ali;
   } else {
     G4cout << "WARNING: Alignment " << ali

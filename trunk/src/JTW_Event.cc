@@ -132,8 +132,30 @@ void JTW_Event::MakeEvent(G4double polarization, G4double alignment,
       BigA    = the_StandardModel_37K->A_beta   (electron.T);
       BigB    = the_StandardModel_37K->B_nu     (electron.T);
       LittleC = the_StandardModel_37K->c_align  (electron.T);
-      LittleA = the_StandardModel_37K->a_beta_nu(electron.T);
+      //      LittleA = the_StandardModel_37K->a_beta_nu(electron.T);
+      /* cludged to vary little a and see the results */
+      LittleA = 0.6661 * 1.1;
 
+      // ***********************************************************************
+      // ***********************************************************************
+      /* IMPORTANT NOTE: The sign convention chosen for the alignment
+         term is such that the alignment given in the configuration
+         file should be POSITIVE.  If you look at the equation below,
+         the alignment terms (LittlceC) has the opposite sign as in
+         JTW.  Second, if you look at the alignment coefficient given
+         by JTW, the sign is always negative.  Therefore, the sign you
+         must always supply here is POSITIVE.  Basically, Spencer has
+         pulled the minus sign out of the second square bracket term
+         of JTW and put it in front of the "c"
+
+         As this relates to OP conventions, here are the results --> 
+         s3 > 0 ---> P > 0, T_{JTW} = T_{OP} < 0, T_{G4} > 0
+         s3 < 0 ---> P < 0, T_{JTW} = T_{OP} < 0, T_{G4} > 0
+      */
+      // ***********************************************************************
+      // ***********************************************************************
+
+      
       Omega = (1.0/(4.0*pow(M_PI, 3.0)))
         *(FF->getVFF(electron.T))
         *electron.Pmag
